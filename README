@@ -1,0 +1,19 @@
+SCORM_API
+Hi, the JavaScript portion of this project is split into the following sections:
+
+SCORM_API.js - This is the main 'long-hand' SCORM 2004 with some additions to rollback to SCORM 1.2.  Please note I've only taken the 1.2 rollback so far, as it was needed on another project I worked on.  There will be cases where there just isn't enough space to store some items if your going from 2004 to 1.2.  Ok fair warning, next.
+
+SCOBOT.js - This is a boiled down series of API's that do common things we all do in a Shareable Content Object.  This is currently a work in progress.
+
+Local_API_1484_11.js - This is a LMS mimic as boiled down as I could get.  Its not the most strict so don't expect it to throw every single error right now.  It keeps the entire CMI object and console logs the JSON object so you can view whats changed during local testing.
+
+You could just use the SCORM_API.js and get down the road.  But, what I've found is you commonly do things that will have to re-entering several bits of this code anyway. I'm leaving the SCOBOT open to additions and something that can be customizable.  If anything maybe just something to springboard off of.
+
+Commonly missed onload, unload events.  There is a js/util/events.js for now that will set up some base examples for hooking into your start and exit.
+
+qunit_SCORM_API.html - This will run a series of 80+ tests against SCORM which include some local debug, gets and sets as well as classic Initialize, GetValue, SetValue, Commit and Terminate.  Even some illegal calls.  This whole package is great to run on a LMS to view if the LMS is compliant with SCORM.
+The test for this is found at 'js/test/scorm_api.js'.
+
+There are additional HTML based 'read me' files I've written up over the months I worked on this.  I based much the work on the fact that it's been many many years since SCORM 2004, and JavaScript has come quite a ways since those days.  Getting this into JSLint, QUnit and some more structured code made good solid sense to me.
+
+I will add more as it becomes available.
