@@ -16,4 +16,6 @@ The test for this is found at 'js/test/scorm_api.js'.
 
 There are additional HTML based 'read me' files I've written up over the months I worked on this.  I based much the work on the fact that it's been many many years since SCORM 2004, and JavaScript has come quite a ways since those days.  Getting this into JSLint, QUnit and some more structured code made good solid sense to me.
 
+In action at http://hivelms.com/test.html *see QUnit SCO.
+
 I will add more as it becomes available.
