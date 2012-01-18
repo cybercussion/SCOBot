@@ -9,7 +9,8 @@ Local_API_1484_11.js - This is a LMS mimic as boiled down as I could get.  Its n
 
 You could just use the SCORM_API.js and get down the road.  But, what I've found is you commonly do things that will have to re-entering several bits of this code anyway. I'm leaving the SCOBOT open to additions and something that can be customizable.  If anything maybe just something to springboard off of.
 
-Commonly missed onload, unload events.  There is a js/util/events.js for now that will set up some base examples for hooking into your start and exit.
+About commonly missed onload, unload events:  There is a js/util/events.js for now that will set up some base examples for hooking into your start and exit.
+You normally want to fire up SCORM when the page loads, and exit gracefully.  There are obviously many levels to this (caring), and commonly you want to choose your default exit strategy.  You may suspend, you may also finish.  Scoring, and completion status as well as success status play a part here as well.  Again, this is just the tip of the ice-burg but whether your making a glorified powerpoint or actually have some assessments, interactions and real scoring taking place, you can choose your path.
 
 qunit_SCORM_API.html - This will run a series of 80+ tests against SCORM which include some local debug, gets and sets as well as classic Initialize, GetValue, SetValue, Commit and Terminate.  Even some illegal calls.  This whole package is great to run on a LMS to view if the LMS is compliant with SCORM.
 The test for this is found at 'js/test/scorm_api.js'.
