@@ -266,7 +266,45 @@ function SCOBOT(options) {
 	};
 	
 	/**
-	 * Set (Internal API)
+	 * Set Interaction
+	 * This will set an interaction based on Journaling or State.
+	 * Parameter for choosing a version is located in the defaults.
+	 * Note: If you are recording Journaling make sure its something the LMS
+	 * supports or plans to support, or your just blimping out your interactions array 
+	 * for no reason.
+	 * You may ask what is "real(10,7)".  This is a binary floating point with a precision up to 7 characters to the right of the decimal.
+	 * Example Data Object:
+	 * data = {
+	 *	id: '1',                             // 4000 chars
+	 *	type: 'true_false',                  // (true_false, multiple_choice, fill_in, long_fill_in, matching, performance, sequencing, likert, numeric, other)
+	 *	objectives: [
+	 *		{
+	 *			id: '12'	
+	 *		}
+	 *	],
+	 *	timestamp: '22',                     // second(10,0)
+	 *	correct_responses: [
+	 *		{
+	 *			pattern: ''
+	 *		}
+	 *	],
+	 *	weighting: '1',
+	 *	learner_response: 'true',
+	 *	result: 'correct',                   // (correct, incorrect, unanticipated, neutral, real (10,7) )
+	 *	latency: '12.2',                     // second(10,2)
+	 *	description: "The question commonly" // 250 chars
+	 * }
+	 * @param data {Object}
+	 */
+	this.setInteraction = function(data) {
+		var count;
+		
+	};
+	
+	
+	
+	/**
+	 * Set
 	 * This locally sets values local to this API
 	 * @param n {String} name
 	 * @param v (String,Number,Object,Array,Boolean} value
@@ -287,7 +325,7 @@ function SCOBOT(options) {
 		return (isError !== 0) ? false : true;
 	};
 	/**
-	 * Get (Internal API)
+	 * Get 
 	 * This locally gets values local to this API
 	 * @param n {String} name
 	 * @returns value
