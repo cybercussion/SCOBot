@@ -1,10 +1,12 @@
-/*global $, JQuery, scorm, DEFAULT_SUCCESS_STATUS */
-
+/*global $, JQuery, scorm, unescape */
+/*jslint browser: true */
 /**
  * This is a sample SCORM Startup sequence and handicap API's for ease of use.
  * General Concept: When the LMS connects, call var SB = new SCOBOT();
  * SCOBOT
  * This only works with the SCORM_API, but has the basis to work with other API's.
+ * Several public API's will call one to many SCORM Calls and this will make every attempt
+ * to do common SCORM Tasks or boil down SCORM tasks into a smaller easy to use method.
  * Mode: {get} Browse, Review, Normal
  * Bookmark: {get/set} SCO Progress
  * Suspend Data: {get/set} Suspend Data Object
@@ -37,20 +39,25 @@
 function SCOBOT(options) {
 	// Constructor ////////////
 	var defaults = {
-		version : "1.0",
-		createDate : "04/07/2011 09:33AM",
-		modifiedDate : "04/29/2011 09:21AM",
-		prefix : "SCOBOT"
+		version: "1.0",
+		createDate: "04/07/2011 09:33AM",
+		modifiedDate: "02/01/2012 13:08AM",
+		prefix: "SCOBOT",
+		// SCORM buffers
+		success_status: "passed",
+		bookmark: "",
+		performance: "",
+		status: "",
+		suspend_data: "",
+		mode: ""
 	},
 	// Settings merged with defaults and extended options
-	settings     = $.extend(defaults, options), isError = false, isStarted = false, error = scorm.get('error'), // no sense retyping this
-	that         = this, // Public to Public Hook
-	//SCORM based holders/buffers for data (translations for cryptic stuff)
-	mode         = '', 
-	bookmark     = '', 
-	suspend_data = '', 
-	status       = '', 
-	performance  = '';
+	settings     = $.extend(defaults, options),
+	isError      = false,
+	isStarted    = false,
+	error        = scorm.get('error'), // no sense retyping this
+	self         = this; // Public to Public Hook
+
 
 	// End Constructor ////////
 	///////////////////////////
@@ -71,7 +78,7 @@ function SCOBOT(options) {
 	 * @returns {Boolean} based on if this value has been set (true) or (false) if not
 	 */
 	function isPerforming() {
-		if(performance !== "passed" && performance !== "failed") {
+		if(settings.performance !== "passed" && settings.performance !== "failed") {
 			return false;
 		}
 		return true;
@@ -91,31 +98,47 @@ function SCOBOT(options) {
 	/**
 	 * Start (Internal API)
 	 * Initializes the SCORM Startup, and communicates with SCORM (cruise control)
+	 * and will begin to store some common used parameters for use later.
 	 * @returns {Boolean}
 	 */
-	this.Start = function() {
+	this.start = function() {
 		scorm.debug(settings.prefix + ": I am starting...", 3);
 		if(!isStarted) {
 			isStarted = true;
-			mode = scorm.getvalue('cmi.mode');
-			bookmark = scorm.getvalue('cmi.location');
-			suspend_data = scorm.getvalue('cmi.suspend_data');
-			status = scorm.getvalue('cmi.completion_status');
-			performance = scorm.getvalue('cmi.success_status');
+			// Retrieve normal settings/parameters from the LMS
+			settings.mode         = scorm.getvalue('cmi.mode');
+			settings.bookmark     = scorm.getvalue('cmi.location');
+			settings.suspend_data = unescape(scorm.getvalue('cmi.suspend_data'));
+			/** Suspend Data technically should be a JSON String.  Structured data would be best suited to
+			 * be recorded this way.  If you don't want to do this, you'll need to back out this portion.
+			 * Also, in order to eliminate foreign keys and other special characters from messing up some
+			 * LMS's we commonly escape going out, and unescape coming in.  We may even need to base64.
+			 * !IMPORTANT- once you do this, your kinda stuck with it.  SCO's will begin to save suspend data
+			 * and if you change mid-stream your going to have to handle the fact you need to reverse support
+			 * old saved data.
+			 * GOAL: Deal with this in a managed way
+			 */
+			if(settings.suspend_data.length > 0) {
+				// Assuming a JSON String
+				settings.suspend_data = JSON.parse(settings.suspend_data); // Turn this back into a object.
+			}
+			settings.status       = scorm.getvalue('cmi.completion_status');
+			settings.performance  = scorm.getvalue('cmi.success_status');
 		} else {
 			notStartedYet();
 			return false;
 		}
 		return true;
 	};
+	
 	/**
 	 * Set Bookmark
 	 * @param v {String} value
 	 * returns {String} 'true' or 'false'.
 	 */
-	this.SetBookmark = function(v) {
+	this.setBookmark = function(v) {
 		if(isStarted) {
-			bookmark = v;
+			settings.bookmark = v;
 			// update local snapshot
 			return scorm.setvalue('cmi.location', v);
 		} else {
@@ -123,24 +146,26 @@ function SCOBOT(options) {
 			return false;
 		}
 	};
+	
 	/**
 	 * Get Bookmark
 	 * @returns {String} bookmark
 	 */
-	this.GetBookmark = function() {
+	this.getBookmark = function() {
 		if(isStarted) {
-			return bookmark;
+			return settings.bookmark;
 			// return local snapshot
 		} else {
 			notStartedYet();
 			return false;
 		}
 	};
+	
 	/**
 	 * Suspend
 	 * This will suspend the SCO and ends with terminating.  No data can be saved after this.
 	 */
-	this.Suspend = function() {
+	this.suspend = function() {
 		if(isStarted) {
 			scorm.debug(settings.prefix + ": I am suspending...", 3);
 			if(!isPerforming()) {
@@ -161,11 +186,11 @@ function SCOBOT(options) {
 	 * Finish
 	 * This will set success status, exit and completion
 	 */
-	this.Finish = function() {
+	this.finish = function() {
 		if(isStarted) {
 			scorm.debug(settings.prefix + ": I am finishing...", 3);
 			if(!isPerforming()) {
-				scorm.setvalue('cmi.success_status', DEFAULT_SUCCESS_STATUS);
+				scorm.setvalue('cmi.success_status', settings.success_status);
 			}
 			scorm.setvalue('cmi.exit', 'normal');
 			scorm.setvalue('cmi.completion_status', 'completed');
@@ -178,15 +203,16 @@ function SCOBOT(options) {
 			return false;
 		}
 	};
+	
 	/**
 	 * Timeout
 	 * This will set success status, exit and completion
 	 */
-	this.Timeout = function() {
+	this.timeout = function() {
 		if(isStarted) {
 			scorm.debug(settings.prefix + ": I am timing out...", 3);
 			if(!isPerforming()) {
-				scorm.setvalue('cmi.success_status', DEFAULT_SUCCESS_STATUS);
+				scorm.setvalue('cmi.success_status', settings.success_status);
 			}
 			scorm.setvalue('cmi.exit', 'timeout');
 			scorm.setvalue('cmi.completion_status', 'completed');
@@ -199,6 +225,46 @@ function SCOBOT(options) {
 			return false;
 		}
 	};
+	
+	/**
+	 * Set Suspend Data
+	 * This will set the suspend data by id (could be a page ID as long as its unique)
+	 * Suspend data is a 64,000 character string.  In this case it will be a JSON Object that
+	 * freely converts to a JSON String or Object.
+	 * @param id {Integer}
+	 * @param data {Object}
+	 * @returns {Boolean}
+	 */
+	this.setSuspendData = function(id, data) {
+		// Suspend data is a array of pages by ID
+		var i;
+		for(i=0; i<settings.suspend_data.length; i++) {
+			if(settings.suspend_data[i].id == id ) {
+				settings.suspend_data[i].data = data; // overwrite existing
+				return true;
+			}
+		}
+		settings.suspend_data.push({'id': id, 'data': data});
+		return true;
+	};
+	
+	/**
+	 * Get Suspend Data
+	 * This will get the suspend data by id 
+	 * @param id {Integer}
+	 * @returns {Object} but false if empty.
+	 */
+	this.getSuspendData = function(id) {
+		// Suspend data is a array of pages by ID
+		var i;
+		for(i=0; i<settings.suspend_data.length; i++) {
+			if(settings.suspend_data[i].id == id) {
+				return settings.suspend_data.data;
+			}
+		}
+		return false;
+	};
+	
 	/**
 	 * Set (Internal API)
 	 * This locally sets values local to this API
