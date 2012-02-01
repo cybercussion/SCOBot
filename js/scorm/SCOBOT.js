@@ -285,7 +285,7 @@ function SCOBOT(options) {
 	 *	timestamp: '22',                     // second(10,0)
 	 *	correct_responses: [
 	 *		{
-	 *			pattern: ''
+	 *			pattern: ''                  // depends on interaction type
 	 *		}
 	 *	],
 	 *	weighting: '1',
@@ -293,15 +293,13 @@ function SCOBOT(options) {
 	 *	result: 'correct',                   // (correct, incorrect, unanticipated, neutral, real (10,7) )
 	 *	latency: '12.2',                     // second(10,2)
 	 *	description: "The question commonly" // 250 chars
-	 * }
+	 * };
 	 * @param data {Object}
 	 */
 	this.setInteraction = function(data) {
 		var count;
 		
 	};
-	
-	
 	
 	/**
 	 * Set
