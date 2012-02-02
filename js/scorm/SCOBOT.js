@@ -38,23 +38,26 @@
  */
 function SCOBOT(options) {
 	// Constructor ////////////
+	/** @default version, createDate, modifiedDate, prefix, interaction_mode, success_status, bookmark, performance, status, suspend_data, mode */
 	var defaults = {
 		version: "1.0",
 		createDate: "04/07/2011 09:33AM",
 		modifiedDate: "02/01/2012 13:08AM",
 		prefix: "SCOBOT",
-		// SCORM buffers
+		// SCORM buffers and settings
+		interaction_mode: "state", // or journaled
 		success_status: "passed",
 		bookmark: "",
 		performance: "",
 		status: "",
-		suspend_data: "",
+		suspend_data: {},
 		mode: ""
 	},
 	// Settings merged with defaults and extended options
 	settings     = $.extend(defaults, options),
 	isError      = false,
 	isStarted    = false,
+	badValues    = '|null|undefined|false|| |',
 	error        = scorm.get('error'), // no sense retyping this
 	self         = this; // Public to Public Hook
 
@@ -83,7 +86,20 @@ function SCOBOT(options) {
 		}
 		return true;
 	}
-
+	
+	/**
+	 * Is Bad Value
+	 * We get a variety of responses from an LMS
+	 * @returns {Boolean} true if its bad. 
+	 */
+	function isBadValue(v) {
+		if(badValues.indexOf('|' + v + '|') >= 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	/**
 	 * Not Started Yet
 	 * You should never see this message
@@ -115,12 +131,18 @@ function SCOBOT(options) {
 			 * LMS's we commonly escape going out, and unescape coming in.  We may even need to base64.
 			 * !IMPORTANT- once you do this, your kinda stuck with it.  SCO's will begin to save suspend data
 			 * and if you change mid-stream your going to have to handle the fact you need to reverse support
-			 * old saved data.
+			 * old saved data.  Don't fall victim to this little gem.
 			 * GOAL: Deal with this in a managed way
 			 */
-			if(settings.suspend_data.length > 0) {
+			// Quality control - You'd be surprised at the things a LMS responds with
+			if(settings.suspend_data.length > 0 && !isBadValue(settings.suspend_data)) {
 				// Assuming a JSON String
+				scorm.debug(settings.prefix + ": Returning suspend data object from a prior session", 4);
 				settings.suspend_data = JSON.parse(settings.suspend_data); // Turn this back into a object.
+				scorm.debug(settings.suspend_data, 4);
+			} else {
+				scorm.debug(settings.prefix + ": Creating new suspend data object", 4);
+				settings.suspend_data = {};
 			}
 			settings.status       = scorm.getvalue('cmi.completion_status');
 			settings.performance  = scorm.getvalue('cmi.success_status');
@@ -227,39 +249,63 @@ function SCOBOT(options) {
 	};
 	
 	/**
-	 * Set Suspend Data
+	 * Set Suspend Data By Page ID
 	 * This will set the suspend data by id (could be a page ID as long as its unique)
 	 * Suspend data is a 64,000 character string.  In this case it will be a JSON Object that
 	 * freely converts to a JSON String or Object.
+	 * Now you could require that the end user have a id in their data object, or in this case keep it
+	 * separate for search ability.  Either way you'll have to verify they are passing a id.
+	 * I've opted to make them pass the ID.  I'm also opting to keep this as a object instead of
+	 * just a page array.  You may want to add more things to suspend data than just pages.
+	 * Example structure of this:
+	 * {
+	 *	sco_id: 'A12345',
+	 *	name: 'value',
+	 *	pages: [
+	 *		{
+	 *			id: 1,
+	 *			title: 'Presentation',
+	 *			data: {data object for a page}
+	 *		},
+	 *		{
+	 *			id: 2,
+	 *			title: 'Match Game',
+	 *			data: {data object for a page}
+	 *		}
+	 *	]
+	 * };
+	 * 
 	 * @param id {Integer}
 	 * @param data {Object}
 	 * @returns {Boolean}
 	 */
-	this.setSuspendData = function(id, data) {
+	this.setSuspendDataByPageID = function(id, title, data) {
 		// Suspend data is a array of pages by ID
 		var i;
-		for(i=0; i<settings.suspend_data.length; i++) {
-			if(settings.suspend_data[i].id == id ) {
-				settings.suspend_data[i].data = data; // overwrite existing
+		for(i=0; i<settings.suspend_data.pages.length; i++) {
+			if(settings.suspend_data.pages[i].id === id ) {
+				// Update Page data
+				settings.suspend_data.pages[i].data = data; // overwrite existing
 				return true;
 			}
 		}
-		settings.suspend_data.push({'id': id, 'data': data});
+		// new page push
+		settings.suspend_data.pages.push({'id': id, 'title': title, 'data': data});
 		return true;
 	};
 	
 	/**
-	 * Get Suspend Data
+	 * Get Suspend Data By Page ID
 	 * This will get the suspend data by id 
 	 * @param id {Integer}
 	 * @returns {Object} but false if empty.
 	 */
-	this.getSuspendData = function(id) {
+	this.getSuspendDataByPageID = function(id) {
 		// Suspend data is a array of pages by ID
 		var i;
-		for(i=0; i<settings.suspend_data.length; i++) {
-			if(settings.suspend_data[i].id == id) {
-				return settings.suspend_data.data;
+		for(i=0; i<settings.suspend_data.pages.length; i++) {
+			if(settings.suspend_data.pages[i].id === id) {
+				return settings.suspend_data.pages[i].data;
 			}
 		}
 		return false;
@@ -274,7 +320,7 @@ function SCOBOT(options) {
 	 * for no reason.
 	 * You may ask what is "real(10,7)".  This is a binary floating point with a precision up to 7 characters to the right of the decimal.
 	 * Example Data Object:
-	 * data = {
+	 * {
 	 *	id: '1',                             // 4000 chars
 	 *	type: 'true_false',                  // (true_false, multiple_choice, fill_in, long_fill_in, matching, performance, sequencing, likert, numeric, other)
 	 *	objectives: [
@@ -291,13 +337,45 @@ function SCOBOT(options) {
 	 *	weighting: '1',
 	 *	learner_response: 'true',
 	 *	result: 'correct',                   // (correct, incorrect, unanticipated, neutral, real (10,7) )
-	 *	latency: '12.2',                     // second(10,2)
+	 *	latency: '12.20',                     // second(10,2)
 	 *	description: "The question commonly" // 250 chars
 	 * };
 	 * @param data {Object}
+	 * TODO
 	 */
 	this.setInteraction = function(data) {
-		var count;
+		var n;
+		// Check for Interaction Mode
+		if(settings.interaction_mode === "journaled") {
+			// Explicitly stating they want a history of interactions
+			n = ''; // we want to use cmi.interactions._count
+		} else { 
+			// Default to state, which will update by id
+			n = ''; // we want to update by interaction id
+		}
+	};
+	
+	/**
+	 * Set Objective
+	 * Sets the data for the scorm objective.  ID's have to be set first and must be unique.
+	 * Example data object
+	 * {
+	 *	id: '1',                            // 4000 chars
+	 *	score: {
+	 *		scaled: '0',                    // real(10,7) *
+	 *		raw: '0',
+	 *		min: '0',
+	 *		max: '0'
+	 *	}
+	 *	success_status: 'failed',            // (passed, failed, unknown)
+	 *	completion_status: 'incomplete',     // (completed, incomplete, not attempted, unknown)
+	 *	progress_measure: '0',               // real(10,7)
+	 *	description: 'This is the objective' // 250 Chars
+	 * }
+	 * 
+	 * TODO
+	 */
+	this.setObjective = function(data) {
 		
 	};
 	
