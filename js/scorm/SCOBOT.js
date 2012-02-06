@@ -122,7 +122,7 @@ function SCOBOT(options) {
 	 * @returns {Object} or false
 	 * {
 	 *	scoreScaled      = '0',
-	 *	successStatus    = '0',
+	 *	successStatus    = 'failed',
 	 *	completionStatus = 'incomplete',
 	 *	progressMeasure  = '0'
 	 * }
