@@ -10,6 +10,8 @@
  * Mode: {get} Browse, Review, Normal
  * Bookmark: {get/set} SCO Progress
  * Suspend Data: {get/set} Suspend Data Object
+ * Interactions: {set} Interaction(s)
+ * Objectives: {set} Objective(s)
  *
  * @author Mark Statkus <mark@cybercussion.com>
  * @requires scorm, JQuery
@@ -47,11 +49,13 @@ function SCOBOT(options) {
 		// SCORM buffers and settings
 		interaction_mode: "state", // or journaled
 		success_status: "passed",
-		bookmark: "",
-		performance: "",
-		status: "",
+		location: "",
+		completion_status: "",
 		suspend_data: {},
-		mode: ""
+		mode: "",
+		scaled_passing_score: 0.7,
+		totalInteractions: 0,
+		totalObjectives: 0
 	},
 	// Settings merged with defaults and extended options
 	settings     = $.extend(defaults, options),
@@ -81,7 +85,7 @@ function SCOBOT(options) {
 	 * @returns {Boolean} based on if this value has been set (true) or (false) if not
 	 */
 	function isPerforming() {
-		if(settings.performance !== "passed" && settings.performance !== "failed") {
+		if(settings.success_status !== "passed" && settings.success_status !== "failed") {
 			return false;
 		}
 		return true;
@@ -108,6 +112,72 @@ function SCOBOT(options) {
 		scorm.debug(settings.prefix + ": You didn't call 'Start()' yet, or you already terminated, ignoring.", 2);
 	}
 
+	/**
+	 * Check Progress
+	 * This should be used sparingly.  Its going to total up the scoring real-time based on any interactions and objectives.
+	 * cmi.score.scaled, 
+	 * cmi.success_status, 
+	 * cmi.completion_status,
+	 * cmi.progress_measure
+	 * @returns {Object} or false
+	 * {
+	 *	scoreScaled      = '0',
+	 *	successStatus    = '0',
+	 *	completionStatus = 'incomplete',
+	 *	progressMeasure  = '0'
+	 * }
+	 */
+	function checkProgress() {
+		var response                 = {},
+			scoreRaw                 = 0,
+			scoreMax                 = 0,
+			scoreMin                 = 0,
+			scoreScaled              = 1,
+			progressMeasure          = 0,
+			completionStatus         = '',
+			totalObjectivesCompleted = 0,
+			totalKnownObjectives     = parseInt(scorm.getvalue('cmi.objectives._count'), 10),
+			totalKnownInteractions   = parseInt(scorm.getvalue('cmi.interactions._count'), 10);
+
+		if(settings.totalInteractions === 0 || settings.totalObjectives === 0) {
+			// This is a non-starter, if the SCO Player doesn't set these we are flying blind
+			scorm.debug(settings.prefix + ": Sorry, I cannot calculate Progress as the totalInteractions and or Objectives are zero", 2);
+			return false;
+		} else {
+			// Set Score Totals (raw, min, max) and count up totalObjectivesCompleted
+			//TODO
+			
+			
+			// Set Score Scaled
+			if((scoreMax - scoreMin) === 0) {
+				// Division By Zero
+				scorm.setvalue('cmi.score.scaled', scoreScaled);
+			} else {
+				scoreScaled = (scoreRaw - scoreMin) / (scoreMax - scoreMin) + "";
+				scorm.setvalue('cmi.score.scaled', scoreScaled);
+			}
+			
+			// Set Progress Measure
+			progressMeasure = settings.totalObjectives / settings.totalObjectivesCompleted + "";
+			scorm.setvalue('cmi.progress_measure', progressMeasure);
+			
+			// Set Completion Status
+			if(progressMeasure >= scorm.getvalue('cmi.completion_threshold')) {
+				scorm.setvalue('cmi.completion_status', 'completed');	
+			} else {
+				scorm.setvalue('cmi.completion_status', 'incomplete');
+			}
+			
+			// Set Success Status
+			if(scoreScaled >= settings.scaled_passing_score) {
+				scorm.setvalue('cmi.success_status', 'passed');
+			} else {
+				scorm.setvalue('cmi.success_status', 'failed');
+			}
+		}
+		return response;
+	}
+	
 	// End Private ////////////
 	///////////////////////////
 	// Public /////////////////
@@ -118,13 +188,21 @@ function SCOBOT(options) {
 	 * @returns {Boolean}
 	 */
 	this.start = function() {
+		var tmpScaledPassingScore = '';
 		scorm.debug(settings.prefix + ": I am starting...", 3);
 		if(!isStarted) {
 			isStarted = true;
 			// Retrieve normal settings/parameters from the LMS
-			settings.mode         = scorm.getvalue('cmi.mode');
-			settings.bookmark     = scorm.getvalue('cmi.location');
-			settings.suspend_data = unescape(scorm.getvalue('cmi.suspend_data'));
+			// Get SCO Mode (normal, browse, review)
+			settings.mode                 = scorm.getvalue('cmi.mode');
+			// Get Bookmark
+			settings.location             = scorm.getvalue('cmi.location');
+			// Scaled Passing Score
+			tmpScaledPassingScore         = scorm.getvalue('cmi.scaled_passing_score'); // This may be empty, default otherwise
+			if(!isBadValue(tmpScaledPassingScore) && tmpScaledPassingScore !== "-1") {
+				settings.scaled_passing_score = tmpScaledPassingScore;
+				// else it defaults to what its set to prior.  i.e. no change.
+			}
 			/** Suspend Data technically should be a JSON String.  Structured data would be best suited to
 			 * be recorded this way.  If you don't want to do this, you'll need to back out this portion.
 			 * Also, in order to eliminate foreign keys and other special characters from messing up some
@@ -134,6 +212,7 @@ function SCOBOT(options) {
 			 * old saved data.  Don't fall victim to this little gem.
 			 * GOAL: Deal with this in a managed way
 			 */
+			settings.suspend_data         = unescape(scorm.getvalue('cmi.suspend_data'));
 			// Quality control - You'd be surprised at the things a LMS responds with
 			if(settings.suspend_data.length > 0 && !isBadValue(settings.suspend_data)) {
 				// Assuming a JSON String
@@ -144,8 +223,8 @@ function SCOBOT(options) {
 				scorm.debug(settings.prefix + ": Creating new suspend data object", 4);
 				settings.suspend_data = {};
 			}
-			settings.status       = scorm.getvalue('cmi.completion_status');
-			settings.performance  = scorm.getvalue('cmi.success_status');
+			settings.completion_status = scorm.getvalue('cmi.completion_status');
+			settings.success_status    = scorm.getvalue('cmi.success_status');
 		} else {
 			notStartedYet();
 			return false;
@@ -160,7 +239,7 @@ function SCOBOT(options) {
 	 */
 	this.setBookmark = function(v) {
 		if(isStarted) {
-			settings.bookmark = v;
+			settings.location = v;
 			// update local snapshot
 			return scorm.setvalue('cmi.location', v);
 		} else {
@@ -175,13 +254,24 @@ function SCOBOT(options) {
 	 */
 	this.getBookmark = function() {
 		if(isStarted) {
-			return settings.bookmark;
+			return settings.location;
 			// return local snapshot
 		} else {
 			notStartedYet();
 			return false;
 		}
 	};
+	
+	/**
+	 * Get Progress
+	 * Hooks to Private method used possibly elsewhere in this API
+	 * cmi.score.scaled, 
+	 * cmi.success_status, 
+	 * cmi.completion_status,
+	 * cmi.progress_measure
+	 * @returns {Object}
+	 */
+	this.getProgress = checkProgress;
 	
 	/**
 	 * Suspend
@@ -275,7 +365,7 @@ function SCOBOT(options) {
 	 *	]
 	 * };
 	 * 
-	 * @param id {Integer}
+	 * @param id {Mixed}
 	 * @param data {Object}
 	 * @returns {Boolean}
 	 */
@@ -297,7 +387,7 @@ function SCOBOT(options) {
 	/**
 	 * Get Suspend Data By Page ID
 	 * This will get the suspend data by id 
-	 * @param id {Integer}
+	 * @param id {Mixed}
 	 * @returns {Object} but false if empty.
 	 */
 	this.getSuspendDataByPageID = function(id) {
@@ -353,6 +443,7 @@ function SCOBOT(options) {
 			// Default to state, which will update by id
 			n = ''; // we want to update by interaction id
 		}
+		
 	};
 	
 	/**
