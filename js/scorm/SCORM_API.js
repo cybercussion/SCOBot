@@ -82,6 +82,7 @@ function SCORM_API(options) {
 		path : false, // Set Path to LMS API or maybe something local later by default?
 		data : {// Defaults
 			completion_status : settings.completion_status,
+			success_status: settings.success_status,
 			exit_type : settings.exit_type
 		},
 		isActive : settings.isActive  // If SCO is initialized already, this was added for a page by page concept where pages unload and load.
@@ -563,7 +564,7 @@ function SCORM_API(options) {
 						case "cmi.success_status":
 						case "cmi.completion_status":
 							nn = "cmi.core.lesson_status";
-							API.completion_status = v;
+							API.data.completion_status = v;
 							// set local status
 							break;
 						case "cmi.session_time":
@@ -592,11 +593,11 @@ function SCORM_API(options) {
 							}
 							break;
 						case "cmi.completion_status":
-							API.completion_status = v;
+							API.data.completion_status = v;
 							// set local status
 							break;
 						case "cmi.exit":
-							API.exit_type = v;
+							API.data.exit_type = v;
 							// set local status
 							break;
 						case "suspend_data":
@@ -690,11 +691,11 @@ function SCORM_API(options) {
 				// Check for any errors previously
 				if(s && ec === 0) {
 					API.isActive = true;
-					API.completion_status = self.getvalue('cmi.completion_status');
+					API.data.completion_status = self.getvalue('cmi.completion_status');
 					settings.startDate = new Date();
 					// Need to set Start Date
 					debug(settings.prefix + ": SCO is initialized.", 3);
-					switch(API.completion_status) {
+					switch(API.data.completion_status) {
 						case "not attempted":
 						case "unknown":
 							self.setvalue("cmi.completion_status", "incomplete");
@@ -722,34 +723,12 @@ function SCORM_API(options) {
 	 */
 	this.terminate = function() {
 		var s = false, lms = API.path, ec = 0;
+		debug(settings.prefix + ": Terminating " + API.isActive + " " + lms, 4);
 		if(API.isActive) {
 			if(lms) {
 				// if not completed or passed, suspend the content.
-				debug(settings.prefix + ": completion_status = " + API.completion_status, 3);
-				if(API.completion_status !== "completed" && API.completion_status !== "passed") {
-					debug(settings.prefix + ": Setting exit type suspend " + typeof (self.setvalue), 3);
-					switch(API.version) {
-						case "1.2":
-							s = self.setvalue("cmi.core.exit", "suspend");
-							// this will return true/false boo
-							break;
-						case "2004":
-							s = self.setvalue("cmi.exit", "suspend");
-							// this will return true/false boo
-							debug(settings.prefix + ": setvalue came back " + s, 3);
-							break;
-						default:
-							// handle non-LMS?
-							break;
-					}
-					// Toss error if no success
-					if(!makeBoolean(s)) {
-						ec = getLastErrorCode();
-						debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + " for Terminate.\nDiagnostic: " + getDiagnostic(ec), 1);
-					}
-				}
-				self.commit();
-				// Store Data before Teriminating
+				debug(settings.prefix + ": completion_status = " + API.data.completion_status + "|| success_status = " + API.data.success_status, 3);
+				self.commit();	// Store Data before Terminating
 				switch(API.version) {
 					case "1.2":
 						s = lms.LMSFinish(""); //makeBoolean(lms.LMSFinish(""));
