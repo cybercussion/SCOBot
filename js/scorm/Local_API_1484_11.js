@@ -53,8 +53,8 @@ function Local_API_1484_11(options) {
 		},
 		completion_status : "unknown",
 		completion_threshold : "",
-		credit : "",
-		entry : "",
+		credit : "no_credit",
+		entry : "ab_initio",
 		exit : "",
 		interactions : {
 			_children : "id,type,objectives,timestamp,correct_responses,weighting,learner_response,result,latency,description",
