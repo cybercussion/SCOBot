@@ -356,6 +356,7 @@ test("initialize", function() {
 				});
 				// Terminate
 				test("terminate", function() {
+					strictEqual(scorm.setvalue('cmi.exit', 'normal'), 'true', "Setting Exit type normal");
 					strictEqual(scorm.terminate(), 'true', "Termination (you can't do anything else after this technically)");
 			
 					// Make some Illegal SCORM Calls after Termination should successfully fail ;)
@@ -363,8 +364,8 @@ test("initialize", function() {
 						var setvalue = scorm.setvalue;
 						strictEqual(setvalue('cmi.location', '5'), 'false', "Setting cmi.location after termination (not allowed)");
 						strictEqual(setvalue('cmi.suspend_data', '{\"something\":\"value\"}'), 'false', "Setting cmi.suspend_data after termination (not allowed)");
-						scorm.debug("Total Set Calls: " + setvalue_calls, 4); // END
-						scorm.debug("Total Get Calls: " + getvalue_calls, 4); // END
+						//scorm.debug("Total Set Calls: " + setvalue_calls, 4); // END
+						//scorm.debug("Total Get Calls: " + getvalue_calls, 4); // END
 					});
 				});
 			});
