@@ -1,4 +1,4 @@
-/*global $, JQuery, scorm, unescape */
+/*global $, JQuery, scorm, escape, unescape, window */
 /*jslint browser: true */
 /**
  * This is a sample SCORM Startup sequence and handicap API's for ease of use.
@@ -38,37 +38,70 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-function SCOBOT(options) {
+function SCOBot(options) {
 	// Constructor ////////////
 	/** @default version, createDate, modifiedDate, prefix, interaction_mode, success_status, bookmark, performance, status, suspend_data, mode */
 	var defaults = {
-		version: "1.0",
-		createDate: "04/07/2011 09:33AM",
-		modifiedDate: "02/01/2012 13:08AM",
-		prefix: "SCOBOT",
-		// SCORM buffers and settings
-		interaction_mode: "state", // or journaled
-		success_status: "passed",
-		location: "",
-		completion_status: "",
-		suspend_data: {},
-		mode: "",
-		scaled_passing_score: 0.7,
-		totalInteractions: 0,
-		totalObjectives: 0
-	},
-	// Settings merged with defaults and extended options
-	settings     = $.extend(defaults, options),
-	isError      = false,
-	isStarted    = false,
-	badValues    = '|null|undefined|false|| |',
-	error        = scorm.get('error'), // no sense retyping this
-	self         = this; // Public to Public Hook
+			version: "1.0",
+			createDate: "04/07/2011 09:33AM",
+			modifiedDate: "02/12/2012 12:05PM",
+			prefix: "SCOBot",
+			// SCORM buffers and settings
+			interaction_mode: "state", // or journaled
+			success_status: "unknown",
+			location: "",
+			completion_status: "",
+			suspend_data: {},
+			mode: "",
+			scaled_passing_score: 0.7,
+			totalInteractions: 0,
+			totalObjectives: 0,
+			startTime: 0
+		},
+		// Settings merged with defaults and extended options
+		settings     = $.extend(defaults, options),
+		lmsconnected = false,
+		isExit       = false,
+		isError      = false,
+		isStarted    = false,
+		badValues    = '|null|undefined|false|| |',
+		error        = scorm.get('error'), // no sense retyping this
+		self         = this; // Hook
 
 
 	// End Constructor ////////
 	///////////////////////////
 	// Private ////////////////
+	/**
+	 * Initialize SCO
+	 * This is commonly done on load of the web page.
+	 * Default behavior
+	 * @returns {Boolean} true or false if established LMS connection
+	 */
+	function initSCO() {
+		lmsconnected = scorm.initialize();
+		scorm.debug(settings.prefix + ": SCO Loaded from window.onload " + lmsconnected, 4);
+		if(lmsconnected) {
+			self.start(); // Things you'd do like getting mode, suspend data
+		}
+		return lmsconnected;
+	}
+	
+	/**
+	 * Exit SCO
+	 * Commonly done when unload or beforeunload is triggered
+	 * Default behavior
+	 * @returns {Boolean} true or false if successfully exited 
+	 */
+	function exitSCO() {
+		if(!isExit) {
+			isExit = true;
+			self.suspend(); // let the player know were exiting
+			scorm.debug(settings.prefix + ": SCO is done unloading.", 4);
+		}
+		return isExit;
+	}
+	
 	/**
 	 * Trigger Warning (internal to this API)
 	 * Throws a console log when a SCORM API Error occurs
@@ -105,13 +138,123 @@ function SCOBOT(options) {
 	}
 	
 	/**
+	 * Is ISO 8601 UTC
+	 * I've got a RegEx to validate ISO 8601 UTC time by the 'Z' at the end.
+	 * This is a great common way to do this so regardless of time zone you can reflect the 
+	 * time this time stamp was referring to.
+	 * @returns {Boolean} true or false
+	 */
+	function isISO8601UTC(v) {
+		var ISO8601Exp = /(\d{4}-[01]\d\-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+\-][0-2]\d:[0-5]\d|Z))/;
+		return ISO8601Exp.test(v);
+	}
+	
+	/**
 	 * Not Started Yet
-	 * You should never see this message
+	 * You should never see this message, but I found I may need to trace this more than once.
 	 */
 	function notStartedYet() {
 		scorm.debug(settings.prefix + ": You didn't call 'Start()' yet, or you already terminated, ignoring.", 2);
 	}
-
+	
+	/**
+	 * Current Time
+	 * @returns {Number} Milliseconds
+	 */
+	function currentTime() {
+		var d = new Date();
+		return d.getTime() + (Date.remoteOffset || 0);
+	}
+	
+	/**
+	 * Set Value By Interaction Type
+	 * @param type {String} Expects true_false, multiple_choice, fill_in, long_fill_in, matching, performance, sequencing, likert, numeric, other
+	 * @param value {Mixed} May take Array or Object of arrays depending
+	 * @returns {String} formatted value for interaction type
+	 * TODO
+	 */
+	function setValueByInteractionType(type, value) {
+		switch(type) {
+			case 'true_false':
+				// true or false
+				// TODO
+			break;
+			case 'multiple_choice':
+				// a[,]b
+				// TODO
+			break;
+			case 'fill_in':
+				// Ok with or without the options (case_matters, order_matters, lang)
+				// Word
+				// {case_matters=true}{order_matters=true}{lang=en}word1[,]word2
+				// TODO
+			break;
+			case 'long_fill_in':
+				// Ok with or without the options (case_matters, lang)
+				// Bunch of text...
+				// {case_matters=true}{lang=en}Bunch of text...
+				// TODO
+			break;
+			case 'matching':
+				// tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
+				// TODO
+			break;
+			case 'performance':
+				// Ok with or without the step name
+				// step_1[.]inspect wound[,]step_2[.]clean wound[,]step_3[.]apply bandage
+				// [.]inspect wound[,][.]clean wound[,][.]apply bandage
+				// TODO
+			break;
+			case 'sequencing':
+				// Close to multiple choice
+				// a[,]b[,]c
+				// TODO
+			break;
+			case 'likert':
+				// "strongly_agree" or short identifier type unique to answer group
+				// TODO
+			break;
+			case 'numeric':
+				// 10.5
+				// 20
+				// TODO
+			break;
+			case 'other':
+				// Anything up to 4000 characters
+				return value + ""; // Do nothing, but ensure string
+			default:
+				// Invalid
+				scorm.debug(settings.prefix + ": Sorry, invalid interaction type detected for " + type + " on " + value, 1);
+				return false;
+		}
+	}
+	
+	/**
+	 * Update Suspend Data
+	 * This will submit existing suspend data and call commit saving it on the LMS
+	 * Note, you should use this sparingly.  This causes a round trip of data to the server.
+	 * I'd recommend using it between pages, or on a timer if your worried about the student
+	 * losing their information due to a power, network or computer outage(s).
+	 * @returns {Boolean} true (success) false (fail)
+	 */
+	function saveSuspendData() {
+		var result;
+		// May want to consider updating scoring here at this time
+		result = scorm.setvalue('cmi.suspend_data', escape(JSON.stringify(settings.suspend_data)));
+		if(result === 'true') {
+			result = scorm.commit();
+			if(result === 'false') {
+				scorm.debug(settings.prefix + ": Sorry, there was an issue committing, please review the SCORM Logs", 1);
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			scorm.debug(settings.prefix + ": Sorry, there was an issue saving your suspend data, please review the SCORM Logs", 1);
+			return false;
+		}
+	}
+	
 	/**
 	 * Check Progress
 	 * This should be used sparingly.  Its going to total up the scoring real-time based on any interactions and objectives.
@@ -126,6 +269,7 @@ function SCOBOT(options) {
 	 *	completionStatus = 'incomplete',
 	 *	progressMeasure  = '0'
 	 * }
+	 * TODO, this is still in progress
 	 */
 	function checkProgress() {
 		var response                 = {},
@@ -184,7 +328,15 @@ function SCOBOT(options) {
 	/**
 	 * Start (Internal API)
 	 * Initializes the SCORM Startup, and communicates with SCORM (cruise control)
-	 * and will begin to store some common used parameters for use later.
+	 * and will begin to store some common used parameters for use later. Like:
+	 * 1. mode
+	 * 2. location (bookmark)
+	 * 3. scaled_passing_score
+	 * 4. suspend_data
+	 * 5. completion_status
+	 * 6. success_status
+	 * These can be obtained by asking SB.get('location'); i.e. the name space for these after you start, 
+	 * and during the session.
 	 * @returns {Boolean}
 	 */
 	this.start = function() {
@@ -194,39 +346,57 @@ function SCOBOT(options) {
 			isStarted = true;
 			// Retrieve normal settings/parameters from the LMS
 			// Get SCO Mode (normal, browse, review)
-			settings.mode                 = scorm.getvalue('cmi.mode');
-			// Get Bookmark
-			settings.location             = scorm.getvalue('cmi.location');
+			settings.startTime            = currentTime();
+			settings.mode                 = scorm.getvalue('cmi.mode'); // normal, browse, review
+			/*
+			 * Entry is interesting.  You may or may not be able to rely on it. If the LMS sets it you'd
+			 * be able identify if this is the first time (ab-intio), or if your resuming.  This would let you know if 
+			 * there was even a bookmark, suspend data to even fetch.  Else, you may have to plug at it anyway.
+			 * So is it really worth it to bother with this?
+			 */
+			settings.entry                = scorm.getvalue('cmi.entry'); // ab-initio, resume or empty
+			// Entry Check-up ...
+			if(settings.entry === '' || settings.entry === 'resume') { // Resume, or possible Resume
+				// Get Bookmark
+				settings.location = scorm.getvalue('cmi.location');
+				
+				/* Suspend Data technically should be a JSON String.  Structured data would be best suited to
+				 * be recorded this way.  If you don't want to do this, you'll need to back out this portion.
+				 * Also, in order to eliminate foreign keys and other special characters from messing up some
+				 * LMS's we commonly escape going out, and unescape coming in.  We may even need to base64.
+				 * !IMPORTANT- once you do this, your kinda stuck with it.  SCO's will begin to save suspend data
+				 * and if you change mid-stream your going to have to handle the fact you need to reverse support
+				 * old saved data.  Don't fall victim to this little gem.
+				 * GOAL: Deal with this in a managed way
+				 */
+				settings.suspend_data         = unescape(scorm.getvalue('cmi.suspend_data'));
+				// Quality control - You'd be surprised at the things a LMS responds with
+				if(settings.suspend_data.length > 0 && !isBadValue(settings.suspend_data)) {
+					// Assuming a JSON String
+					scorm.debug(settings.prefix + ": Returning suspend data object from a prior session", 4);
+					settings.suspend_data = JSON.parse(settings.suspend_data); // Turn this back into a object.
+					scorm.debug(settings.suspend_data, 4);
+				} else {
+					scorm.debug(settings.prefix + ": Creating new suspend data object", 4);
+					// Object already created by default see settings.suspend_data
+				}
+			
+			} else {
+				// First time
+				scorm.debug(settings.prefix + ": First time running this SCO based on LMS entry value.", 4);
+				scorm.debug(settings.prefix + ": Creating new suspend data object", 4);
+			}
 			// Scaled Passing Score
 			tmpScaledPassingScore         = scorm.getvalue('cmi.scaled_passing_score'); // This may be empty, default otherwise
 			if(!isBadValue(tmpScaledPassingScore) && tmpScaledPassingScore !== "-1") {
 				settings.scaled_passing_score = tmpScaledPassingScore;
 				// else it defaults to what its set to prior.  i.e. no change.
 			}
-			/** Suspend Data technically should be a JSON String.  Structured data would be best suited to
-			 * be recorded this way.  If you don't want to do this, you'll need to back out this portion.
-			 * Also, in order to eliminate foreign keys and other special characters from messing up some
-			 * LMS's we commonly escape going out, and unescape coming in.  We may even need to base64.
-			 * !IMPORTANT- once you do this, your kinda stuck with it.  SCO's will begin to save suspend data
-			 * and if you change mid-stream your going to have to handle the fact you need to reverse support
-			 * old saved data.  Don't fall victim to this little gem.
-			 * GOAL: Deal with this in a managed way
-			 */
-			settings.suspend_data         = unescape(scorm.getvalue('cmi.suspend_data'));
-			// Quality control - You'd be surprised at the things a LMS responds with
-			if(settings.suspend_data.length > 0 && !isBadValue(settings.suspend_data)) {
-				// Assuming a JSON String
-				scorm.debug(settings.prefix + ": Returning suspend data object from a prior session", 4);
-				settings.suspend_data = JSON.parse(settings.suspend_data); // Turn this back into a object.
-				scorm.debug(settings.suspend_data, 4);
-			} else {
-				scorm.debug(settings.prefix + ": Creating new suspend data object", 4);
-				settings.suspend_data = {};
-			}
+			
 			settings.completion_status = scorm.getvalue('cmi.completion_status');
 			settings.success_status    = scorm.getvalue('cmi.success_status');
 		} else {
-			notStartedYet();
+			scorm.debug(settings.prefix + ": You already called start!  I don't see much point in doing this more than once.", 2);
 			return false;
 		}
 		return true;
@@ -234,14 +404,14 @@ function SCOBOT(options) {
 	
 	/**
 	 * Set Bookmark
+	 * This will update the local snap shot, and update SCORM (commit still required)
 	 * @param v {String} value
 	 * returns {String} 'true' or 'false'.
 	 */
 	this.setBookmark = function(v) {
 		if(isStarted) {
-			settings.location = v;
-			// update local snapshot
-			return scorm.setvalue('cmi.location', v);
+			settings.location = v + ""; // update local snapshot, ensure string
+			return scorm.setvalue('cmi.location', settings.location);
 		} else {
 			notStartedYet();
 			return false;
@@ -250,12 +420,12 @@ function SCOBOT(options) {
 	
 	/**
 	 * Get Bookmark
+	 * This will return the local snapshot, but is in sync with cmi.location
 	 * @returns {String} bookmark
 	 */
 	this.getBookmark = function() {
 		if(isStarted) {
-			return settings.location;
-			// return local snapshot
+			return settings.location; // return local snapshot
 		} else {
 			notStartedYet();
 			return false;
@@ -273,70 +443,6 @@ function SCOBOT(options) {
 	 */
 	this.getProgress = checkProgress;
 	
-	/**
-	 * Suspend
-	 * This will suspend the SCO and ends with terminating.  No data can be saved after this.
-	 */
-	this.suspend = function() {
-		if(isStarted) {
-			scorm.debug(settings.prefix + ": I am suspending...", 3);
-			if(!isPerforming()) {
-				scorm.setvalue('cmi.success_status', 'unknown');
-			}
-			scorm.setvalue('cmi.exit', 'suspend');
-			if(status !== "completed") {
-				scorm.setvalue('cmi.completion_status', 'incomplete');
-			}
-			scorm.terminate();
-			isStarted = false;
-		} else {
-			notStartedYet();
-			return false;
-		}
-	};
-	/**
-	 * Finish
-	 * This will set success status, exit and completion
-	 */
-	this.finish = function() {
-		if(isStarted) {
-			scorm.debug(settings.prefix + ": I am finishing...", 3);
-			if(!isPerforming()) {
-				scorm.setvalue('cmi.success_status', settings.success_status);
-			}
-			scorm.setvalue('cmi.exit', 'normal');
-			scorm.setvalue('cmi.completion_status', 'completed');
-			// This is completed per this call.
-			scorm.terminate();
-			isStarted = false;
-			return true;
-		} else {
-			notStartedYet();
-			return false;
-		}
-	};
-	
-	/**
-	 * Timeout
-	 * This will set success status, exit and completion
-	 */
-	this.timeout = function() {
-		if(isStarted) {
-			scorm.debug(settings.prefix + ": I am timing out...", 3);
-			if(!isPerforming()) {
-				scorm.setvalue('cmi.success_status', settings.success_status);
-			}
-			scorm.setvalue('cmi.exit', 'timeout');
-			scorm.setvalue('cmi.completion_status', 'completed');
-			// This is completed per this call.
-			scorm.terminate();
-			isStarted = false;
-			return true;
-		} else {
-			notStartedYet();
-			return false;
-		}
-	};
 	
 	/**
 	 * Set Suspend Data By Page ID
@@ -364,7 +470,7 @@ function SCOBOT(options) {
 	 *		}
 	 *	]
 	 * };
-	 * 
+	 * Calling commit will still be needed to truly save it.
 	 * @param id {Mixed}
 	 * @param data {Object}
 	 * @returns {Boolean}
@@ -402,6 +508,14 @@ function SCOBOT(options) {
 	};
 	
 	/**
+	 * Get Time From Start
+	 * 
+	 */
+	this.getSecondsFromStart = function() {
+		return settings.startTime - currentTime(); // turn in to seconds
+	};
+	
+	/**
 	 * Set Interaction
 	 * This will set an interaction based on Journaling or State.
 	 * Parameter for choosing a version is located in the defaults.
@@ -418,7 +532,7 @@ function SCOBOT(options) {
 	 *			id: '12'	
 	 *		}
 	 *	],
-	 *	timestamp: '22',                     // second(10,0)
+	 *	timestamp: '',                     // second(10,0) Pass a date object
 	 *	correct_responses: [
 	 *		{
 	 *			pattern: ''                  // depends on interaction type
@@ -434,16 +548,71 @@ function SCOBOT(options) {
 	 * TODO
 	 */
 	this.setInteraction = function(data) {
-		var n;
+		var n,       // Reserved for the count within interactions.n.x
+			m,       // Reserved for the count within interactions.objectives.m.x
+			i,       // Reserved for objective loop
+			j,       // Reserved for correct_responses loop
+			orig_timestamp = data.timestamp,
+			timestamp, // Reserved for converting the Timestamp
+			orig_latency = data.latency,
+			latency, // Reserved for doing the Timestamp to latency conversion (May not exist)
+			namespace, // Reserved for holding the cmi.interaction.n. name space to stop having to re-type it
+			result;  // Result of calling values against the SCORM API
+
+		//Time stuff will need to move after ID is added
+		timestamp = scorm.isoDateStringUTC(data.timestamp); // 2012-02-12T00:37:29Z formatted
+		data.timestamp = timestamp;
+		if(typeof(data.latency) === "object") {
+			latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
+			data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
+		}
 		// Check for Interaction Mode
 		if(settings.interaction_mode === "journaled") {
 			// Explicitly stating they want a history of interactions
 			n = ''; // we want to use cmi.interactions._count
 		} else { 
 			// Default to state, which will update by id
-			n = ''; // we want to update by interaction id
+			// Lets validate taht this data object has a ID
+			if(!isBadValue(data.id)) {
+				n = scorm.getInteractionByID(data.id); // we want to update by interaction id
+				if(isBadValue(n)) {
+					n = scorm.getvalue('cmi.interactions._count'); // This is a add
+				}
+				/* 
+				 * We need to make several setvalues now against cmi.interactions.n.x
+				 * As stated by the standard, if we run into issues they will show in the log from the SCORM API.
+				 * I won't currently do anything at this point to handle them here, as I doubt there is little that could be done.
+				 */
+				result = scorm.setvalue('cmi.interactions.'+n+'.id', data.id);
+				result = scorm.setvalue('cmi.interactions.'+n+'.type', data.type);
+				
+				// Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
+				// Either ignore value because its already added, or add it based on _count
+				// result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+".id", data.objectives[i].id);
+				for(i=0; i<data.objectives.length; i++) {
+					// We need to find out if the objective is already added
+					m = scorm.getInteractionObjectiveByID(n, data.objectives[i].id); // will return 0 or the locator where it existed
+					result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+'.id', data.objectives[i].id);
+				}
+				
+				result = scorm.setvalue('cmi.interactions.'+n+'.timestamp', data.timestamp);
+				
+				// Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type 
+				// TODO LOOP: result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
+				
+				result = scorm.setvalue('cmi.interactions.'+n+'.weighting', data.weighting);
+				result = scorm.setvalue('cmi.interactions.'+n+'.learner_response', data.learner_response); // will need to format by interaction type
+				result = scorm.setvalue('cmi.interactions.'+n+'.result', data.result);
+				result = scorm.setvalue('cmi.interactions.'+n+'.latency', data.latency);
+				result = scorm.setvalue('cmi.interactions.'+n+'.description', data.description);
+				
+				return "I'm not done with this yet.";
+			} else {
+				// This is a show stopper, try to give them some bread crumb to locate the problem.
+				scorm.debug(settings.prefix + ": Developer, your passing a interaction without a ID\nSee question:\n" + data.description, 1);
+				return 'false';
+			}
 		}
-		
 	};
 	
 	/**
@@ -467,8 +636,77 @@ function SCOBOT(options) {
 	 * TODO
 	 */
 	this.setObjective = function(data) {
-		
+		return "I haven't even started this yet";
 	};
+	
+	/**
+	 * Suspend
+	 * This will suspend the SCO and ends with terminating.  No data can be saved after this.
+	 */
+	this.suspend = function() {
+		if(isStarted) {
+			scorm.debug(settings.prefix + ": I am suspending...", 3);
+			if(!isPerforming()) {
+				scorm.setvalue('cmi.success_status', 'unknown');
+			}
+			scorm.setvalue('cmi.exit', 'suspend');
+			if(status !== "completed") {
+				scorm.setvalue('cmi.completion_status', 'incomplete'); //? May not want to do this
+			}
+			isStarted = false;
+			return scorm.terminate();
+		} else {
+			notStartedYet();
+			return 'false';
+		}
+	};
+	/**
+	 * Finish
+	 * This will set success status, exit and completion
+	 */
+	this.finish = function() {
+		if(isStarted) {
+			scorm.debug(settings.prefix + ": I am finishing...", 3);
+			if(!isPerforming()) {
+				scorm.setvalue('cmi.success_status', settings.success_status);
+			}
+			scorm.setvalue('cmi.exit', 'normal');
+			scorm.setvalue('cmi.completion_status', 'completed'); //? May not want to do this
+			// This is completed per this call.
+			isStarted = false;
+			return scorm.terminate();
+		} else {
+			notStartedYet();
+			return 'false';
+		}
+	};
+	
+	/**
+	 * Timeout
+	 * This will set success status, exit and completion
+	 */
+	this.timeout = function() {
+		if(isStarted) {
+			scorm.debug(settings.prefix + ": I am timing out...", 3);
+			if(!isPerforming()) {
+				scorm.setvalue('cmi.success_status', settings.success_status);
+			}
+			scorm.setvalue('cmi.exit', 'timeout');
+			scorm.setvalue('cmi.completion_status', 'completed'); //? May not want to do this
+			// This is completed per this call.
+			isStarted = false;
+			return scorm.terminate();
+		} else {
+			notStartedYet();
+			return 'false';
+		}
+	};
+	
+	/**
+	 * Is ISO 8601 UTC
+	 * @returns {Boolean} true/false
+	 */
+	this.isISO8601UTC = isISO8601UTC; // Public to Private hook
 	
 	/**
 	 * Set
@@ -505,4 +743,64 @@ function SCOBOT(options) {
 		return settings[n];
 	};
 	// End Public //////////////
+	/**
+	 * Wrap up Constructor
+	 * Certain versions of mozilla had an issue with not firing the window unload event.
+	 * At the time, I used window.top to get around this.  Later I started seeing with JQuery
+	 * different behavior once I incorporated it.  So at this point I'm using window not window.top.
+	*/
+	$(window).bind('load', initSCO);
+	$(window).bind('unload', exitSCO);
 }
+
+/*
+ * Mark: I'm leaving this bit of functionality here in case we need it.  See: https://github.com/csnover/js-iso8601
+ * Jury is out right now whether we'll need to convert times back into to date times yet but there are a number of 
+ * sources for this. 
+ * Possibilities to save space (need testing)
+ *  1. new Date(s.replace(/-/g,”/”).replace(/T/g,” “).replace(/Z/, ‘ UTC’));
+ *  2.
+ */
+
+/**
+ * Date.parse with progressive enhancement for ISO 8601 <https://github.com/csnover/js-iso8601>
+ * © 2011 Colin Snover <http://zetafleet.com>
+ * Released under MIT license.
+ */
+/*
+(function (Date, undefined) {
+    var origParse = Date.parse, numericKeys = [ 1, 4, 5, 6, 7, 10, 11 ];
+    Date.parse = function (date) {
+        var timestamp, struct, minutesOffset = 0;
+
+        // ES5 §15.9.4.2 states that the string should attempt to be parsed as a Date Time String Format string
+        // before falling back to any implementation-specific date parsing, so that’s what we do, even if native
+        // implementations could be faster
+        //              1 YYYY                2 MM       3 DD           4 HH    5 mm       6 ss        7 msec        8 Z 9 ±    10 tzHH    11 tzmm
+        if ((struct = /^(\d{4}|[+\-]\d{6})(?:-(\d{2})(?:-(\d{2}))?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{3}))?)?(?:(Z)|([+\-])(\d{2})(?::(\d{2}))?)?)?$/.exec(date))) {
+            // avoid NaN timestamps caused by “undefined” values being passed to Date.UTC
+            for (var i = 0, k; (k = numericKeys[i]); ++i) {
+                struct[k] = +struct[k] || 0;
+            }
+
+            // allow undefined days and months
+            struct[2] = (+struct[2] || 1) - 1;
+            struct[3] = +struct[3] || 1;
+
+            if (struct[8] !== 'Z' && struct[9] !== undefined) {
+                minutesOffset = struct[10] * 60 + struct[11];
+
+                if (struct[9] === '+') {
+                    minutesOffset = 0 - minutesOffset;
+                }
+            }
+
+            timestamp = Date.UTC(struct[1], struct[2], struct[3], struct[4], struct[5] + minutesOffset, struct[6], struct[7]);
+        }
+        else {
+            timestamp = origParse ? origParse(date) : NaN;
+        }
+
+        return timestamp;
+    };
+}(Date));*/
