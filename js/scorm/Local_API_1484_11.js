@@ -54,7 +54,7 @@ function Local_API_1484_11(options) {
 		completion_status : "unknown",
 		completion_threshold : "",
 		credit : "no_credit",
-		entry : "ab_initio",
+		entry : "ab-initio",
 		exit : "",
 		interactions : {
 			_children : "id,type,objectives,timestamp,correct_responses,weighting,learner_response,result,latency,description",
@@ -104,7 +104,7 @@ function Local_API_1484_11(options) {
 	 id -       This is read-only under adl.data.n.id, and read/write everywhere else
 	 comments_from_lms are entirely read-only (global rule)
 	 */
-	read_only = "|_version|completion_threshold|credit|entry|launch_data|learner_id|learner_name|_children|_count|mode|maximum_time_allowed|scaled_passing_score|time_limit_action|total_time|comment|timestamp|",
+	read_only = "|_version|completion_threshold|credit|entry|launch_data|learner_id|learner_name|_children|_count|mode|maximum_time_allowed|scaled_passing_score|time_limit_action|total_time|comment|", //timestamp RO in comments
 	/**
 	 * Write Only values
 	 */
@@ -348,7 +348,7 @@ function Local_API_1484_11(options) {
 			//eval(param + "=" + value +";");
 			//s = data;
 			if(isReadOnly(k)) {
-				scorm.debug("This " + k + " is read only", 4);
+				scorm.debug(settings.prefix + ": This " + k + " is read only", 4);
 				settings.errorCode = 404;
 				return "false";
 			} else {
@@ -357,6 +357,11 @@ function Local_API_1484_11(options) {
 				switch(tiers[0]) {
 					case "cmi":
 						switch(key) {
+							case "cmi.location":
+								if(v.length > 1000) {
+									scorm.debug(settings.prefix + ": Some LMS's might truncate your bookmark as you've passed " + v.length + " characters of bookmarking data", 2);
+								}
+							break;
 							case "cmi.completion_status":
 								if(completion_status.indexOf('|' + v + '|') === -1) {
 									// Invalid value
@@ -374,7 +379,7 @@ function Local_API_1484_11(options) {
 								switch(tiers[1]) {
 									/*jslint nomen: false */ // _ built in to SCORM 2004
 									case "interactions":
-										//scorm.debug("Checking Interactions .... " + getObjLength(cmi.interactions), 4);
+										//scorm.debug(settings.prefix + ": Checking Interactions .... " + getObjLength(cmi.interactions), 4);
 										cmi.interactions._count = (getObjLength(cmi.interactions) - 2) + ""; // Why -2?  _count and _children
 										
 										// Check interactions.n.objectives._count
@@ -384,6 +389,7 @@ function Local_API_1484_11(options) {
 											// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
 											if(!cmi.interactions[tiers[2]].objectives) {
 												// Setup Objectives for the first time
+												scorm.debug(settings.prefix + ": Constructing objectives object for new interaction", 4);
 												cmi.interactions[tiers[2]].objectives = {};
 												cmi.interactions[tiers[2]].objectives._count = "0";
 												cmi.interactions[tiers[2]].objectives._children = "id,score,success_status,completion_status,description";
