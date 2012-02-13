@@ -1,35 +1,6 @@
 /*global $, JQuery, ok, module, test, strictEqual, equal, SCORM_API, debug, enableDebug, learner_name, learner_id, DEFAULT_EXIT_TYPE, mode, local */
 var scorm;
 // This is required by the Local SCORM API_1484_11
-/**
- * ok(method(args), "Valid/Invalid") or ok(!method(args), "Valid/Invalid") boolean assertion
- * equal(actual, expected, message)
- * expect(amount) for integers
- *
- */
-
-/*
-// Ajax call
-module("Communication (Async)");
-asyncTest("sendMessage", function() {
-	setTimeout(function() {
-		var method = new Communication(),
-		data_obj = {
-		action: "Server_Checkup"
-	};
-	function handleResponse(obj) {
-		ok(true, JSON.stringify(obj, null, 4));
-		
-		strictEqual(obj.status, "success", "Valid JSON return for Success");
-		strictEqual(obj.sql.online, "yes", "Valid JSON return for SQL");
-		strictEqual(obj.php.online, "yes", "Valid JSON return for PHP");
-		
-		start();
-	}
-	method.sendMessage(data_obj, handleResponse, "QUnit Test");
-	}, 13);
-});
-*/
 
 // SCORM API (the long-hand scorm calls a more granular test)
 module("SCORM_API");
@@ -49,6 +20,7 @@ $(scorm).on("getvalue", function(e) {
 	getvalue_calls++;
 	return false;
 });
+
 // END
 // Debug
 test("scorm.debug", function() {
@@ -117,7 +89,7 @@ test("initialize", function() {
 				getvalue                  = scorm.getvalue,
 				interactionIndex          = getvalue('cmi.interactions._count'),
 				objectiveIndex            = getvalue('cmi.objectives._count'),
-				interactionObjectiveIndex = '0',
+				interactionObjectiveIndex = scorm.getInteractionObjectiveByID(interactionIndex, '0_1_1'),
 				interactionResponses      = '0';
 				
 				scorm.debug(">>>>>>>>>>>> start set value test <<<<<<<<<<<<<<<<<<<", 4);
@@ -147,7 +119,7 @@ test("initialize", function() {
 				// Some Interaction based * 0 would be the index per question
 				strictEqual(setvalue('cmi.interactions.' + interactionIndex + '.id', '0_1'), 'true', 'Setting cmi.interation.' + interactionIndex + '.id');
 				strictEqual(setvalue('cmi.interactions.' + interactionIndex + '.type', 'true-false'), 'true', 'Setting cmi.interation.' + interactionIndex + '.type');
-				strictEqual(setvalue('cmi.interactions.' + interactionIndex + '.objectives.' + objectiveIndex + '.id', '0_1_1'), 'true', 'Setting cmi.interactions.' + interactionIndex + '.objectives.' + interactionObjectiveIndex + '.id');
+				strictEqual(setvalue('cmi.interactions.' + interactionIndex + '.objectives.' + interactionObjectiveIndex + '.id', '0_1_1'), 'true', 'Setting cmi.interactions.' + interactionIndex + '.objectives.' + interactionObjectiveIndex + '.id');
 				// Pattern is sticky, new count.
 				strictEqual(setvalue('cmi.interactions.' + interactionIndex + '.correct_responses.' + interactionResponses + '.pattern', 'true'), 'true', 'Setting cmi.interation.' + interactionIndex + '.correct_responses.' + interactionResponses + '.pattern');
 				
