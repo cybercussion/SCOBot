@@ -57,20 +57,21 @@ function SCORM_API(options) {
 	var defaults = {
 		version : "1.0",
 		createDate : "04/05/2011 08:56AM",
-		modifiedDate : "01/17/2012 07:45AM",
+		modifiedDate : "02/12/2012 12:17PM",
 		debug : false,
 		isActive : false,
 		throw_alerts : true,
 		prefix : "SCORM_API",
 		exit_type : "suspend",
-		success_status : "passed",
+		success_status : "unknown",
 		use_standalone : true,
 		completion_status : "unknown"
 	},
 	// Settings merged with defaults and extended options
 	settings = $.extend(defaults, options),
 	// Internal API Error Boolean, Error Code object
-	isError = 0, error = {
+	isError = 0,
+	error = {
 		0 : "No Error",
 		404 : "Not Found",
 		405 : "Prevented on a read only resource"
@@ -80,7 +81,7 @@ function SCORM_API(options) {
 		connection : false,
 		version : "none", // 2004, 1.2 or none
 		path : false, // Set Path to LMS API or maybe something local later by default?
-		data : {// Defaults
+		data : {// Defaults, I'm moving a few of the SCORM defaults into this data object, they will be maintained here thereafter.
 			completion_status : settings.completion_status,
 			success_status: settings.success_status,
 			exit_type : settings.exit_type
@@ -90,10 +91,8 @@ function SCORM_API(options) {
 	self = this;
 	// Public to Public call hook within the internal API
 	// Set some more 'settings'
-	settings.error = error;
-	// Inherit
-	settings.startDate = {};
-	// Set on Success of Initialize aka "the start time"
+	settings.error = error;	 // Inherit
+	settings.startDate = {}; // Set on Success of Initialize aka "the start time"
 	// End Constructor ////////
 
 	// Private ////////////////
@@ -155,7 +154,7 @@ function SCORM_API(options) {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Find API
 	 * API_1484_11 or API for SCORM 2004 or 1.2
@@ -207,27 +206,31 @@ function SCORM_API(options) {
 		// 1 day = 8640000 centiseconds
 		// 1 hour = 360000 centiseconds
 		// 1 minute = 6000 centiseconds
-		var str = "P", nCs = n, nY = 0, nM = 0, nD = 0, nH = 0, nMin = 0, nS = 0;
-		n = Math.max(n, 0);
-		// there is no such thing as a negative duration
-		nCs = n;
+		var str = "P", 
+			nCs = Math.max(n, 0), 
+			nY = 0, 
+			nM = 0, 
+			nD = 0, 
+			nH = 0, 
+			nMin = 0, 
+			nS = 0;
 		// Next set of operations uses whole seconds
-		//with (Math) { agrumentavely considered harmful
-		nCs = Math.round(nCs);
-		if(bPrecise === true) {
-			nD = Math.floor(nCs / 8640000);
-		} else {
-			nY = Math.floor(nCs / 3155760000);
-			nCs -= nY * 3155760000;
-			nM = Math.floor(nCs / 262980000);
-			nCs -= nM * 262980000;
-			nD = Math.floor(nCs / 8640000);
-		}
-		nCs -= nD * 8640000;
-		nH = Math.floor(nCs / 360000);
-		nCs -= nH * 360000;
-		nMin = Math.floor(nCs / 6000);
-		nCs -= nMin * 6000;
+		//with (Math) { //agrumentavely considered harmful
+			nCs = Math.round(nCs);
+			if(bPrecise === true) {
+				nD = Math.floor(nCs / 8640000);
+			} else {
+				nY = Math.floor(nCs / 3155760000);
+				nCs -= nY * 3155760000;
+				nM = Math.floor(nCs / 262980000);
+				nCs -= nM * 262980000;
+				nD = Math.floor(nCs / 8640000);
+			}
+			nCs -= nD * 8640000;
+			nH = Math.floor(nCs / 360000);
+			nCs -= nH * 360000;
+			nMin = Math.floor(nCs / 6000);
+			nCs -= nMin * 6000;
 		//}
 		// Now we can construct string
 		if(nY > 0) {
@@ -257,7 +260,24 @@ function SCORM_API(options) {
 		// technically PT0S should do but SCORM test suite assumes longer form.
 		return str;
 	}
-
+	
+	/**
+	 * Pad Time
+	 * Pads time with proper formatting (double digits)
+	 */
+	function padTime(n){
+        return n<10 ? '0'+n : n;
+    }
+	
+	/**
+	 * ISO 8601 Date String UTC
+	 * Converts date object into ISO 8601 standard
+	 * returns {String} ISO 8601
+	 */
+	function isoDateStringUTC(d) {
+	    return d.getUTCFullYear() + '-' + padTime(d.getUTCMonth() + 1) + '-' + padTime(d.getUTCDate()) + 'T' + padTime(d.getUTCHours()) + ':' + padTime(d.getUTCMinutes()) + ':' + padTime(d.getUTCSeconds()) + 'Z';
+	}
+	
 	/**
 	 * Centiseconds To SCORM 1.2 Duration
 	 * Borrowed from Claude Ostyn, but touched up for JSLint/JavaScript and evil "with" statement
@@ -301,8 +321,8 @@ function SCORM_API(options) {
 		//if (bTruncated) alert ("Hours truncated to 9999 to fit HHHH:MM:SS.SS format")
 		return str;
 	}
-
 	// End SCORM Time Handlers /////////////////////////////
+	
 	/**
 	 * Make Boolean
 	 * Turns 'yes', 'no', 'true', 'false', '0', '1' into true/false
@@ -430,12 +450,12 @@ function SCORM_API(options) {
 		ec = 0, // error code
 		nn = null, // new number
 		ig = false;	// ignore
-		// Triggering events can get dicy.  Just left this here for a test.  I found that if you don't have something listening
-		// to this event you get a 'maximum thread count exceeded' error. See 'return false;'
-		/*$(self).trigger({
+		
+		// Custom event Trigger getvalue
+		$(self).triggerHandler({
 			'type': "getvalue",
 			'n': n
-		});*/
+		});
 		
 		if(API.isActive) {// it has initialized
 			// This is switch cased to appropriately translate SCORM 2004 to 1.2 if needed.
@@ -522,13 +542,16 @@ function SCORM_API(options) {
 		ec = 0, // error code
 		nn = null, // new number
 		ig = false;	// ignore
-		// Triggering events can get dicy.  Just left this here for a test.  I found that if you don't have something listening
-		// to this event you get a 'maximum thread count exceeded' error. See 'return false;'
-		/*$(self).trigger({
+		
+		// Custom Event Trigger setvalue
+		$(self).triggerHandler({
 			'type': "setvalue",
 			'n': n,
 			'v': v
-		});*/
+		});
+		// Security Consideration?
+		// It may be worth some minor security later to validate this is being set from a authorized source.  This is lacking support old versions of IE however.
+		//debug(settings.prefix + ": The caller of this method is " + arguments.callee.caller.caller.name, 4);  //arguments.callee.caller
 		
 		if(API.isActive) {// it has initialized
 			// This is switch cased to appropriately translate SCORM 2004 to 1.2 if needed.
@@ -572,8 +595,7 @@ function SCORM_API(options) {
 							break;
 						// Possibly need more here, review further later.
 						case "cmi.suspend_data":
-							if(v.length > 4096) {debug(settings.prefix + ": Warning, your suspend data is over the limit!!", 2);
-							}
+							if(v.length > 4096) {debug(settings.prefix + ": Warning, your suspend data is over the limit!!", 2);}
 							nn = n;
 							break;
 						default:
@@ -589,8 +611,7 @@ function SCORM_API(options) {
 				case "2004":
 					switch (n) {
 						case "cmi.location":
-							if(v.length > 1000) {debug(settings.prefix + ": Warning, your bookmark is over the limit!!", 2);
-							}
+							if(v.length > 1000) {debug(settings.prefix + ": Warning, your bookmark is over the limit!!", 2);}
 							break;
 						case "cmi.completion_status":
 							API.data.completion_status = v;
@@ -601,8 +622,7 @@ function SCORM_API(options) {
 							// set local status
 							break;
 						case "suspend_data":
-							if(v.length > 64000) {debug(settings.prefix + ": Warning, your suspend data is over the limit!!", 2);
-							}
+							if(v.length > 64000) {debug(settings.prefix + ": Warning, your suspend data is over the limit!!", 2);}
 							break;
 						default:
 							// any other handling?
@@ -634,8 +654,12 @@ function SCORM_API(options) {
 	 * @returns {String} 'true' or 'false'
 	 */
 	this.commit = function() {
-		var s = false, lms = API.path, ec = 0, session_secs = 0, saveDate = new Date();
-		session_secs = (saveDate.getTime() - settings.startDate.getTime()) / 1000;
+		var s            = false,
+			lms          = API.path,
+			ec           = 0,
+			session_secs = 0,
+			saveDate     = new Date();
+		session_secs     = (saveDate.getTime() - settings.startDate.getTime()) / 1000;
 		if(API.isActive) {// it has initialized
 			debug(settings.prefix + ": Committing data", 3);
 			switch(API.version) {
@@ -669,7 +693,7 @@ function SCORM_API(options) {
 	 * @returns {Boolean}
 	 */
 	this.initialize = function() {
-		debug(settings.prefix + ": Initialize Called. \nSCORM_API version: " + settings.version + "\nModified: " + settings.modifiedDate, 3);
+		debug(settings.prefix + ": Initialize Called. \n\tversion: " + settings.version + "\n\tModified: " + settings.modifiedDate, 3);
 		var s = false, // success boo
 		lms = API.path, // shortcut
 		ec = 0;
@@ -815,6 +839,32 @@ function SCORM_API(options) {
 			return 'false';
 		}
 	};
+	
+	/**
+	 * Get interaction.n.objective By ID
+	 * You can have multiple objectives assigned to a interaction.
+	 */
+	this.getInteractionObjectiveByID = function(n, id) {
+		var count = self.getvalue("cmi.interactions."+n+".objectives._count"), // obtain total objectives
+			i,
+			tID;
+		if(count === "" || count === 'false') {
+			return '0';
+		} else {
+			count = parseInt(count, 10) - 1; // convert from string
+			scorm.debug(settings.prefix + ": Getting interaction objectives from count " + count, 4);
+			for(i=count; i>=0; i--) {
+				tID = this.getvalue("cmi.interactions."+n+".objectives."+i+".id");
+				scorm.debug(settings.prefix + ": Interaction Objective ID Check for " + i + " : " + tID + " vs " + id, 4);
+				if(id == tID) {
+					scorm.debug(settings.prefix + ": Interaction Objective By ID Returning " + i);
+					return i;
+				}
+			}
+			return 'false';
+		}
+	};
+	
 	// End SCORM Public Utilities 
 	
 	// Internal API Public Calls //////////
@@ -909,6 +959,8 @@ function SCORM_API(options) {
 	 */
 	this.centisecsToSCORM12Duration = centisecsToSCORM12Duration;
 	this.centisecsToISODuration = centisecsToISODuration;
+	this.isoDateStringUTC = isoDateStringUTC;
+	this.makeBoolean = makeBoolean;
 	this.debug = debug;
 
 	// Self Initialize, note you could make this call outside, but later I decided to do it by default.
