@@ -151,12 +151,12 @@ function Local_API_1484_11(options) {
 	 */
 	function getData(key, obj) {
 		//if (!obj) { obj = data;} //outside (non-recursive) call, use "data" as our base object
-		scorm.debug(settings.prefix + ": GetData Checking " + key, 4);
+		//scorm.debug(settings.prefix + ": GetData Checking " + key, 4);
 		var ka = key.split(/\./), v;
 		//split the key by the dots
 		if(ka.length < 2) {
 			try {
-				scorm.debug(settings.prefix + ":  getData returning -   key:" + ka[0] + " value:" + obj[ka[0]], 4);
+				//scorm.debug(settings.prefix + ":  getData returning -   key:" + ka[0] + " value:" + obj[ka[0]], 4);
 				return obj[ka[0]];
 			} catch (e) {
 				settings.errorCode = 402;
@@ -394,7 +394,18 @@ function Local_API_1484_11(options) {
 												cmi.interactions[tiers[2]].objectives._count = "0";
 												cmi.interactions[tiers[2]].objectives._children = "id,score,success_status,completion_status,description";
 											}
-											cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 1) + ""; // Why -1?  _count
+											cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 1) + ""; // Why -1?  _count and _children
+										}
+										if(tiers[3] === 'correct_responses') {
+											// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
+											if(!cmi.interactions[tiers[2]].correct_responses) {
+												// Setup Objectives for the first time
+												scorm.debug(settings.prefix + ": Constructing correct responses object for new interaction", 4);
+												cmi.interactions[tiers[2]].correct_responses = {};
+												cmi.interactions[tiers[2]].correct_responses._count = "0";
+												//cmi.interactions[tiers[2]].correct_responses._children = "pattern"; // scorm spec didn't include _children for pattern.
+											}
+											cmi.interactions[tiers[2]].correct_responses._count = (getObjLength(cmi.interactions[tiers[2]].correct_responses)) + ""; // Why -1?  _count
 										}
 										// this should work (Subtract _count, and _children)
 										if(parseInt(tiers[2], 10) === "NaN") {
