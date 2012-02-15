@@ -92,7 +92,7 @@ test("initialize", function() {
 				interactionObjectiveIndex = scorm.getInteractionObjectiveByID(interactionIndex, '0_1_1'),
 				interactionResponses      = '0';
 				
-				scorm.debug(">>>>>>>>>>>> start set value test <<<<<<<<<<<<<<<<<<<", 4);
+			scorm.debug(">>>>>>>>>>>> start set value test <<<<<<<<<<<<<<<<<<<", 4);
 			strictEqual(setvalue('cmi.mode', 'browse'), 'false', "Setting cmi.mode (not allowed, will throw error 404)"); // This is not allowed validate
 			ok(setvalue('cmi.location', '4'), "Setting cmi.location to 4");
 			ok(setvalue('cmi.completion_status', "incomplete"), "Setting cmi.completion_status to incomplete");
@@ -319,6 +319,7 @@ test("initialize", function() {
 				// Wrap up scoring
 				test("setvalue", function() {
 					strictEqual(setvalue('cmi.score.raw', "1"), 'true', 'Setting cmi.score.raw to 1');
+					strictEqual(setvalue('cmi.score.scaled', "1"), 'true', 'Setting cmi.score.scaled to 1');
 					strictEqual(setvalue('cmi.completion_status', 'completed'), 'true', 'Setting cmi.completion_status to completed');
 					strictEqual(setvalue('cmi.success_status', 'passed'), 'true', 'Setting cmi.success_status to passed');
 				});
