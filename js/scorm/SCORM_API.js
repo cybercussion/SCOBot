@@ -854,10 +854,36 @@ function SCORM_API(options) {
 			count = parseInt(count, 10) - 1; // convert from string
 			scorm.debug(settings.prefix + ": Getting interaction objectives from count " + count, 4);
 			for(i=count; i>=0; i--) {
-				tID = this.getvalue("cmi.interactions."+n+".objectives."+i+".id");
+				tID = self.getvalue("cmi.interactions."+n+".objectives."+i+".id");
 				scorm.debug(settings.prefix + ": Interaction Objective ID Check for " + i + " : " + tID + " vs " + id, 4);
 				if(id == tID) {
 					scorm.debug(settings.prefix + ": Interaction Objective By ID Returning " + i);
+					return i;
+				}
+			}
+			return 'false';
+		}
+	};
+	
+	/**
+	 * Get interaction.n.correct_responses By pattern
+	 * You can have multiple correct responses assigned to a interaction.
+	 */
+	this.getInteractionCorrectResponsesByPattern = function(n, pattern) {
+		var count = self.getvalue("cmi.interactions."+n+".correct_responses._count"), // obtain total correct_responses
+			i,
+			p;
+		if(count === "" || count === 'false') {
+			scorm.debug(settings.prefix + ": Correct Responses pattern was empty or false", 4);
+			return '0'; // never created before so go with 0
+		} else {
+			count = parseInt(count, 10) - 1; // convert from string
+			scorm.debug(settings.prefix + ": Getting interaction correct responses from count " + count, 4);
+			for(i=count; i>=0; i--) {
+				p = self.getvalue("cmi.interactions."+n+".correct_responses."+i+".pattern");
+				scorm.debug(settings.prefix + ": Interaction Correct Responses Pattern Check for " + i + " : " + p + " vs " + pattern, 4);
+				if(pattern == p) {
+					scorm.debug(settings.prefix + ": Interaction Correct Responses By Pattern Returning " + i);
 					return i;
 				}
 			}
