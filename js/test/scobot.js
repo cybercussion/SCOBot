@@ -497,6 +497,28 @@ test("SCORM Interactions", function() {
 	// End Other Interaction
 });
 
+test("SCORM Get Interaction", function() {
+	scorm.debug("============================", 4);
+	var int1 = SB.getInteraction('1');
+	scorm.debug(int1, 4);
+	scorm.debug("============================", 4);
+	
+	scorm.debug("============================", 4);
+	var int3 = SB.getInteraction('3');
+	scorm.debug(int3, 4);
+	scorm.debug("============================", 4);
+	
+	scorm.debug("============================", 4);
+	var int5 = SB.getInteraction('5');
+	scorm.debug(int5, 4);
+	scorm.debug("============================", 4);
+	
+	scorm.debug("============================", 4);
+	var int6 = SB.getInteraction('6');
+	scorm.debug(int6, 4);
+	scorm.debug("============================", 4);
+});
+
 test("SCORM Set Suspend Data By Page ID", function() {
 	var result,
 		answer_arr = ["a","b","c","d"],
