@@ -42,6 +42,8 @@ test("initialize", function() {
 		strictEqual(getvalue('cmi.session_time'), 'false', "Requested cmi.session_time - (not allowed, will throw error 405)");
 		if(local) {
 			// First time this will be blank / null, since this is local your pretty much always in the "first time" category
+			strictEqual(getvalue('cmi.entry'), 'ab-initio', "Requested cmi.entry - " + getvalue('cmi.entry'));
+			strictEqual(getvalue('cmi.credit'), 'no_credit', "Requested cmi.credit - " + getvalue('cmi.credit'));
 			strictEqual(getvalue('cmi.location'), "", "Getting cmi.location - " + getvalue('cmi.location') + "(this should be empty)");
 			// this may need to be "false"
 			strictEqual(getvalue('cmi.completion_status'), "incomplete", "Getting cmi.completion_status - " + getvalue('cmi.completion_status'));
