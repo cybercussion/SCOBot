@@ -209,6 +209,30 @@ function SCOBot(options) {
 	}
 	
 	/**
+	 * Find Response Type (May not use this)
+	 * This is designed to check for {case_matters: true/false}, {order_matters: true/false} or {lang: x}
+	 * @param type {String} order_matters, case_matters, lang
+	 * @returns {Number}
+	 */
+	function findResponseType(type, str) {
+		var reg = 0;
+		switch(type) {
+			case "order_matters":
+			reg = /^\{order_matters=.*?\}/;
+			break;
+			case "case_matters":
+			reg = /^\{case_matters=.*?\}/;
+			break;
+			case "lang":
+			reg = /^\{lang=.*?\}/;
+			break;
+			default:
+				scorm.debug(settings.prefix + ": Sorry, this is not a valid Response type.", 1);
+			break;
+		}
+		return reg.exec(str);
+	}
+	/**
 	 * Set Value By Interaction Type
 	 * This is a data filter to convert input formats into SCORM standard strings.  Please review each interaction for what it expects.
 	 * This will not enforce SCORM char limits, so please mind your logs if your doing something your not suppose to.
@@ -217,7 +241,7 @@ function SCOBot(options) {
 	 * @returns {String} formatted value for interaction type
 	 * TODO
 	 */
-	function setValueByInteractionType(type, value) {
+	function encodeInteractionType(type, value) {
 		var str = '',
 			i = 0,
 			arr = [];
@@ -344,7 +368,6 @@ function SCOBot(options) {
 				if($.isArray(value)) {
 					for(i=0; i<value.length; i++) {
 						if($.isArray(value[i])) {
-							scorm.debug("Value is" + value[i].length, 4);
 							arr.push(value[i].join("[.]")); // this isn't working
 						} else {
 							scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof(value) + " instead", 1);
@@ -387,6 +410,157 @@ function SCOBot(options) {
 		}
 	}
 	
+	/**
+	 * Decode Value By Interaction Type
+	 * This is a data filter to convert input formats from SCORM standard strings to there native JS equivalent.
+	 * @param type {String} Expects true_false, multiple_choice, fill_in, long_fill_in, matching, performance, sequencing, likert, numeric, other
+	 * @param value {String} SCORM 2004 Format for Interaction learner response, or pattern
+	 * @returns {Mixed} formatted value for interaction type
+	 * TODO
+	 */
+	function decodeInteractionType(type, value) {
+		var str = '',
+			i = 0,
+			arr = [],
+			obj = {};
+		switch(type) {
+			case 'true_false':
+			return value;
+			case 'multiple_choice':
+			case 'sequencing':
+				// a[,]b to array
+				arr = value.split("[,]");
+				value = arr;
+			return value;
+			/*
+			 * Fill In
+			 * This will expect an {Object} with optional values
+			 * {
+			 *		case_matters: true, // optional {Boolean}
+			 *		order_maters: true, // optional {Boolean}
+			 *		lang: 'en-us',      // optional, can also be alternate letter lang code {String}
+			 *		words: [            // required {Array}
+			 *			'word1',
+			 *			'word2'
+			 *		]
+			 * }
+			 */
+			case 'fill_in':
+				// Word
+				// {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
+				// Check for case_matters
+				arr = findResponseType('case_matters', value);
+				if(arr !== null) {
+					if(arr[0].search(/^\{case_matters=(true|false)\}$/) !== -1) {
+						obj.case_matters = arr[0].substring('{case_matters='.length, arr[0].length - 1);
+						value = value.substring(arr[0].length, value.length); // trim off
+						scorm.debug("=== case matters" + value, 4);
+					}
+				}
+				// Check for order_matters
+				arr = findResponseType('order_matters', value);
+				if(arr !== null) {
+					if(arr[0].search(/^\{order_matters=(true|false)\}$/) !== -1) {
+						obj.order_matters = arr[0].substring('{order_matters='.length, arr[0].length - 1);
+						value = value.substring(arr[0].length, value.length); // trim off
+						scorm.debug("=== order matters" + value, 4);
+					}
+				}
+				// Check for lang
+				arr = findResponseType('lang', value);
+				if(arr !== null) {
+					if(arr[0].search(/^\{lang=.*?\}$/) !== -1) {
+						obj.lang = arr[0].substring('{lang='.length, arr[0].length - 1); // returns language value
+						value = value.substring(arr[0].length, value.length); // trim off
+					}
+				}
+				obj.words = value.split("[,]");
+			return obj;
+			/*
+			 * Long Fill In
+			 * This will expect an {Object} with optional values
+			 * {
+			 *		case_matters: true,   // Optional {Boolean}
+			 *		lang: 'en-us',        // Optional, can also be alternate letter lang code {String}
+			 *		text: 'Bunch of text' // Required 4000 character limit {String}
+			 * }
+			 */
+			case 'long_fill_in':
+				// Bunch of text...
+				// {case_matters=true}{lang=en}Bunch of text...
+					// Check for case_matters
+				arr = findResponseType('case_matters', value);
+				if(arr !== null) {
+					if(arr[0].search(/^\{case_matters=(true|false)\}$/) !== -1) {
+						obj.case_matters = arr[0].substring('{case_matters='.length, arr[0].length - 1);
+						value = value.substring(arr[0].length, value.length); // trim off
+						scorm.debug("=== case matters" + value, 4);
+					}
+				}
+				// Check for lang
+				arr = findResponseType('lang', value);
+				if(arr !== null) {
+					if(arr[0].search(/^\{lang=.*?\}$/) !== -1) {
+						obj.lang = arr[0].substring('{lang='.length, arr[0].length - 1); // returns language value
+						value = value.substring(arr[0].length, value.length); // trim off
+					}
+				}
+				obj.text = value;
+			return obj;
+			/*
+			 * Matching
+			 * This will expect {Array} of {Array}'s
+			 * [
+			 *		['tile1', 'target1'],
+			 *		['tile2', 'target3'],
+			 *		['tile3', 'target2']
+			 * ]
+			 */
+			case 'matching':
+			/*
+			 * Performance
+			 * This will expect {Array} of {Array}'s
+			 * Similar to matching, but its optional to pass the step identifier
+			 * [
+			 *		["step_1", "inspect wound"],
+			 *		["step_2", "clean wound"],
+			 *		["step_3", "apply bandage"]
+			 * ]
+			 */
+			case 'performance':
+				// tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
+				arr = value.split("[,]");
+				for(i=0; i<arr.length; i++) {
+					arr[i] = arr[i].split("[.]"); // this isn't working
+				}
+			return arr;
+
+			/**
+			 * Numeric
+			 * This falls into a simple hand off
+			 */
+			case 'numeric':
+
+			/*
+			 * LikeRT
+			 * No real hands on here, expects a {String}
+			 * This is like 'other', but expects a short identifier type
+			 */
+			case 'likert':
+			/*
+			 * Other
+			 * This will take a {String} and recommended not to go beyond 4000 chars
+			 */
+			
+			case 'other':
+				// Anything up to 4000 characters
+			return value; // Do nothing
+				default:
+				// Invalid
+				scorm.debug(settings.prefix + ": Sorry, invalid interaction type detected for " + type + " on " + value, 1);
+			return false;
+		}
+	}
 	/**
 	 * Update Suspend Data
 	 * This will submit existing suspend data and call commit saving it on the LMS
@@ -470,7 +644,7 @@ function SCOBot(options) {
 			}
 			
 			// Set Progress Measure
-			progressMeasure = settings.totalObjectives / settings.totalObjectivesCompleted + "";
+			progressMeasure = settings.totalObjectivesCompleted / settings.totalObjectives + "";
 			scorm.setvalue('cmi.progress_measure', progressMeasure);
 			
 			// Set Completion Status
@@ -570,6 +744,46 @@ function SCOBot(options) {
 		return true;
 	};
 	
+	/** 
+	 * Set Totals
+	 * This will take in total objectives, interactions, score max and score min to aid
+	 * in the calculation of a score rollup.
+	 * @param data {Object}
+	 * {
+	 *	totalInteractions: '0',
+	 *	totalObjectives: '0',
+	 *	scoreMin: '0',
+	 *	scoreMax: '0'
+	 * }
+	 * @returns {String} 'true' or 'false'
+	 */
+	this.setTotals = function(data) {		
+		if(isStarted) {
+			if(!isBadValue(data.totalInteractions)) {settings.totalInteractions = data.totalInteractions;}
+			if(!isBadValue(data.totalObjectives)) {settings.totalInteraction  = data.totalObjectives;}
+			if(!isBadValue(data.scoreMin)) {settings.scoreMin = data.scoreMin;}
+			if(!isBadValue(data.scoreMax)) {settings.scoreMax = data.scoreMax;}	
+			return 'true';
+		} else {
+			notStartedYet();
+			return 'false';
+		}
+	};
+	
+	/**
+	 * Get Mode
+	 * This will return the current SCO Mode we are in (normal, browse, review)
+	 * @returns {String} normal, browse, review
+	 */
+	this.getMode = function() {
+		if(isStarted) {
+			return settings.mode;
+		} else {
+			notStartedYet();
+			return 'false';
+		}
+	};
+	
 	/**
 	 * Set Bookmark
 	 * This will update the local snap shot, and update SCORM (commit still required)
@@ -582,7 +796,7 @@ function SCOBot(options) {
 			return scorm.setvalue('cmi.location', settings.location);
 		} else {
 			notStartedYet();
-			return false;
+			return 'false';
 		}
 	};
 	
@@ -596,7 +810,7 @@ function SCOBot(options) {
 			return settings.location; // return local snapshot
 		} else {
 			notStartedYet();
-			return false;
+			return 'false';
 		}
 	};
 	
@@ -717,7 +931,7 @@ function SCOBot(options) {
 	 *	result: 'correct',                   // (correct, incorrect, unanticipated, neutral, real (10,7) )
 	 *	latency: 'expects date object after interaction is done',  // second(10,2)
 	 *	description: "The question commonly" // 250 chars
-	 * };
+	 * }
 	 * @param data {Object} Interaction Object from SCORM
 	 * @returns {String} 'true' or 'false'
 	 */
@@ -727,6 +941,7 @@ function SCOBot(options) {
 			i,       // Reserved for objective loop
 			j,       // Reserved for correct responses loop
 			p,       // Reserved for the count within interactions.n.ncorrect_responses.p loop
+			p1 = 'cmi.interactions.', // Reduction of retyping
 			orig_timestamp = data.timestamp,
 			timestamp, // Reserved for converting the Timestamp
 			orig_latency = data.latency,
@@ -757,15 +972,16 @@ function SCOBot(options) {
 			if(!isBadValue(data.id)) {
 				n = scorm.getInteractionByID(data.id); // we want to update by interaction id
 				if(isBadValue(n)) {
-					n = scorm.getvalue('cmi.interactions._count'); // This is a add
+					n = scorm.getvalue(p1 + '_count'); // This is a add
 				}
 				/* 
 				 * We need to make several setvalues now against cmi.interactions.n.x
 				 * As stated by the standard, if we run into issues they will show in the log from the SCORM API.
 				 * I won't currently do anything at this point to handle them here, as I doubt there is little that could be done.
 				 */
-				result = scorm.setvalue('cmi.interactions.'+n+'.id', data.id);
-				result = scorm.setvalue('cmi.interactions.'+n+'.type', data.type);
+				p1 += n + "."; // Add n to part 1 str
+				result = scorm.setvalue(p1 + 'id', data.id);
+				result = scorm.setvalue(p1 + 'type', data.type);
 				
 				// Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
 				// Either ignore value because its already added, or add it based on _count
@@ -774,12 +990,12 @@ function SCOBot(options) {
 					// We need to find out if the objective is already added
 					m = scorm.getInteractionObjectiveByID(n, data.objectives[i].id); // will return 0 or the locator where it existed or false (not found)
 					if(m === 'false') {
-						m = scorm.getvalue('cmi.interactions.'+n+'.objectives._count');
+						m = scorm.getvalue(p1 + 'objectives._count');
 					}
-					result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+'.id', data.objectives[i].id);
+					result = scorm.setvalue(p1 + 'objectives.'+m+'.id', data.objectives[i].id);
 				}
 				
-				result = scorm.setvalue('cmi.interactions.'+n+'.timestamp', data.timestamp);
+				result = scorm.setvalue(p1 + 'timestamp', data.timestamp);
 				
 				// Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type 
 				//result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
@@ -787,17 +1003,17 @@ function SCOBot(options) {
 					p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
 					scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
 					if(p === 'false') {
-						p = scorm.getvalue('cmi.interactions.'+n+'.correct_responses._count');
+						p = scorm.getvalue(p1 + 'correct_responses._count');
 						scorm.debug(settings.prefix + ": p is now " + p, 4);
 					}
-					result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', setValueByInteractionType(data.type, data.correct_responses[j].pattern));
+					result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
 				}
 				
-				result = scorm.setvalue('cmi.interactions.'+n+'.weighting', data.weighting);
-				result = scorm.setvalue('cmi.interactions.'+n+'.learner_response', setValueByInteractionType(data.type, data.learner_response)); // will need to format by interaction type
-				result = scorm.setvalue('cmi.interactions.'+n+'.result', data.result);
-				result = scorm.setvalue('cmi.interactions.'+n+'.latency', data.latency);
-				result = scorm.setvalue('cmi.interactions.'+n+'.description', data.description);
+				result = scorm.setvalue(p1 + 'weighting', data.weighting);
+				result = scorm.setvalue(p1 + 'learner_response', encodeInteractionType(data.type, data.learner_response)); // will need to format by interaction type
+				result = scorm.setvalue(p1 + 'result', data.result);
+				result = scorm.setvalue(p1 + 'latency', data.latency);
+				result = scorm.setvalue(p1 + 'description', data.description);
 				
 				return result;
 			} else {
@@ -808,6 +1024,97 @@ function SCOBot(options) {
 		}
 	};
 	
+	/**
+	 * Get Interaction
+	 * Returns the full Interaction object 
+	 * @param id {String}
+	 * @returns {Mixed} object or string 'false'
+	 * {
+	 *	id: '1',                             // 4000 chars
+	 *	type: 'true_false',                  // (true_false, multiple_choice, fill_in, long_fill_in, matching, performance, sequencing, likert, numeric, other)
+	 *	objectives: [
+	 *		{
+	 *			id: '12'	
+	 *		}
+	 *	],
+	 *	timestamp: 'expects date object when interaction starts',  // second(10,0) Pass a date object
+	 *	correct_responses: [
+	 *		{
+	 *			pattern: ''                  // depends on interaction type
+	 *		}
+	 *	],
+	 *	weighting: '1',
+	 *	learner_response: 'true',
+	 *	result: 'correct',                   // (correct, incorrect, unanticipated, neutral, real (10,7) )
+	 *	latency: 'expects date object after interaction is done',  // second(10,2)
+	 *	description: "The question commonly" // 250 chars
+	 * }
+	 * or
+	 * 'false'
+	 */
+	this.getInteraction = function(id) {
+		var n = 'false', // Interaction count
+			p1 = 'cmi.interactions.', // Reduction of typing
+			m = 0, // objectives count
+			p = 0, // correct_responses count
+			i = 0, // loop count
+			obj = {}; // Response object
+		if(isStarted) {
+			n = scorm.getInteractionByID(id);
+			if(n === 'false') {
+				return n;
+			} else {
+				// Lets rebuild the Interaction object
+				p1 += n + '.';
+				obj.id                = id;
+				obj.type              = scorm.getvalue(p1 + 'type');
+				m                     = scorm.getvalue(p1 + 'objectives._count');
+				obj.objectives        = [];
+				if(m !== 'false') {
+					for(i=0; i<m; i++) {
+						obj.objectives.push({
+							id: scorm.getvalue(p1 + 'objectives.'+i+'.id')
+						});
+					}
+				}
+				obj.timestamp         = scorm.getvalue(p1 + 'timestamp'); // TODO need to convert to date object?
+				p                     = scorm.getvalue(p1 + 'correct_responses._count');
+				obj.correct_responses = [];
+				if(p !== 'false') {
+					// Loop thru and grab the patterns
+					for(i=0; i<p; i++) {
+						obj.correct_responses.push({
+							pattern: decodeInteractionType(obj.type, scorm.getvalue(p1 + 'correct_responses.'+i+'.pattern'))
+						});
+					}
+				}
+				obj.weighting         = scorm.getvalue(p1 + 'weighting');
+				obj.learner_response  = decodeInteractionType(obj.type, scorm.getvalue(p1 + 'learner_response'));
+				obj.result            = scorm.getvalue(p1 + 'result');
+				obj.latency           = scorm.getvalue(p1 + 'latency'); // TODO need to convert to date object?
+				obj.description       = scorm.getvalue(p1 + 'description'); 
+				return obj;
+				/*
+				 Could return in this format
+				 return {
+					id: '',
+					type: '',
+					objectives: [],
+					timestamp: {},
+					correct_responses: [],
+					weighting: '',
+					learner_response: '',
+					result: '',
+					latency: '',
+					descriptoin: ''
+				 };
+				 */
+			}
+		} else {
+			notStartedYet();
+			return 'false';
+		}
+	};
 	/**
 	 * Set Objective
 	 * Sets the data for the scorm objective.  ID's have to be set first and must be unique.
@@ -830,37 +1137,69 @@ function SCOBot(options) {
 	 */
 	this.setObjective = function(data) {
 		var n = scorm.getvalue('cmi.objective._count'),
+			p1 = 'cmi.objectives.',
 			i = 0,
 			result = 'false';
 		if(n === "" || n === 'false') {
 			n = 0;
-			result = scorm.setvalue('cmi.objectives.'+n+'.id', data.id);
-			result = scorm.setvalue('cmi.objectives.'+n+'.score.scaled', data.score.scaled);
-			result = scorm.setvalue('cmi.objectives.'+n+'.score.raw', data.score.raw);
-			result = scorm.setvalue('cmi.objectives.'+n+'.score.min', data.score.min);
-			result = scorm.setvalue('cmi.objectives.'+n+'.score.max', data.score.max);
-			result = scorm.setvalue('cmi.objectives.'+n+'.score.max', data.success_status);
-			result = scorm.setvalue('cmi.objectives.'+n+'.score.max', data.completion_status);
-			result = scorm.setvalue('cmi.objectives.'+n+'.score.max', data.progress_measure);
-			result = scorm.setvalue('cmi.objectives.'+n+'.score.max', data.description);
+			p1 += n + ".";
+			result = scorm.setvalue(p1 + 'id', data.id);
+			result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled);
+			result = scorm.setvalue(p1 + 'score.raw', data.score.raw);
+			result = scorm.setvalue(p1 + 'score.min', data.score.min);
+			result = scorm.setvalue(p1 + 'score.max', data.score.max);
+			result = scorm.setvalue(p1 + 'score.success_status', data.success_status);
+			result = scorm.setvalue(p1 + 'score.completion_status', data.completion_status);
+			result = scorm.setvalue(p1 + 'score.progress_measure', data.progress_measure);
+			result = scorm.setvalue(p1 + 'score.description', data.description);
 		} else {
 			n = scorm.getObjectiveByID(data.id);
 			if(isBadValue(n)) {
 				n = scorm.getvalue('cmi.objectives._count'); // This is a add
-			}			
-			//scorm.setvalue('cmi.objectives.'+n+'.id', data.id); // shouldn't change this
-			if(!isBadValue(data.score.scaled)) {result = scorm.setvalue('cmi.objectives.'+n+'.score.scaled', data.score.scaled);}
-			if(!isBadValue(data.score.raw)) {result = scorm.setvalue('cmi.objectives.'+n+'.score.raw', data.score.raw);}
-			if(!isBadValue(data.score.min)) {result = scorm.setvalue('cmi.objectives.'+n+'.score.min', data.score.min);}
-			if(!isBadValue(data.score.max)) {result = scorm.setvalue('cmi.objectives.'+n+'.score.max', data.score.max);}
-			if(!isBadValue(data.success_status)) {result = scorm.setvalue('cmi.objectives.'+n+'.score.max', data.success_status);}
-			if(!isBadValue(data.completion_status)) {result = scorm.setvalue('cmi.objectives.'+n+'.score.max', data.completion_status);}
-			if(!isBadValue(data.progress_measure)) {result = scorm.setvalue('cmi.objectives.'+n+'.score.max', data.progress_measure);}
-			if(!isBadValue(data.description)) {result = scorm.setvalue('cmi.objectives.'+n+'.score.max', data.description);}
+			}
+			p1 += n + '.';		
+			//scorm.setvalue(p1 + '.id', data.id); // shouldn't change this
+			if(!isBadValue(data.score.scaled)) {result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled);}
+			if(!isBadValue(data.score.raw)) {result = scorm.setvalue(p1 + 'score.raw', data.score.raw);}
+			if(!isBadValue(data.score.min)) {result = scorm.setvalue(p1 + 'score.min', data.score.min);}
+			if(!isBadValue(data.score.max)) {result = scorm.setvalue(p1 + 'score.max', data.score.max);}
+			if(!isBadValue(data.success_status)) {result = scorm.setvalue(p1 + 'score.success_status', data.success_status);}
+			if(!isBadValue(data.completion_status)) {result = scorm.setvalue(p1 + 'score.completion_status', data.completion_status);}
+			if(!isBadValue(data.progress_measure)) {result = scorm.setvalue(p1 + 'score.progress_measure', data.progress_measure);}
+			if(!isBadValue(data.description)) {result = scorm.setvalue(p1 + 'score.description', data.description);}
 		}	
 		return result;
 	};
 	
+	/**
+	 * Get Objective
+	 * Returns the Objective object by ID
+	 * @param id {String}
+	 * @returns {Mixed} object or string 'false'
+	 * {
+	 *	id: '1',                            // 4000 chars
+	 *	score: {
+	 *		scaled: '0',                    // real(10,7) *
+	 *		raw: '0',
+	 *		min: '0',
+	 *		max: '0'
+	 *	}
+	 *	success_status: 'failed',            // (passed, failed, unknown)
+	 *	completion_status: 'incomplete',     // (completed, incomplete, not attempted, unknown)
+	 *	progress_measure: '0',               // real(10,7)
+	 *	description: 'This is the objective' // 250 Chars
+	 * }
+	 * or 
+	 * 'false'
+	 */
+	this.getObjective = function(id) {
+		if(isStarted) {
+			// TODO
+		} else {
+			notStartedYet();
+			return 'false';
+		}
+	};
 	/**
 	 * Suspend
 	 * This will suspend the SCO and ends with terminating.  No data can be saved after this.
