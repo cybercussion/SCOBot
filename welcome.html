@@ -4,78 +4,162 @@
 		<meta charset="utf-8" />
 		<title>SCORM_API Sample Usage</title>
 		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-    	<meta name="apple-mobile-web-app-capable" content="yes" />
-    	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    	<meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    	<link rel="apple-touch-icon" href="img/icon.png"/>
-	    <link rel="apple-touch-startup-image" href="img/startup.png" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+		<link rel="apple-touch-icon" href="img/icon.png"/>
+		<link rel="apple-touch-startup-image" href="img/startup.png" />
 		<link rel="stylesheet" href="css/styles.css" />
 		<!--[if lt IE 9]>
 		<script src="js/util/html5.js"></script>
 		<![endif]-->
-		<script type="text/javascript" charset="utf-8">
-			// Please edit these parameters to match your deployment defaults
-			var enableDebug            = 1,         // 1 or 0
-				DEFAULT_EXIT_TYPE      = 'suspend', // timeout, suspend, logout, normal, "" 
-				DEFAULT_SUCCESS_STATUS = 'passed';  // passed, failed, unknown
-		</script>
+		<!--[if lt IE 8]>
+		<script type="text/javascript" src="js/player/util/json2.js"></script>
+		<![endif]-->
 		<!-- Developer Breakout: This will be merged, minified and packed when built -->
-		<script type="text/javascript" charset="utf-8" src="js/util/json2.js"></script>
 		<script type="text/javascript" charset="utf-8" src="js/jquery/jquery-1.7.1.js"></script>
 		<script type="text/javascript" charset="utf-8" src="js/scorm/Local_API_1484_11.js"></script>
 		<script type="text/javascript" charset="utf-8" src="js/scorm/SCORM_API.js"></script>
-		<script type="text/javascript" charset="utf-8" src="js/scorm/SCOBOT.js"></script>
-		<script type="text/javascript" charset="utf-8" src="js/util/events.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/scorm/SCOBot.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			/*globals SCORM_API, SCOBot */
+			// Please edit these parameters to match your deployment defaults
+			var scorm       = new SCORM_API({debug: true, exit_type: "suspend", success_status: "unknown"}),
+				SB          = new SCOBot(); // This could be moved to a Player Object/Init
+			// passed, failed, unknown
+		</script>
 	</head>
 	<body>
 		<header>
 			<h1>About this SCORM_API</h1>
-			<p>Looking for a light weight SCORM API with or without the crutches?  This is roughly a year of off-hour work I'd call "self-improvement".  It was driven by a desire to 'update' SCORM and blend in some Test Driven Development, and best practices.  This API is used by the SCO's (Shareable Content Object's) to connect with the LMS and communicate thru JavaScript (the way scorm was designed). I've added a "SCOBOT" helper, which boils down SCORM API calls, and handles common tasks SCORM does without the guesswork. This assists you with not having to do all longhand SCORM Calls.  But make no mistake, there is no magic SCORM drop-in that magically knows you're taking a test or a quiz.  You have to make the appropriate calls when needed.</p>
-			<p>Commonly, within the SCORM Specification its riddled with arbitrary limitations on character limits, and read/write access within the CMI Object.  Because SCORM is a Government standard, I did my best to remain true to the specification, but I don't feel LMS's should 100% strictly impose these character limits.  What commonly happens is if you go over your suspend data limit or bookmarking etc … the LMS will ignore your setting of the value.  This causes data to be lost.  Also, they didn't make or let SCORM scale properly.  If I want to store a new object, that I want to fetch later, don't hinder me from doing so.  So, with this said I took a hybrid approach to warning you when you're breaking the spec, but not stopping you from doing so.  These are things I think LMS's should consider in the future, but you NEED to be aware of these limitations.</p>
+			<p>
+				Looking for a light weight SCORM API with or without the crutches?  This is roughly a year of off-hour work I'd call "self-improvement".  It was driven by a desire to 'update' SCORM and blend in some Test Driven Development, and best practices.  This API is used by the SCO's (Shareable Content Object's) to connect with the LMS and communicate thru JavaScript (the way scorm was designed). I've added a "SCOBOT" helper, which boils down SCORM API calls, and handles common tasks SCORM does without the guesswork. This assists you with not having to do all longhand SCORM Calls.  But make no mistake, there is no magic SCORM drop-in that magically knows you're taking a test or a quiz.  You have to make the appropriate calls when needed.
+			</p>
+			<p>
+				Commonly, within the SCORM Specification its riddled with arbitrary limitations on character limits, and read/write access within the CMI Object.  Because SCORM is a Government standard, I did my best to remain true to the specification, but I don't feel LMS's should 100% strictly impose these character limits.  What commonly happens is if you go over your suspend data limit or bookmarking etc … the LMS will ignore your setting of the value.  This causes data to be lost.  Also, they didn't make or let SCORM scale properly.  If I want to store a new object, that I want to fetch later, don't hinder me from doing so.  So, with this said I took a hybrid approach to warning you when you're breaking the spec, but not stopping you from doing so.  These are things I think LMS's should consider in the future, but you NEED to be aware of these limitations.
+			</p>
 			<br />
-			<p>Without looking at your browsers console, this page will just look like a plain old 'read me' file.  Its actually included the SCORM API, SCOBOT and made SCORM Calls.  Suspend and Finish below will either Suspend and Terminate or Finish and Terminate.  You can review the logs to see the console traces.</p>
+			<p>
+				Without looking at your browsers console, this page will just look like a plain old 'read me' file.  Its actually included the SCORM API, SCOBOT and made SCORM Calls.  Suspend and Finish below will either Suspend and Terminate or Finish and Terminate.  You can review the logs to see the console traces.
+			</p>
 			<br />
 			<h1>Debugging this Project</h1>
-			<p>The console is your friend. Review the console to see messages in Chrome and Safari - (right-click, inspect element, console tab)</p>
-			<p>If you are using IE, but use - (F12 Developer Tools).  Note: mileage varies.</p>
-			<p>If you use FireFox you need the Add-on <a href="http://getfirebug.com/">FireBug</a>, then the console should show up since it supports console.show().</p>
-			<p>What you should end up seeing is a series of SCORM Debug messages.  If you are running this locally, the Local_API_1484_11 will mimic a LMS when one is not present.</p>
-			<p>I mention this because its important to monitor how your interacting.  This is a great place to catch 404 errors (file not found) among script/syntax errors, debug messages as well as inspecting elements and there styling.  Developers worked many years in the 'dark', and this is a nice way to bring your project into the light.</p>
-			<p>Putting this into your project is essentially how this page is set up.  If you view the source you'll see the files included.  But, lets dive in a little deeper...</p>
+			<p>
+				The console is your friend. Review the console to see messages in Chrome and Safari - (right-click, inspect element, console tab)
+			</p>
+			<p>
+				If you are using IE, but use - (F12 Developer Tools).  Note: mileage varies.
+			</p>
+			<p>
+				If you use FireFox you need the Add-on <a href="http://getfirebug.com/">FireBug</a>, then the console should show up since it supports console.show().
+			</p>
+			<p>
+				What you should end up seeing is a series of SCORM Debug messages.  If you are running this locally, the Local_API_1484_11 will mimic a LMS when one is not present.
+			</p>
+			<p>
+				I mention this because its important to monitor how your interacting.  This is a great place to catch 404 errors (file not found) among script/syntax errors, debug messages as well as inspecting elements and there styling.  Developers worked many years in the 'dark', and this is a nice way to bring your project into the light.
+			</p>
+			<p>
+				Putting this into your project is essentially how this page is set up.  If you view the source you'll see the files included.  But, lets dive in a little deeper...
+			</p>
 			<br />
 			<h1>Getting Around</h1>
-			<p>This project makes use of <a href="jquery.com">JQuery</a>.  Using it without will require some subtle re-writing.</p>
-			<p>SCORM can be as little as <code>initialize</code> and <code>terminate</code>, and ramp up to full quiz, essay, interactions and objectives with the ability to suspend data.  Depending on where you fall on the spectrum, it's a good idea to take a solid look at what your needs are so you're not lofting around a lot of overhead to do a simple task.</p>
-			<p>There is a readme.html file located in <a href="js/scorm/readme.html">js/scorm/readme.html</a> that covers in greater detail what I'm eluding to here.  This documentation is being added as the project solidifies, but it covers much of the implementation.</p>
-			<p>If you were looking for a single file to drop into your project, your seeking the actual "build" of this project.  This is the process of merging and packing all JavaScript files.  In order to keep things open, and editable for now, I've kept it broken out until I reach a conclusion on the best way to offer the needed edits, with the base code.</p>
+			<p>
+				This project makes use of <a href="jquery.com">JQuery</a>.  Using it without will require some subtle re-writing.
+			</p>
+			<p>
+				SCORM can be as little as <code>
+					initialize</code>
+				and <code>
+					terminate</code>
+				, and ramp up to full quiz, essay, interactions and objectives with the ability to suspend data.  Depending on where you fall on the spectrum, it's a good idea to take a solid look at what your needs are so you're not lofting around a lot of overhead to do a simple task.
+			</p>
+			<p>
+				There is a readme.html file located in <a href="js/scorm/readme.html">js/scorm/readme.html</a> that covers in greater detail what I'm eluding to here.  This documentation is being added as the project solidifies, but it covers much of the implementation.
+			</p>
+			<p>
+				If you were looking for a single file to drop into your project, your seeking the actual "build" of this project.  This is the process of merging and packing all JavaScript files.  In order to keep things open, and editable for now, I've kept it broken out until I reach a conclusion on the best way to offer the needed edits, with the base code.
+			</p>
 			<br />
 			<h1>Versions</h1>
-			<p><b>SCORM_API.js</b> version: <script type="text/javascript">document.write(scorm.get('version'));</script>, Last Change: <script type="text/javascript">document.write(scorm.get('modifiedDate'));</script></p>
-			<p><b>SCOBOT.js</b> version: <script type="text/javascript">document.write(SB.get('version'));</script>, Last Change: <script type="text/javascript">document.write(SB.get('modifiedDate'));</script></p>
+			<p>
+				<b>SCORM_API.js</b> version:
+				<script type="text/javascript">
+					document.write(scorm.get('version'));
+
+				</script>
+				, Last Change:
+				<script type="text/javascript">
+					document.write(scorm.get('modifiedDate'));
+
+				</script>
+			</p>
+			<p>
+				<b>SCOBOT.js</b> version:
+				<script type="text/javascript">
+					document.write(SB.get('version'));
+
+				</script>
+				, Last Change:
+				<script type="text/javascript">
+					document.write(SB.get('modifiedDate'));
+
+				</script>
+			</p>
 			<br />
 			<h1>Options and Editing:</h1>
-			<p><b>Optional</b> - js/scorm/Local_API_1484_11.js :: This mimic's the LMS's Runtime API and can be used for standalone use.</p>
-			<p><b>Optional</b> - js/scorm/SCOBOT.js :: This essentially groups 'like' SCORM calls into groups of API's like Start(), Suspend(), Finish().  Makes SCORM a little easier.</p>
-			<p><b>Edit</b> - js/util/events.js :: This is currently setup to use SCOBOT.  If you remove it, you'll need to locate equivalents to your specific SCORM calls.  This covers the <code>onload</code> and <code>onunload</code> events for proper Initializing and Terminating (does not replace Save or Finish/Done buttons within your SCO).</p>
-			<p>Its important to note that this project was split up so you could chop off things you don't need or use.  However the API's present in SCOBOT are things you will have to do regardless if you were doing SCORM longhand.  The support for a Local API_1484_11 will allow you to generate CMI Objects natively within the SCO and run like you would if you were on the LMS, without the ability of persistence after you close the browser.</p>
+			<p>
+				<b>Optional</b> - js/scorm/Local_API_1484_11.js :: This mimic's the LMS's Runtime API and can be used for standalone use.
+			</p>
+			<p>
+				<b>Optional</b> - js/scorm/SCOBOT.js :: This essentially groups 'like' SCORM calls into groups of API's like Start(), Suspend(), Finish().  Makes SCORM a little easier.
+			</p>
+			<p>
+				<b>Edit</b> - js/util/events.js :: This is currently setup to use SCOBOT.  If you remove it, you'll need to locate equivalents to your specific SCORM calls.  This covers the <code>
+					onload</code>
+				and <code>
+					onunload</code>
+				events for proper Initializing and Terminating (does not replace Save or Finish/Done buttons within your SCO).
+			</p>
+			<p>
+				Its important to note that this project was split up so you could chop off things you don't need or use.  However the API's present in SCOBOT are things you will have to do regardless if you were doing SCORM longhand.  The support for a Local API_1484_11 will allow you to generate CMI Objects natively within the SCO and run like you would if you were on the LMS, without the ability of persistence after you close the browser.
+			</p>
 			<br />
 			<h1>Project Goals:</h1>
-			<p><b>JSLint Integration</b> - Better code maintainability and error control.</p>
-			<p><b>JSDocs Commenting</b> - Comments formatted for interpretation by jsDocs for instant documentation</p>
-			<p><b>Qunit Integration</b> - QUnit is a test suite that allows for Test Driven Development.  This more accurately tests existing and new functionality.</p>
-			<p><b>Size</b> - &lt; 10KB packed (by itself).  Currently loaded with Local_API_1484_11, SCOBOT, and SCORM_API is 10,276 bytes (7/5/2011)</p>
+			<p>
+				<b>JSLint Integration</b> - Better code maintainability and error control.
+			</p>
+			<p>
+				<b>JSDocs Commenting</b> - Comments formatted for interpretation by jsDocs for instant documentation
+			</p>
+			<p>
+				<b>Qunit Integration</b> - QUnit is a test suite that allows for Test Driven Development.  This more accurately tests existing and new functionality.
+			</p>
+			<p>
+				<b>Size</b> - &lt; 10KB packed (by itself).  Currently loaded with Local_API_1484_11, SCOBOT, and SCORM_API is 10,276 bytes (7/5/2011)
+			</p>
 			<br />
 			<h1>Why build this?</h1>
-			<p>Since late 2005 I've seen several groups attempt to create a SCORM API.  After failed attempts due to misunderstanding what SCORM was and how it works, you can reach out to 3rd parties to solve things.  As I mentioned in my goals above, I was after maintainability, code cleanliness, transparency, Test Driven Development, and lowering the footprint.  You don't typically find out your 3rd party code is difficient until your neck deep in it.</p>
+			<p>
+				Since late 2005 I've seen several groups attempt to create a SCORM API.  After failed attempts due to misunderstanding what SCORM was and how it works, you can reach out to 3rd parties to solve things.  As I mentioned in my goals above, I was after maintainability, code cleanliness, transparency, Test Driven Development, and lowering the footprint.  You don't typically find out your 3rd party code is difficient until your neck deep in it.
+			</p>
 			<br />
 			<h1>Final Build</h1>
-			<p>TBD</p>
-			<p>I'm still running this API thru the mill.  I've tied it into QUnit for validation and tests, as well as put it on Test Track or the SCORM Cloud.  As I finish polishing up support at lower levels like Objectives and Interactions I will release a non-beta build.</p>
-			<p>I've had some requests for a 'single file'.  This is much like a series of JQuery Plugins you might locate to bolt on to your webpage.  You can do a final build and roll in all your customizations, or you could take a build I make.  But keep in mind once you build a SCO, you commonly add in more files, and you should be following a build process that merges, minifies and or packs your CSS, JavaScript and HTML reducing bandwidth and HTTP hits.  Its never a good idea to re-pack a packed file.  This is much like rezipping a zip file.</p>
+			<p>
+				TBD
+			</p>
+			<p>
+				I'm still running this API thru the mill.  I've tied it into QUnit for validation and tests, as well as put it on Test Track or the SCORM Cloud.  As I finish polishing up support at lower levels like Objectives and Interactions I will release a non-beta build.
+			</p>
+			<p>
+				I've had some requests for a 'single file'.  This is much like a series of JQuery Plugins you might locate to bolt on to your webpage.  You can do a final build and roll in all your customizations, or you could take a build I make.  But keep in mind once you build a SCO, you commonly add in more files, and you should be following a build process that merges, minifies and or packs your CSS, JavaScript and HTML reducing bandwidth and HTTP hits.  Its never a good idea to re-pack a packed file.  This is much like rezipping a zip file.
+			</p>
 			<br />
-			<p>Thanks, <a href="mailto:mark@cybercussion.com">Mark Statkus</a></p>
+			<p>
+				Thanks, <a href="mailto:mark@cybercussion.com">Mark Statkus</a>
+			</p>
 			<br />
-			<a href="#" class="myButton fl" onclick="SB.Suspend(); return false;">Suspend</a><a href="#" class="myButton fl" onclick="SB.Finish(); return false;">Finish</a>
+			<a href="#" class="myButton fl" onclick="SB.suspend(); return false;">Suspend</a><a href="#" class="myButton fl" onclick="SB.finish(); return false;">Finish</a>
 		</header>
 	</body>
 </html>
