@@ -1195,6 +1195,7 @@ function SCOBot(options) {
 	this.getObjective = function(id) {
 		if(isStarted) {
 			// TODO
+			return 'false';
 		} else {
 			notStartedYet();
 			return 'false';
