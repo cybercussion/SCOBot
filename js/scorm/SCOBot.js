@@ -562,27 +562,24 @@ function SCOBot(options) {
 		}
 	}
 	/**
-	 * Update Suspend Data
-	 * This will submit existing suspend data and call commit saving it on the LMS
-	 * Note, you should use this sparingly.  This causes a round trip of data to the server.
-	 * I'd recommend using it between pages, or on a timer if your worried about the student
-	 * losing their information due to a power, network or computer outage(s).
+	 * Set Suspend Data
+	 * This will set existing suspend data managed by escaping the values
 	 * @returns {Boolean} true (success) false (fail)
 	 */
-	function saveSuspendData() {
+	function setSuspendData() {
 		var result;
 		// May want to consider updating scoring here at this time
 		result = scorm.setvalue('cmi.suspend_data', escape(JSON.stringify(settings.suspend_data)));
 		if(result === 'true') {
-			result = scorm.commit();
+			/*result = scorm.commit();
 			if(result === 'false') {
 				scorm.debug(settings.prefix + ": Sorry, there was an issue committing, please review the SCORM Logs", 1);
 				return result;
-			} else {
+			} else {*/
 				scorm.debug(settings.prefix + ": Suspend Data saved", 4);
 				scorm.debug(settings.suspend_data, 4);
 				return 'true';
-			}
+			//}
 		} else {
 			scorm.debug(settings.prefix + ": Sorry, there was an issue saving your suspend data, please review the SCORM Logs", 1);
 			return 'false';
@@ -1207,6 +1204,7 @@ function SCOBot(options) {
 	 */
 	this.suspend = function() {
 		if(isStarted) {
+			setSuspendData();
 			scorm.debug(settings.prefix + ": I am suspending...", 3);
 			if(!isPerforming()) {
 				scorm.setvalue('cmi.success_status', 'unknown');
@@ -1229,6 +1227,7 @@ function SCOBot(options) {
 	 */
 	this.finish = function() {
 		if(isStarted) {
+			setSuspendData();
 			scorm.debug(settings.prefix + ": I am finishing...", 3);
 			if(!isPerforming()) {
 				scorm.setvalue('cmi.success_status', settings.success_status);
@@ -1253,6 +1252,7 @@ function SCOBot(options) {
 	 */
 	this.timeout = function() {
 		if(isStarted) {
+			setSuspendData();
 			scorm.debug(settings.prefix + ": I am timing out...", 3);
 			if(!isPerforming()) {
 				scorm.setvalue('cmi.success_status', settings.success_status);
