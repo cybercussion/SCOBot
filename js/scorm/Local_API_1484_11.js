@@ -275,6 +275,19 @@ function Local_API_1484_11(options) {
 		}
 		return false;
 	}
+	
+	/**
+	 * Round Value
+	 * Rounds to 2 decimal places
+	 * @param v {Number}
+	 * @returns {Number}
+	 */
+	function roundVal(v){
+		var dec = 2,
+			result = Math.round(v*Math.pow(10,dec))/Math.pow(10,dec);
+		return result;
+	}
+	
 	/** 
 	 * Get Object Length
 	 * @param {Object}
@@ -301,6 +314,18 @@ function Local_API_1484_11(options) {
 		settings.errorCode = "406";
 		return 'false';
 	}
+	
+	/**
+	 * Update Suspend Data Usage Statistics
+	 * Will update settings.suspend_date_usage with current % level
+	 */
+	function suspendDataUsageStatistic() {
+		return roundVal( (cmi.suspend_data.length / 64000) * 100 ) + "%";
+	}
+	
+	// End Private
+	
+	// Public
 	
 	/**
 	 * isRunning, Returns true if initialized is 1 and terminated is 0
@@ -506,7 +531,9 @@ function Local_API_1484_11(options) {
 	};
 
 	this.Commit = function(v) {
+		scorm.debug(settings.prefix + ": Commit CMI Object:", 4);
 		scorm.debug(cmi);
+		scorm.debug(settings.prefix + ": Suspend Data Usage " + suspendDataUsageStatistic());
 		// trace object as its committed
 		return 'true';
 	};
@@ -517,6 +544,7 @@ function Local_API_1484_11(options) {
 		settings.initialized = 0;
 		return 'true';
 	};
+	
 	/**
 	 * GetErrorString (SCORM) - Returns the error string from the associated Number
 	 * @param param number
@@ -534,6 +562,7 @@ function Local_API_1484_11(options) {
 			return "";
 		}
 	};
+	
 	/**
 	 * GetLastError (SCORM) - Returns the error number from the last error
 	 * @param param number
@@ -542,6 +571,12 @@ function Local_API_1484_11(options) {
 	this.GetLastError = function() {
 		return settings.errorCode;
 	};
+	
+	/**
+	 * Get Diagnostic
+	 * This would return further information from the lms about a error
+	 * @returns {String} description of error in more detail
+	 */
 	this.GetDiagnostic = function() {
 		return settings.diagnostic;
 	};
