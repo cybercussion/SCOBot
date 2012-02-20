@@ -101,7 +101,7 @@ function SCORM_API(options) {
 	 * Lack of support in older browsers forced this
 	 * @param msg {String} Debug Message
 	 * @param lvl {Mixed} 1=Error, 2=Warning, 3=Log, 4=Info
-	 * @event debug fired when no console is available.
+	 * @event debug fired when no console is available.  You could listen to this to put it in an alternative log.
 	 */
 	function noconsole(msg, lvl) {
 		// ignore (IE 8 and prior or other browser that doesn't support it).  Routing event out so it can be handled.
