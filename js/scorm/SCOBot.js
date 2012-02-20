@@ -1,4 +1,4 @@
-/*global $, JQuery, scorm, escape, unescape, window */
+/*global $, JQuery, scorm, window */
 /*jslint browser: true */
 /**
  * This is a sample SCORM Startup sequence and handicap API's for ease of use.
@@ -162,6 +162,16 @@ function SCOBot(options) {
 		}
 	}
 	
+	/**
+	 * Cleanse Data
+	 * This will escape out characters that may of been cross-contaminated from other proprietary sources.
+	 * These can often result in UTF-8 and other encoding issues and may result in errors.
+	 */
+	function cleanseData(str) {
+		var cleanseExp =  /[^\f\r\n\t\v\0\s\S\w\W\d\D\b\B\cX\xhh\uhhh]/gi; ///(\f\r\n\t\v\0[/b]\s\S\w\W\d\D\b\B\cX\xhh\uhhh)/;
+		return str.replace(cleanseExp, '');
+	}
+	
 	// See $.isArray (JQuery)
 	/*function isArray(obj) {
 		return (obj.constructor.toString().indexOf("Array") != -1);
@@ -177,18 +187,6 @@ function SCOBot(options) {
 	function isISO8601UTC(v) {
 		var ISO8601Exp = /(\d{4}-[01]\d\-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+\-][0-2]\d:[0-5]\d|Z))/;
 		return ISO8601Exp.test(v);
-	}
-	
-	/**
-	 * Round Value
-	 * Rounds to 2 decimal places
-	 * @param v {Number}
-	 * @returns {Number}
-	 */
-	function roundVal(v){
-		var dec = 2,
-			result = Math.round(v*Math.pow(10,dec))/Math.pow(10,dec);
-		return result;
 	}
 	
 	/**
@@ -569,7 +567,7 @@ function SCOBot(options) {
 	function setSuspendData() {
 		var result;
 		// May want to consider updating scoring here at this time
-		result = scorm.setvalue('cmi.suspend_data', escape(JSON.stringify(settings.suspend_data)));
+		result = scorm.setvalue('cmi.suspend_data', cleanseData(JSON.stringify(settings.suspend_data)));
 		if(result === 'true') {
 			/*result = scorm.commit();
 			if(result === 'false') {
@@ -584,14 +582,6 @@ function SCOBot(options) {
 			scorm.debug(settings.prefix + ": Sorry, there was an issue saving your suspend data, please review the SCORM Logs", 1);
 			return 'false';
 		}
-	}
-	
-	/**
-	 * Update Suspend Data Usage Statistics
-	 * Will update settings.suspend_date_usage with current % level
-	 */
-	function updateSuspendDataUsageStatistics() {
-		settings.suspend_data_usage = roundVal( (escape(JSON.stringify(settings.suspend_data)).length / 64000) * 100) + "%";
 	}
 	
 	/**
@@ -702,13 +692,15 @@ function SCOBot(options) {
 				/* Suspend Data technically should be a JSON String.  Structured data would be best suited to
 				 * be recorded this way.  If you don't want to do this, you'll need to back out this portion.
 				 * Also, in order to eliminate foreign keys and other special characters from messing up some
-				 * LMS's we commonly escape going out, and unescape coming in.  We may even need to base64.
+				 * LMS's we commonly escape going out, and unescape coming in.  I noticed this was increasing
+				 * the suspend_data string length by almost 50%.  I'm opting to use a cleanseData() method now
+				 * to define a whitelist of safe characters.  We may even need to base64.
 				 * !IMPORTANT- once you do this, your kinda stuck with it.  SCO's will begin to save suspend data
 				 * and if you change mid-stream your going to have to handle the fact you need to reverse support
 				 * old saved data.  Don't fall victim to this little gem.
 				 * GOAL: Deal with this in a managed way
 				 */
-				settings.suspend_data         = unescape(scorm.getvalue('cmi.suspend_data'));
+				settings.suspend_data         = (scorm.getvalue('cmi.suspend_data'));
 				// Quality control - You'd be surprised at the things a LMS responds with
 				if(settings.suspend_data.length > 0 && !isBadValue(settings.suspend_data)) {
 					// Assuming a JSON String
@@ -868,8 +860,8 @@ function SCOBot(options) {
 		}
 		// new page push
 		settings.suspend_data.pages.push({'id': id, 'title': title, 'data': data});
-		updateSuspendDataUsageStatistics();
-		scorm.debug(settings.prefix + ": Suspend Data Set.\n\t\t\tCurrent Usage: " + settings.suspend_data_usage, 4);
+
+		scorm.debug(settings.prefix + ": Suspend Data set:", 4);
 		scorm.debug(settings.suspend_data, 4);
 		
 		return 'true';
