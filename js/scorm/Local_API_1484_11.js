@@ -103,8 +103,9 @@ function Local_API_1484_11(options) {
 	 This would of allowed me to just evaluate the last item and perform that rule globally.  The following are issues -
 	 id -       This is read-only under adl.data.n.id, and read/write everywhere else
 	 comments_from_lms are entirely read-only (global rule)
+	 timestamp is RO for comments from LMS
 	 */
-	read_only = "|_version|completion_threshold|credit|entry|launch_data|learner_id|learner_name|_children|_count|mode|maximum_time_allowed|scaled_passing_score|time_limit_action|total_time|comment|", //timestamp RO in comments
+	read_only = "|_version|completion_threshold|credit|entry|launch_data|learner_id|learner_name|_children|_count|mode|maximum_time_allowed|scaled_passing_score|time_limit_action|total_time|comment|",
 	/**
 	 * Write Only values
 	 */
@@ -408,7 +409,10 @@ function Local_API_1484_11(options) {
 								// Need to dig in to some of these lower level values
 								switch(tiers[1]) {
 									/*jslint nomen: false */ // _ built in to SCORM 2004
-									// TODO LMS Comments Timestamp is RO, doesn't fit with the rest of the model.  Have to check for it.
+									case "comments_from_lms":
+										settings.errorCode = "404";
+										settings.diagnostic = "The cmi.comments_from_lms element is entirely read only.";
+										return 'false';
 									case "interactions":
 										//scorm.debug(settings.prefix + ": Checking Interactions .... " + getObjLength(cmi.interactions), 4);
 										cmi.interactions._count = (getObjLength(cmi.interactions) - 2) + ""; // Why -2?  _count and _children
