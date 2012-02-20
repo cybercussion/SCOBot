@@ -567,7 +567,7 @@ function SCOBot(options) {
 	function setSuspendData() {
 		var result;
 		// May want to consider updating scoring here at this time
-		result = scorm.setvalue('cmi.suspend_data', cleanseData(JSON.stringify(settings.suspend_data)));
+		result = scorm.setvalue('cmi.suspend_data', cleanseData( JSON.stringify(settings.suspend_data) ) );
 		if(result === 'true') {
 			/*result = scorm.commit();
 			if(result === 'false') {
