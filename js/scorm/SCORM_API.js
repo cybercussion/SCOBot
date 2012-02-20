@@ -105,7 +105,7 @@ function SCORM_API(options) {
 	 */
 	function noconsole(msg, lvl) {
 		// ignore (IE 8 and prior or other browser that doesn't support it).  Routing event out so it can be handled.
-		$(self).trigger({
+		$(self).triggerHandler({
 			'type': "debug",
 			'msg': msg,
 			'lvl': lvl
