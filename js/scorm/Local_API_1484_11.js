@@ -108,7 +108,37 @@ function Local_API_1484_11(options) {
 	/**
 	 * Write Only values
 	 */
-	write_only = "|exit|session_time|", exit = "|time-out|suspend|logout|normal||", self = this;
+	write_only = "|exit|session_time|",
+	exit = "|time-out|suspend|logout|normal||",
+	errors = {
+			0: "No error",
+			101: "General exception",
+			102: "General Initialization Failure",
+			103: "Already Initialized",
+			104: "Content Instance Terminated",
+			111: "General Termination Failure",
+			112: "Termination Before Initialization",
+			113: "Termination After Termination",
+			122: "Retrieve Data Before Initialization",
+			123: "Retrieve Data After Termination",
+			132: "Store Data Before Initialization",
+			133: "Store Data After Termination",
+			142: "Commit Before Initialization",
+			143: "Commit After Termination",
+			201: "General Argument Error",
+			301: "General Get Failure",
+			351: "General Set Failure",
+			391: "General Commit Failure",
+			401: "Undefined Data Model",
+			402: "Unimplemented Data Model Element",
+			403: "Data Model Element Value Not Initialized",
+			404: "Data Model Element Is Read Only",
+			405: "Data Model Element Is Write Only",
+			406: "Data Model Element Type Mismatch",
+			407: "Data Model Element Value Out Of Range",
+			408: "Data Model Dependency Not Established"
+	},
+	self = this;
 	// For the above please see: http://scorm.com/wp-content/assets/scorm_ref_poster/RusticiSCORMPoster.pdf
 	
 	// Private
@@ -378,6 +408,7 @@ function Local_API_1484_11(options) {
 								// Need to dig in to some of these lower level values
 								switch(tiers[1]) {
 									/*jslint nomen: false */ // _ built in to SCORM 2004
+									// TODO LMS Comments Timestamp is RO, doesn't fit with the rest of the model.  Have to check for it.
 									case "interactions":
 										//scorm.debug(settings.prefix + ": Checking Interactions .... " + getObjLength(cmi.interactions), 4);
 										cmi.interactions._count = (getObjLength(cmi.interactions) - 2) + ""; // Why -2?  _count and _children
@@ -489,91 +520,12 @@ function Local_API_1484_11(options) {
 	 */
 	this.GetErrorString = function(param) {
 		if(param !== "") {
-			var errorString = "", nparam = parseInt(param, 10);
-			switch(nparam) {
-				case 0:
-					errorString = "No error";
-					break;
-				case 101:
-					errorString = "General exception";
-					break;
-				case 102:
-					errorString = "General Initialization Failure";
-					break;
-				case 103:
-					errorString = "Already Initialized";
-					break;
-				case 104:
-					errorString = "Content Instance Terminated";
-					break;
-				case 111:
-					errorString = "General Termination Failure";
-					break;
-				case 112:
-					errorString = "Termination Before Initialization";
-					break;
-				case 113:
-					errorString = "Termination After Termination";
-					break;
-				case 122:
-					errorString = "Retrieve Data Before Initialization";
-					break;
-				case 123:
-					errorString = "Retrieve Data After Termination";
-					break;
-				case 132:
-					errorString = "Store Data Before Initialization";
-					break;
-				case 133:
-					errorString = "Store Data After Termination";
-					break;
-				case 142:
-					errorString = "Commit Before Initialization";
-					break;
-				case 143:
-					errorString = "Commit After Termination";
-					break;
-				case 201:
-					errorString = "General Argument Error";
-					break;
-				case 301:
-					errorString = "General Get Failure";
-					break;
-				case 351:
-					errorString = "General Set Failure";
-					break;
-				case 391:
-					errorString = "General Commit Failure";
-					break;
-				case 401:
-					errorString = "Undefined Data Model";
-					break;
-				case 402:
-					errorString = "Unimplemented Data Model Element";
-					break;
-				case 403:
-					errorString = "Data Model Element Value Not Initialized";
-					break;
-				case 404:
-					errorString = "Data Model Element Is Read Only";
-					break;
-				case 405:
-					errorString = "Data Model Element Is Write Only";
-					break;
-				case 406:
-					errorString = "Data Model Element Type Mismatch";
-					break;
-				case 407:
-					errorString = "Data Model Element Value Out Of Range";
-					break;
-				case 408:
-					errorString = "Data Model Dependency Not Established";
-					break;
-				default:
-					errorString = "Unknown error ID passed " + param;
-					break;
+			var nparam = parseInt(param, 10);				
+			if(errors[nparam] !== undefined) { 
+				return errors[nparam];
+			} else  { 
+				return "";
 			}
-			return errorString;
 		} else {
 			return "";
 		}
