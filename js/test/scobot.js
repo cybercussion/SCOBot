@@ -495,6 +495,56 @@ test("SCORM Interactions", function() {
 	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.result'), 'correct', 'Verifying cmi.interactions.'+n+'.result is correct');
 	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.latency'), 'PT5M', 'Verifying cmi.interactions.'+n+'.latency is PT5M');
 	// End Other Interaction
+	
+	// Performance Interaction
+	intID = '9';
+	objID = '9_1';
+	//endTime.setMinutes(startTime.getMinutes() + 15); // Add 5 minutes for latency, result would be PT10M
+	strictEqual(SB.setInteraction({
+		id: intID,                                                    // {String}
+		type: 'performance',                                          // {String}
+		objectives: [                                                 // {Array}
+			{                                                         // {Object}
+				id: objID                                             // {String}
+			}
+		],
+		timestamp: startTime,                                         // {Object} date start
+		correct_responses:  [                                         // {Array}
+			{                                                         // {Object}
+				pattern: [                                            // {Array}
+					{
+						order_matters: false,                         // {Boolean} (optional)
+						answers: [                                    // {Array}
+							["step_1", "answer_2"],                   // {Array} of {String}s step identifier (optional)
+							["step_2", "answer_1"],
+							["step_3", "answer_3"]
+						]
+					}
+				]
+			}
+		],
+		weighting: '1',                                               // {String}
+		learner_response: [                                           // {Array} 
+			["step_1", "answer_2"],                                   // {Array} of {String}s step identifier (optional)
+			["step_2", "answer_1"],
+			["step_3", "answer_3"]
+		],
+		result: 'correct',                                            // {String} correct, incorrect, neutral
+		latency: endTime,                                             // {Object} date end (optional)
+		description: "Arrange the pairs into an order of completion." // {String} question commonly
+	}), 'true', "Setting matching Interaction 6");
+	
+	// Verify Data was set properly, I'm using long-hand scorm calls for this
+	n = scorm.getInteractionByID(intID);
+	m = scorm.getInteractionObjectiveByID(n, objID);
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.type'), 'performance', 'Verifying cmi.interactions.'+n+'.type is performance');
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives._count'), '1', 'Verifying cmi.interactions.'+n+'.objectives._count count is 1');
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives.'+m+'.id'), '9_1', 'Verifying cmi.interactions.'+n+'.objectives.'+m+'.id id is 9_1');
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.learner_response'), 'step_1[.]answer_2[,]step_2[.]answer_1[,]step_3[.]answer_3', 'Verifying cmi.interactions.'+n+'.learner_response is step_1[.]step_answer_2[,]step_2[.]answer_1[,]step_3[.]answer_3');
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.result'), 'correct', 'Verifying cmi.interactions.'+n+'.result is correct');
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.latency'), 'PT5M', 'Verifying cmi.interactions.'+n+'.latency is PT5M');
+	// End Performance Interaction
+	
 });
 
 test("SCORM Get Interaction By ID", function() {
