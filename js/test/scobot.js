@@ -456,33 +456,33 @@ test("SCORM Interactions", function() {
 	objID = '8_1';
 	//endTime.setMinutes(startTime.getMinutes() + 15); // Add 5 minutes for latency, result would be PT10M
 	strictEqual(SB.setInteraction({
-		id: intID,
-		type: 'other',
-		objectives: [
-			{
-				id: objID
+		id: intID,                                                       // {String}
+		type: 'other',                                                   // {String}
+		objectives: [                                                    // {Array}
+			{                                                            // {Object}
+				id: objID                                                // {String}
 			}
 		],
-		timestamp: startTime, // Snapshot of time at beginning of interaction
+		timestamp: startTime,                                            // {Object} date start
 		correct_responses: [
-			{
-				pattern: "Anything we want." // {String}
+			{                                                            // {Object}
+				pattern: "Anything we want."                             // {String}
 			},
 			{
-				pattern: "Almost anything." // {String}
+				pattern: "Almost anything."                              // {String}
 			},
 			{
-				pattern: "Everything." // {String}
+				pattern: "Everything."                                   // {String}
 			},
 			{
-				pattern: "A ton of stuff!" // {String}
+				pattern: "A ton of stuff!"                               // {String}
 			}
 		],
-		weighting: '1',
-		learner_response: "Anything we want.", // {String} commonly a unique identifier for the group
-		result: 'correct',
-		latency: endTime,   // Snapshot of time at the end of the interaction (optional)
-		description: "What can we put in the 'other' interaction type?"
+		weighting: '1',                                                  // {String}
+		learner_response: "Anything we want.",                           // {String} 
+		result: 'correct',                                               // {String} correct, incorrect, neutral
+		latency: endTime,                                                // {Object} date end (optional)
+		description: "What can we put in the 'other' interaction type?"  // {String} question commonly
 	}), 'true', "Setting other Interaction 8");
 	
 	// Verify Data was set properly, I'm using long-hand scorm calls for this
