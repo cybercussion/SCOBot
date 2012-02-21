@@ -244,32 +244,32 @@ test("SCORM Interactions", function() {
 	objID = '3_1';
 	//endTime.setMinutes(startTime.getMinutes() + 11); // Add 5 minutes for latency, result would be PT10M
 	strictEqual(SB.setInteraction({
-		id: intID,
-		type: 'fill_in',
-		objectives: [
-			{
-				id: objID
+		id: intID,             // {String}
+		type: 'fill_in',       // {String}
+		objectives: [          // {Array}
+			{                  // {Object}
+				id: objID      // {String}
 			}
 		],
-		timestamp: startTime, // Snapshot of time at beginning of interaction
-		correct_responses: [
-			{
-				pattern: {  // {Object}
-					case_matters: true,
-					order_matters: true,
-					lang: 'en',
-					words: ["car","automobile"]
+		timestamp: startTime,  // {Object} date start
+		correct_responses: [   // {Array}
+			{                  // {Object}
+				pattern: {     // {Object}
+					case_matters: true,         // {Boolean}
+					order_matters: true,        // {Boolean}
+					lang: 'en',                 // {String} 2 or 3 letter lang code
+					words: ["car","automobile"] // {Array} of {String}s
 				}
 			}
 		],
-		weighting: '1',
-		learner_response: {  // {Object}
-			lang: 'en',
-			words:["car","automobile"]
+		weighting: '1',        // {String}
+		learner_response: {    // {Object}
+			lang: 'en',        // {String} 2 or 3 letter lang code
+			words:["car","automobile"] // {Array} of {String}s
 		},
-		result: 'correct',
-		latency: endTime,   // Snapshot of time at the end of the interaction (optional)
-		description: 'Which choices would <b>you</b> pick?'
+		result: 'correct',     // {String} correct, incorrect, neutral
+		latency: endTime,      // {Object} date end
+		description: 'Which choices would <b>you</b> pick?' // {String} question commonly
 	}), 'true', "Setting Fill In Interaction 3");
 	
 	// Verify Data was set properly, I'm using long-hand scorm calls for this
