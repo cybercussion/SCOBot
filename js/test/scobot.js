@@ -172,24 +172,24 @@ test("SCORM Interactions", function() {
 	
 	// True False Interaction
 	strictEqual(SB.setInteraction({
-		id: intID,
-		type: 'true_false',
-		objectives: [
-			{
-				id: objID
+		id: intID,                 // {String}
+		type: 'true_false',        // {String}
+		objectives: [              // {Array}
+			{                      // {Object}
+				id: objID          // {String}
 			}
 		],
-		timestamp: startTime, // Snapshot of time at beginning of interaction
-		correct_responses: [
-			{
-				pattern: 'true'
+		timestamp: startTime,      // {Object} date start
+		correct_responses: [       // {Array}
+			{                      // {Object}
+				pattern: 'true'    // {String} true or false
 			}
 		],
-		weighting: '1',
-		learner_response: 'true',  // tile_1[.]target_2
-		result: 'correct',
-		latency: endTime,   // Snapshot of time at the end of the interaction (optional)
-		description: 'This is the question?'
+		weighting: '1',            // {String}
+		learner_response: 'true',  // {String} true or false
+		result: 'correct',         // {String} correct, incorrect, neutral 
+		latency: endTime,          // {Object} date end
+		description: 'This is the question?' // {String} question commonly
 	}), 'true', "Setting true/false Interaction 1");
 	
 	// Verify Data was set properly, I'm using long-hand scorm calls for this
@@ -451,7 +451,7 @@ test("SCORM Interactions", function() {
 	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.latency'), 'PT5M', 'Verifying cmi.interactions.'+n+'.latency is PT5M');
 	// End LikeRT Interaction
 	
-	// LikeRT Interaction
+	// Other Interaction
 	intID = '8';
 	objID = '8_1';
 	//endTime.setMinutes(startTime.getMinutes() + 15); // Add 5 minutes for latency, result would be PT10M
@@ -497,26 +497,30 @@ test("SCORM Interactions", function() {
 	// End Other Interaction
 });
 
-test("SCORM Get Interaction", function() {
-	scorm.debug("============================", 4);
-	var int1 = SB.getInteraction('1');
-	scorm.debug(int1, 4);
-	scorm.debug("============================", 4);
+test("SCORM Get Interaction By ID", function() {
+	var interaction = SB.getInteraction('1'); // True False
 	
-	scorm.debug("============================", 4);
-	var int3 = SB.getInteraction('3');
-	scorm.debug(int3, 4);
-	scorm.debug("============================", 4);
+
+	interaction = SB.getInteraction('2'); // Multiple Choice
+
+	interaction = SB.getInteraction('3'); // Fill In
 	
-	scorm.debug("============================", 4);
-	var int5 = SB.getInteraction('5');
-	scorm.debug(int5, 4);
-	scorm.debug("============================", 4);
+	interaction = SB.getInteraction('4'); // Sequencing
 	
-	scorm.debug("============================", 4);
-	var int6 = SB.getInteraction('6');
-	scorm.debug(int6, 4);
-	scorm.debug("============================", 4);
+	interaction = SB.getInteraction('5'); // Long Fill In
+	
+	interaction = SB.getInteraction('6'); // Matching
+	
+	interaction = SB.getInteraction('7'); // LikeRT
+	
+	interaction = SB.getInteraction('8'); // Other
+	
+	strictEqual(SB.getInteraction('999'), 'false', "Getting bogus interaction, should be false");
+
+});
+test("SCORM Get Objective By ID", function() {
+	
+	
 });
 
 test("SCORM Set Suspend Data By Page ID", function() {
