@@ -324,31 +324,31 @@ test("SCORM Interactions", function() {
 	objID = '5_1';
 	//endTime.setMinutes(startTime.getMinutes() + 21); // Add 5 minutes for latency, result would be PT10M
 	strictEqual(SB.setInteraction({
-		id: intID,
-		type: 'long_fill_in',
-		objectives: [
-			{
-				id: objID
+		id: intID,                               // {String}
+		type: 'long_fill_in',                    // {String}
+		objectives: [                            // {Array}
+			{                                    // {Object}
+				id: objID                        // {String}
 			}
 		],
-		timestamp: startTime, // Snapshot of time at beginning of interaction
-		correct_responses: [
-			{
-				pattern: {  // {Object}
-					lang: 'en',
-					case_matters: false,
-					text: "it's been a long day"
+		timestamp: startTime,                    // {Object} date start
+		correct_responses: [                     // {Array}
+			{                                    // {Object}
+				pattern: {                       // {Object}
+					lang: 'en',                  // {String} lang code (optional)
+					case_matters: false,         // {Boolean} (optional)
+					text: "it's been a long day" // {String}
 				}
 			}
 		],
-		weighting: '1',
-		learner_response: {  // {Object}
-			lang: 'en',
-			text: "There was one once, but it's been a long day."
+		weighting: '1',                          // {String}
+		learner_response: {                      // {Object}
+			lang: 'en',                          // {String} lang code (optional)
+			text: "There was one once, but it's been a long day." // {String}
 		},
-		result: 'correct',
-		latency: endTime,   // Snapshot of time at the end of the interaction (optional)
-		description: 'Which choices would <b>you</b> pick?'
+		result: 'correct',                       // {String} correct, incorrect, neutral
+		latency: endTime,                        // {Object} date end (optional)
+		description: 'Which choices would <b>you</b> pick?' // {String}
 	}), 'true', "Setting long fill in Interaction 5");
 	
 	// Verify Data was set properly, I'm using long-hand scorm calls for this
