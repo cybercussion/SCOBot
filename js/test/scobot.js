@@ -411,33 +411,33 @@ test("SCORM Interactions", function() {
 	objID = '7_1';
 	//endTime.setMinutes(startTime.getMinutes() + 15); // Add 5 minutes for latency, result would be PT10M
 	strictEqual(SB.setInteraction({
-		id: intID,
-		type: 'likert',
-		objectives: [
-			{
-				id: objID
+		id: intID,                                       // {String}
+		type: 'likert',                                  // {String}
+		objectives: [                                    // {Array}
+			{                                            // {Object}
+				id: objID                                // {String}
 			}
 		],
-		timestamp: startTime, // Snapshot of time at beginning of interaction
+		timestamp: startTime,                            // {Object} date start
 		correct_responses: [
-			{
-				pattern: "strongly_agree" // {String}
+			{                                            // {Object}
+				pattern: "strongly_agree"                // {String}
 			},
-			{
-				pattern: "agree" // {String}
+			{                                            // {Object}
+				pattern: "agree"                         // {String}
 			},
-			{
-				pattern: "disagree" // {String}
+			{                                            // {Object}
+				pattern: "disagree"                      // {String}
 			},
-			{
-				pattern: "strongly_disagree" // {String}
+			{                                            // {Object}
+				pattern: "strongly_disagree"             // {String}
 			}
 		],
-		weighting: '1',
-		learner_response: "strongly_agree", // {String} commonly a unique identifier for the group
-		result: 'correct',
-		latency: endTime,   // Snapshot of time at the end of the interaction (optional)
-		description: "Do you like filling in surveys?"
+		weighting: '1',                                  // {String}
+		learner_response: "strongly_agree",              // {String} commonly a unique identifier for the group
+		result: 'correct',                               // {String} correct, incorrect, neutral
+		latency: endTime,                                // {Object} date end (optional)
+		description: "Do you like filling in surveys?"   // {String} question commonly
 	}), 'true', "Setting likert Interaction 7");
 	
 	// Verify Data was set properly, I'm using long-hand scorm calls for this
