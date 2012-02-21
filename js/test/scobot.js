@@ -288,24 +288,24 @@ test("SCORM Interactions", function() {
 	objID = '4_1';
 	//endTime.setMinutes(startTime.getMinutes() + 15); // Add 5 minutes for latency, result would be PT10M
 	strictEqual(SB.setInteraction({
-		id: intID,
-		type: 'sequencing',
-		objectives: [
-			{
-				id: objID
+		id: intID,             // {String}
+		type: 'sequencing',    // {String}
+		objectives: [          // {Array}
+			{                  // {Object}
+				id: objID      // {String}
 			}
 		],
-		timestamp: startTime, // Snapshot of time at beginning of interaction
-		correct_responses: [
-			{
-				pattern: ["c","b", "a"] // {Array}
+		timestamp: startTime,  // {Object} date start
+		correct_responses: [   // {Array}
+			{                  // {Object}
+				pattern: ["c","b", "a"]  // {Array}
 			}
 		],
-		weighting: '1',
+		weighting: '1',        // {String}
 		learner_response: ["a","c","b"],  // {Array}
-		result: 'incorrect',
-		latency: endTime,   // Snapshot of time at the end of the interaction (optional)
-		description: 'Place these options in order'
+		result: 'incorrect',   // {String} correct, incorrect, neutral
+		latency: endTime,      // {Object} date end (optional)
+		description: 'Place these options in order' // {String}
 	}), 'true', "Setting sequencing Interaction 4");
 	
 	// Verify Data was set properly, I'm using long-hand scorm calls for this
