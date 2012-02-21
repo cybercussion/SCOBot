@@ -367,32 +367,32 @@ test("SCORM Interactions", function() {
 	objID = '6_1';
 	//endTime.setMinutes(startTime.getMinutes() + 15); // Add 5 minutes for latency, result would be PT10M
 	strictEqual(SB.setInteraction({
-		id: intID,
-		type: 'matching',
-		objectives: [
-			{
-				id: objID
+		id: intID,                             // {String}
+		type: 'matching',                      // {String}
+		objectives: [                          // {Array}
+			{                                  // {Object}
+				id: objID                      // {String}
 			}
 		],
-		timestamp: startTime, // Snapshot of time at beginning of interaction
-		correct_responses: [
-			{
-				pattern: [  // {Array}
-					["tile_1", "target_2"],
-					["tile_2", "target_1"],
+		timestamp: startTime,                  // {Object} date start
+		correct_responses: [                   // {Array}
+			{                                  // {Object}
+				pattern: [                     // {Array}
+					["tile_1", "target_2"],    // {Array} of {String}s
+					["tile_2", "target_1"], 
 					["tile_3", "target_3"]
 				]
 			}
 		],
-		weighting: '1',
-		learner_response: [ // Array
-					["tile_1", "target_2"],
+		weighting: '1',                        // {String}
+		learner_response: [                    // {Array} 
+					["tile_1", "target_2"],    // {Array} of {String}s
 					["tile_2", "target_1"],
 					["tile_3", "target_3"]
 				],
-		result: 'correct',
-		latency: endTime,   // Snapshot of time at the end of the interaction (optional)
-		description: "Place these steps over the matching order you'd do them."
+		result: 'correct',                     // {String} correct, incorrect, neutral
+		latency: endTime,                      // {Object} date end (optional)
+		description: "Place these steps over the matching order you'd do them." // {String} question commonly
 	}), 'true', "Setting matching Interaction 6");
 	
 	// Verify Data was set properly, I'm using long-hand scorm calls for this
