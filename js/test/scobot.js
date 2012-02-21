@@ -208,24 +208,24 @@ test("SCORM Interactions", function() {
 	objID = '2_1';
 	//endTime.setMinutes(startTime.getMinutes() + 10); // Add 5 minutes for latency, result would be PT10M
 	strictEqual(SB.setInteraction({
-		id: intID,
-		type: 'multiple_choice',
-		objectives: [
-			{
-				id: objID
+		id: intID,                // {String}
+		type: 'multiple_choice',  // {String}
+		objectives: [             // {Array}
+			{                     // {Object}
+				id: objID         // {String}
 			}
 		],
-		timestamp: startTime, // Snapshot of time at beginning of interaction
-		correct_responses: [
-			{
+		timestamp: startTime,     // {Object} date start
+		correct_responses: [      // {Array}
+			{                     // {Object}
 				pattern: ["a","b"] // {Array}
 			}
 		],
-		weighting: '1',
+		weighting: '1',           // {String}
 		learner_response: ["a","c"],  // {Array}
-		result: 'incorrect',
-		latency: endTime,   // Snapshot of time at the end of the interaction (optional)
-		description: 'Which choices would <b>you</b> pick?'
+		result: 'incorrect',     // {String} correct, incorrect, neutral
+		latency: endTime,         // {Object} date end
+		description: 'Which choices would <b>you</b> pick?' // {String} question commonly
 	}), 'true', "Setting multiple choice Interaction 2");
 	
 	// Verify Data was set properly, I'm using long-hand scorm calls for this
