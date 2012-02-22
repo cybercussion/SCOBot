@@ -621,7 +621,7 @@ function SCOBot(options) {
 				} else {
 					return arr;
 				}
-
+			break;
 			/**
 			 * Numeric
 			 * This falls into a simple hand off
