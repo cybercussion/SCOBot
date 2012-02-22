@@ -115,7 +115,7 @@ test("SCORM Objectives", function() {
 		completion_status: 'not attempted',
 		progress_measure: '0',
 		description: 'They will answer a long fill in interaction'
-	}), 'true', "Setting Objective Sequencing 5_1 unscored");
+	}), 'true', "Setting Objective Long Fill In 5_1 unscored");
 	// For Matching
 	strictEqual(SB.setObjective({
 		id: '6_1',
@@ -129,7 +129,7 @@ test("SCORM Objectives", function() {
 		completion_status: 'not attempted',
 		progress_measure: '0',
 		description: 'They will answer a matching interaction'
-	}), 'true', "Setting Objective Sequencing 6_1 unscored");
+	}), 'true', "Setting Objective Matching 6_1 unscored");
 	// For LikeRT
 	strictEqual(SB.setObjective({
 		id: '7_1',
@@ -143,7 +143,7 @@ test("SCORM Objectives", function() {
 		completion_status: 'not attempted',
 		progress_measure: '0',
 		description: 'They will answer a likert interaction'
-	}), 'true', "Setting Objective Sequencing 7_1 unscored");
+	}), 'true', "Setting Objective LikeRT 7_1 unscored");
 	// For Other
 	strictEqual(SB.setObjective({
 		id: '8_1',
@@ -157,7 +157,35 @@ test("SCORM Objectives", function() {
 		completion_status: 'not attempted',
 		progress_measure: '0',
 		description: 'They will answer a other interaction'
-	}), 'true', "Setting Objective Sequencing 8_1 unscored");
+	}), 'true', "Setting Objective Other 8_1 unscored");
+	// For Performance
+	strictEqual(SB.setObjective({
+		id: '9_1',
+		score: {
+			scaled: '0',
+			raw: '0',
+			min: '0',
+			max: '1'
+		},
+		success_status: 'unknkown',
+		completion_status: 'not attempted',
+		progress_measure: '0',
+		description: 'They will answer a performance interaction'
+	}), 'true', "Setting Objective Performance 8_1 unscored");
+	// For Numeric
+	strictEqual(SB.setObjective({
+		id: '10_1',
+		score: {
+			scaled: '0',
+			raw: '0',
+			min: '0',
+			max: '1'
+		},
+		success_status: 'unknkown',
+		completion_status: 'not attempted',
+		progress_measure: '0',
+		description: 'They will answer a numeric interaction'
+	}), 'true', "Setting Objective Numeric 8_1 unscored");
 });
 
 test("SCORM Interactions", function() {
