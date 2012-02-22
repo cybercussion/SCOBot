@@ -128,7 +128,7 @@ function SCOBot(options) {
 	 * @returns {Boolean} based on if this value has been set (true) or (false) if not
 	 */
 	function isPassed() {
-		if(settings.success_status !== "passed" && settings.success_status !== "failed") {
+		if(scorm.get('success_status') !== "passed" && scorm.get('success_status') !== "failed") {
 			return false;
 		}
 		return true;
@@ -140,7 +140,7 @@ function SCOBot(options) {
 	 * May need to tighten this up later, its mostly for SCO's that default to finish and expect them to be complete.
 	 */
 	function verifyScoreScaled() {
-		if(settings.success_status === 'passed' && settings.exit_type === "finish") {
+		if(scorm.get('success_status') === 'passed' && scorm.get('exit_type') === "finish") {
 			if(scorm.getvalue('cmi.score.scaled') === 'false') {
 				if(scorm.getvalue('cmi.score.max') === '1') {
 					scorm.setvalue('cmi.score.scaled', '1');
@@ -192,9 +192,11 @@ function SCOBot(options) {
 	/**
 	 * Not Started Yet
 	 * You should never see this message, but I found I may need to trace this more than once.
+	 * @returns {String} 'false'
 	 */
 	function notStartedYet() {
 		scorm.debug(settings.prefix + ": You didn't call 'Start()' yet, or you already terminated, ignoring.", 2);
+		return 'false';
 	}
 	
 	/**
@@ -787,13 +789,14 @@ function SCOBot(options) {
 				 * old saved data.  Don't fall victim to this little gem.
 				 * GOAL: Deal with this in a managed way
 				 */
-				settings.suspend_data         = (scorm.getvalue('cmi.suspend_data'));
+				settings.suspend_data         = (scorm.getvalue('cmi.suspend_data')); // no longer unescaping
 				// Quality control - You'd be surprised at the things a LMS responds with
 				if(settings.suspend_data.length > 0 && !isBadValue(settings.suspend_data)) {
 					// Assuming a JSON String
 					scorm.debug(settings.prefix + ": Returning suspend data object from a prior session", 4);
 					settings.suspend_data = JSON.parse(settings.suspend_data); // Turn this back into a object.
 					scorm.debug(settings.suspend_data, 4);
+					if(settings.entry === "") {settings.entry = "resume";} // most definitly its a resume if there is suspend data.
 				} else {
 					scorm.debug(settings.prefix + ": Creating new suspend data object", 4);
 					// Object already created by default see settings.suspend_data
@@ -841,8 +844,7 @@ function SCOBot(options) {
 			if(!isBadValue(data.scoreMax)) {settings.scoreMax = data.scoreMax;}	
 			return 'true';
 		} else {
-			notStartedYet();
-			return 'false';
+			return notStartedYet();
 		}
 	};
 	
@@ -855,8 +857,20 @@ function SCOBot(options) {
 		if(isStarted) {
 			return settings.mode;
 		} else {
-			notStartedYet();
-			return 'false';
+			return notStartedYet();
+		}
+	};
+	
+	/**
+	 * Get Entry
+	 * This will return the entry type (ab-initio, resume or "")
+	 * @returns {String} ab-initio, resume , ""
+	 */
+	this.getEntry = function() {
+		if(isStarted){
+			return settings.entry;
+		} else {
+			return notStartedYet();
 		}
 	};
 	
@@ -871,8 +885,7 @@ function SCOBot(options) {
 			settings.location = v + ""; // update local snapshot, ensure string
 			return scorm.setvalue('cmi.location', settings.location);
 		} else {
-			notStartedYet();
-			return 'false';
+			return notStartedYet();
 		}
 	};
 	
@@ -885,8 +898,7 @@ function SCOBot(options) {
 		if(isStarted) {
 			return settings.location; // return local snapshot
 		} else {
-			notStartedYet();
-			return 'false';
+			return notStartedYet();
 		}
 	};
 	
@@ -1198,8 +1210,7 @@ function SCOBot(options) {
 				 */
 			}
 		} else {
-			notStartedYet();
-			return 'false';
+			return notStartedYet();
 		}
 	};
 	/**
@@ -1304,8 +1315,7 @@ function SCOBot(options) {
 				};
 			}
 		} else {
-			notStartedYet();
-			return 'false';
+			return notStartedYet();
 		}
 	};
 	/**
@@ -1327,8 +1337,7 @@ function SCOBot(options) {
 			isStarted = false;
 			return scorm.terminate();
 		} else {
-			notStartedYet();
-			return 'false';
+			return notStartedYet();
 		}
 	};
 	/**
@@ -1351,8 +1360,7 @@ function SCOBot(options) {
 			isStarted = false;
 			return scorm.terminate();
 		} else {
-			notStartedYet();
-			return 'false';
+			return notStartedYet();
 		}
 	};
 	
@@ -1374,8 +1382,7 @@ function SCOBot(options) {
 			isStarted = false;
 			return scorm.terminate();
 		} else {
-			notStartedYet();
-			return 'false';
+			return notStartedYet();
 		}
 	};
 	
