@@ -386,10 +386,10 @@ test("SCORM Interactions", function() {
 		],
 		weighting: '1',                        // {String}
 		learner_response: [                    // {Array} 
-					["tile_1", "target_2"],    // {Array} of {String}s
-					["tile_2", "target_1"],
-					["tile_3", "target_3"]
-				],
+			["tile_1", "target_2"],            // {Array} of {String}s
+			["tile_2", "target_1"],
+			["tile_3", "target_3"]
+		],
 		result: 'correct',                     // {String} correct, incorrect, neutral
 		latency: endTime,                      // {Object} date end (optional)
 		description: "Place these steps over the matching order you'd do them." // {String} question commonly
@@ -511,16 +511,14 @@ test("SCORM Interactions", function() {
 		timestamp: startTime,                                         // {Object} date start
 		correct_responses:  [                                         // {Array}
 			{                                                         // {Object}
-				pattern: [                                            // {Array}
-					{
-						order_matters: false,                         // {Boolean} (optional)
-						answers: [                                    // {Array}
-							["step_1", "answer_2"],                   // {Array} of {String}s step identifier (optional)
-							["step_2", "answer_1"],
-							["step_3", "answer_3"]
-						]
-					}
-				]
+				pattern: {                                            // {Object}
+					order_matters: false,                             // {Boolean} (optional)
+					answers: [                                        // {Array}
+						["step_1", "answer_2"],                       // {Array} of {String}s step identifier (optional)
+						["step_2", "answer_1"],
+						["step_3", "answer_3"]
+					]
+				}		
 			}
 		],
 		weighting: '1',                                               // {String}
