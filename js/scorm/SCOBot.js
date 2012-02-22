@@ -1319,9 +1319,24 @@ function SCOBot(options) {
 			return notStartedYet();
 		}
 	};
+	
+	/**
+	 * Commit
+	 * This will commit the data stored at the LMS Level to the backend.  Please use sparingly.
+	 * @returns {String} 'true' or 'false'
+	 */
+	this.commit = function() {
+		if(isStarted) {
+			return scorm.commit('');
+		} else {
+			return notStartedYet();
+		}
+	};
+	
 	/**
 	 * Suspend
 	 * This will suspend the SCO and ends with terminating.  No data can be saved after this.
+	 * @returns {String} 'true' or 'false'
 	 */
 	this.suspend = function() {
 		if(isStarted) {
@@ -1344,6 +1359,7 @@ function SCOBot(options) {
 	/**
 	 * Finish
 	 * This will set success status, exit and completion
+	 * @returns {String} 'true' or 'false'
 	 */
 	this.finish = function() {
 		if(isStarted) {
@@ -1368,6 +1384,7 @@ function SCOBot(options) {
 	/**
 	 * Timeout
 	 * This will set success status, exit and completion
+	 * @returns {String} 'true' or 'false'
 	 */
 	this.timeout = function() {
 		if(isStarted) {
