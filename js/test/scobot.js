@@ -1,6 +1,7 @@
 /*global $, JQuery, ok, module, test, strictEqual, equal, SCORM_API, SCOBot, debug, enableDebug, learner_name, learner_id, mode, local */
 var scorm  = new SCORM_API({
 		debug: true,
+		throw_alerts: false,
 		exit_type: 'suspend',
 		success_status: 'passed'
 	}),
