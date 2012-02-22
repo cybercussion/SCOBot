@@ -127,7 +127,7 @@ function SCOBot(options) {
 	 * This is based on cmi.success_status
 	 * @returns {Boolean} based on if this value has been set (true) or (false) if not
 	 */
-	function isPerforming() {
+	function isPassed() {
 		if(settings.success_status !== "passed" && settings.success_status !== "failed") {
 			return false;
 		}
@@ -351,17 +351,6 @@ function SCOBot(options) {
 			 * ]
 			 */
 			case 'matching':
-			/*
-			 * Performance
-			 * This will expect {Array} of {Array}'s
-			 * Similar to matching, but its optional to pass the step identifier
-			 * [
-			 *		["step_1", "inspect wound"],
-			 *		["step_2", "clean wound"],
-			 *		["step_3", "apply bandage"]
-			 * ]
-			 */
-			case 'performance':
 				// tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
 				if($.isArray(value)) {
 					for(i=0; i<value.length; i++) {
@@ -379,7 +368,72 @@ function SCOBot(options) {
 					value = '';
 				}
 			return value;
-
+			/*
+			 * Performance
+			 * This will expect {Array} of {Array}'s
+			 * Similar to matching, but its optional to pass the step identifier
+			 * Correct Responses Pattern:
+			 * Correct Response Pattern: {Object}
+			 * {
+			 *	order_matters: false,
+			 *	answers: [
+			 *			["step_1", "inspect wound"],
+			 *			["step_2", "clean wound"],
+			 *			["step_3", "apply bandage"]
+			 *		]
+			 *	}
+			 * Learner Response:
+			 * [
+			 *		["step_1", "inspect wound"],
+			 *		["step_2", "clean wound"],
+			 *		["step_3", "apply bandage"]
+			 * ]
+			 */
+			case 'performance':
+				//
+				if(!$.isArray(value)) { // This would be a Correct Response Pattern
+					// Check for order_matters
+					if(value.order_matters !== undefined) {
+						str += "{order_matters=" + value.order_matters + "}";
+					}
+					if($.isArray(value.answers)) {
+						for(i=0; i<value.answers.length; i++) {
+							if($.isArray(value.answers[i])) {
+								arr.push(value.answers[i].join("[.]")); // this isn't working
+							} else {
+								scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance correct response.  I got " + typeof(value.answers[i]) + " instead on " + i, 1);
+								scorm.debug(value, 1);
+								return '';
+							}
+						}
+						str += arr.join("[,]");
+					} else {
+						scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance correct response.  I got " + typeof(value.answers) + " instead", 1);
+						scorm.debug(value, 1);
+					}
+				} else {
+					if(typeof($.isArray(value))) { // This would be a Learner Response
+						for(i=0; i<value.length; i++) {
+							if($.isArray(value[i])) {
+								arr.push(value[i].join("[.]")); // this isn't working
+							} else {
+								scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance learner response.  I got " + typeof(value[i]) + " instead on " + i, 1);
+								scorm.debug(value, 1);
+								return '';
+							}
+						}
+						str = arr.join("[,]");
+					} else {
+						scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance learner response.  I got " + typeof(value) + " instead", 1);
+						value = '';
+					}
+				}
+				value = str;
+			return value;
+			/**
+			 * Numeric
+			 * comments coming
+			 */
 			case 'numeric':
 				if(typeof(value) === "number") {
 					value = value + "";
@@ -420,7 +474,8 @@ function SCOBot(options) {
 		var str = '',
 			i = 0,
 			arr = [],
-			obj = {};
+			obj = {},
+			match = false;
 		switch(type) {
 			case 'true_false':
 			return value;
@@ -515,23 +570,52 @@ function SCOBot(options) {
 			 * ]
 			 */
 			case 'matching':
-			/*
-			 * Performance
-			 * This will expect {Array} of {Array}'s
-			 * Similar to matching, but its optional to pass the step identifier
-			 * [
-			 *		["step_1", "inspect wound"],
-			 *		["step_2", "clean wound"],
-			 *		["step_3", "apply bandage"]
-			 * ]
-			 */
-			case 'performance':
-				// tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
+			// tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
 				arr = value.split("[,]");
 				for(i=0; i<arr.length; i++) {
 					arr[i] = arr[i].split("[.]"); // this isn't working
 				}
 			return arr;
+			/*
+			 * Performance
+			 * This will expect {Array} of {Array}'s
+			 * Similar to matching, but its optional to pass the step identifier
+			 * Correct Response Pattern: {Object}
+			 * {
+			 *	order_matters: false,
+			 *	answers: [
+			 *			["step_1", "inspect wound"],
+			 *			["step_2", "clean wound"],
+			 *			["step_3", "apply bandage"]
+			 *		]
+			 *	}
+			 * Learner Response: {Array}
+			 * ["step_1", "inspect wound"],
+	         * ["step_2", "clean wound"],
+	         * ["step_3", "apply bandage"]
+			 */
+			case 'performance':
+				// {order_matters=false}tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
+				// Check for order_matters (located in the correct_response pattern)
+				arr = findResponseType('order_matters', value);
+				if(arr !== null) {
+					if(arr[0].search(/^\{order_matters=(true|false)\}$/) !== -1) {
+						match = true; // This is a correct_responses.n.pattern
+						obj.order_matters = arr[0].substring('{order_matters='.length, arr[0].length - 1);
+						value = value.substring(arr[0].length, value.length); // trim off
+						scorm.debug("=== order matters" + value, 4);
+					}
+				}
+				arr = value.split("[,]");
+				for(i=0; i<arr.length; i++) {
+					arr[i] = arr[i].split("[.]"); // this isn't working
+				}
+				if(match) {
+					obj.answers = arr;
+					return obj;
+				} else {
+					return arr;
+				}
 
 			/**
 			 * Numeric
@@ -937,31 +1021,40 @@ function SCOBot(options) {
 			latency, // Reserved for doing the Timestamp to latency conversion (May not exist)
 			namespace, // Reserved for holding the cmi.interaction.n. name space to stop having to re-type it
 			result;  // Result of calling values against the SCORM API
-
-		//Time stuff will need to move after ID is added
-		timestamp = scorm.isoDateStringUTC(data.timestamp); // 2012-02-12T00:37:29Z formatted
-		data.timestamp = timestamp;
-		if(typeof(data.latency) === "object") {
-			latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
-			data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
-		} else if(data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
-			// may want to force latency?
-			data.latency = new Date();
-			latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
-			data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
-		} // Else you won't record latency as the student didn't touch the question.
-		
-		// Check for Interaction Mode
-		if(settings.interaction_mode === "journaled") {
-			// Explicitly stating they want a history of interactions
-			n = ''; // we want to use cmi.interactions._count
-		} else { 
-			// Default to state, which will update by id
-			// Lets validate taht this data object has a ID
-			if(!isBadValue(data.id)) {
-				n = scorm.getInteractionByID(data.id); // we want to update by interaction id
-				if(isBadValue(n)) {
-					n = scorm.getvalue(p1 + '_count'); // This is a add
+		if(typeof(data) !== "object") {
+			scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof(data) + " instead.", 1);
+			return 'false';
+		} else {
+			if(isBadValue(data.id)) {
+				// This is a show stopper, try to give them some bread crumb to locate the problem.
+				scorm.debug(settings.prefix + ": Developer, your passing a interaction without a ID\nSee question:\n" + data.description, 1);
+				return 'false';
+			} else {
+				//Time stuff will need to move after ID is added
+				if(typeof(data.timestamp) === "object") {
+					timestamp = scorm.isoDateStringUTC(data.timestamp); // 2012-02-12T00:37:29Z formatted
+				}
+				data.timestamp = timestamp;
+				if(typeof(data.latency) === "object") {
+					latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
+					data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
+				} else if(data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
+					// may want to force latency?
+					data.latency = new Date();
+					latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
+					data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
+				} // Else you won't record latency as the student didn't touch the question.
+				
+				// Check for Interaction Mode
+				if(settings.interaction_mode === "journaled") {
+					// Explicitly stating they want a history of interactions
+					n = scorm.getvalue(p1 + '_count'); // we want to use cmi.interactions._count
+				} else { 
+					// Default to state, which will update by id
+					n = scorm.getInteractionByID(data.id); // we want to update by interaction id
+					if(isBadValue(n)) {
+						n = scorm.getvalue(p1 + '_count'); // This is a add
+					}
 				}
 				/* 
 				 * We need to make several setvalues now against cmi.interactions.n.x
@@ -975,27 +1068,33 @@ function SCOBot(options) {
 				// Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
 				// Either ignore value because its already added, or add it based on _count
 				// result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+".id", data.objectives[i].id);
-				for(i=0; i<data.objectives.length; i++) {
-					// We need to find out if the objective is already added
-					m = scorm.getInteractionObjectiveByID(n, data.objectives[i].id); // will return 0 or the locator where it existed or false (not found)
-					if(m === 'false') {
-						m = scorm.getvalue(p1 + 'objectives._count');
+				if(data.objectives !== undefined) {
+					for(i=0; i<data.objectives.length; i++) {
+						// We need to find out if the objective is already added
+						m = scorm.getInteractionObjectiveByID(n, data.objectives[i].id); // will return 0 or the locator where it existed or false (not found)
+						if(m === 'false') {
+							m = scorm.getvalue(p1 + 'objectives._count');
+						}
+						result = scorm.setvalue(p1 + 'objectives.'+m+'.id', data.objectives[i].id);
 					}
-					result = scorm.setvalue(p1 + 'objectives.'+m+'.id', data.objectives[i].id);
 				}
 				
-				result = scorm.setvalue(p1 + 'timestamp', data.timestamp);
+				if(data.timestamp !== undefined) {
+					result = scorm.setvalue(p1 + 'timestamp', data.timestamp);
+				}
 				
 				// Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type 
 				//result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
-				for(j=0; j<data.correct_responses.length; j++) {
-					p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
-					scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
-					if(p === 'false') {
-						p = scorm.getvalue(p1 + 'correct_responses._count');
-						scorm.debug(settings.prefix + ": p is now " + p, 4);
+				if(typeof(data.correct_responses) === "object") {
+					for(j=0; j<data.correct_responses.length; j++) {
+						p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
+						scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
+						if(p === 'false') {
+							p = scorm.getvalue(p1 + 'correct_responses._count');
+							scorm.debug(settings.prefix + ": p is now " + p, 4);
+						}
+						result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
 					}
-					result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
 				}
 				
 				result = scorm.setvalue(p1 + 'weighting', data.weighting);
@@ -1005,10 +1104,6 @@ function SCOBot(options) {
 				result = scorm.setvalue(p1 + 'description', data.description);
 				
 				return result;
-			} else {
-				// This is a show stopper, try to give them some bread crumb to locate the problem.
-				scorm.debug(settings.prefix + ": Developer, your passing a interaction without a ID\nSee question:\n" + data.description, 1);
-				return 'false';
 			}
 		}
 	};
@@ -1095,7 +1190,7 @@ function SCOBot(options) {
 					learner_response: '',
 					result: '',
 					latency: '',
-					descriptoin: ''
+					description: ''
 				 };
 				 */
 			}
@@ -1132,11 +1227,11 @@ function SCOBot(options) {
 		if(n === "" || n === 'false') {
 			n = 0;
 			p1 += n + ".";
-			result = scorm.setvalue(p1 + 'id', data.id);
-			result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled);
-			result = scorm.setvalue(p1 + 'score.raw', data.score.raw);
-			result = scorm.setvalue(p1 + 'score.min', data.score.min);
-			result = scorm.setvalue(p1 + 'score.max', data.score.max);
+			result = scorm.setvalue(p1 + 'id', data.id + "");
+			result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled + "");
+			result = scorm.setvalue(p1 + 'score.raw', data.score.raw + "");
+			result = scorm.setvalue(p1 + 'score.min', data.score.min + "");
+			result = scorm.setvalue(p1 + 'score.max', data.score.max + "");
 			result = scorm.setvalue(p1 + 'score.success_status', data.success_status);
 			result = scorm.setvalue(p1 + 'score.completion_status', data.completion_status);
 			result = scorm.setvalue(p1 + 'score.progress_measure', data.progress_measure);
@@ -1148,10 +1243,10 @@ function SCOBot(options) {
 			}
 			p1 += n + '.';		
 			//scorm.setvalue(p1 + '.id', data.id); // shouldn't change this
-			if(!isBadValue(data.score.scaled)) {result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled);}
-			if(!isBadValue(data.score.raw)) {result = scorm.setvalue(p1 + 'score.raw', data.score.raw);}
-			if(!isBadValue(data.score.min)) {result = scorm.setvalue(p1 + 'score.min', data.score.min);}
-			if(!isBadValue(data.score.max)) {result = scorm.setvalue(p1 + 'score.max', data.score.max);}
+			if(!isBadValue(data.score.scaled)) {result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled + "");}
+			if(!isBadValue(data.score.raw)) {result = scorm.setvalue(p1 + 'score.raw', data.score.raw + "");}
+			if(!isBadValue(data.score.min)) {result = scorm.setvalue(p1 + 'score.min', data.score.min + "");}
+			if(!isBadValue(data.score.max)) {result = scorm.setvalue(p1 + 'score.max', data.score.max + "");}
 			if(!isBadValue(data.success_status)) {result = scorm.setvalue(p1 + 'score.success_status', data.success_status);}
 			if(!isBadValue(data.completion_status)) {result = scorm.setvalue(p1 + 'score.completion_status', data.completion_status);}
 			if(!isBadValue(data.progress_measure)) {result = scorm.setvalue(p1 + 'score.progress_measure', data.progress_measure);}
@@ -1183,8 +1278,28 @@ function SCOBot(options) {
 	 */
 	this.getObjective = function(id) {
 		if(isStarted) {
-			// TODO
-			return 'false';
+			var n = scorm.getObjectiveByID(id),
+				p1 = 'cmi.objectives.',
+				obj = {};
+			if(n === 'false') {
+				return n;
+			} else {
+				p1 += n + ".";
+				// Build Response
+				return {
+					id:  scorm.getvalue(p1 + "success_status"),
+					score: {
+						scaled: scorm.getvalue(p1 + "score.scaled"),
+						raw: scorm.getvalue(p1 + "score.raw"),
+						min: scorm.getvalue(p1 + "score.min"),
+						max: scorm.getvalue(p1 + "score.max")
+					},
+					success_status: scorm.getvalue(p1 + "success_status"),
+					completion_status: scorm.getvalue(p1 + "completion_status"),
+					progress_measure: scorm.getvalue(p1 + "progress_measure"),
+					description: scorm.getvalue(p1 + "description")
+				};
+			}
 		} else {
 			notStartedYet();
 			return 'false';
@@ -1198,7 +1313,7 @@ function SCOBot(options) {
 		if(isStarted) {
 			setSuspendData();
 			scorm.debug(settings.prefix + ": I am suspending...", 3);
-			if(!isPerforming()) {
+			if(!isPassed()) {
 				scorm.setvalue('cmi.success_status', 'unknown');
 			}
 			verifyScoreScaled();
@@ -1221,7 +1336,7 @@ function SCOBot(options) {
 		if(isStarted) {
 			setSuspendData();
 			scorm.debug(settings.prefix + ": I am finishing...", 3);
-			if(!isPerforming()) {
+			if(!isPassed()) {
 				scorm.setvalue('cmi.success_status', settings.success_status);
 			}
 			verifyScoreScaled();
@@ -1246,7 +1361,7 @@ function SCOBot(options) {
 		if(isStarted) {
 			setSuspendData();
 			scorm.debug(settings.prefix + ": I am timing out...", 3);
-			if(!isPerforming()) {
+			if(!isPassed()) {
 				scorm.setvalue('cmi.success_status', settings.success_status);
 			}
 			verifyScoreScaled();
