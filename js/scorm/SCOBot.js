@@ -1234,37 +1234,34 @@ function SCOBot(options) {
 	 * @returns {String} 'true' or 'false'
 	 */
 	this.setObjective = function(data) {
-		var n = scorm.getvalue('cmi.objective._count'),
-			p1 = 'cmi.objectives.',
+		var p1 = 'cmi.objectives.',
+			n = scorm.getObjectiveByID(data.id),
 			i = 0,
 			result = 'false';
-		if(n === "" || n === 'false') {
-			n = 0;
+		if(isBadValue(n)) {
+			n = scorm.getvalue(p1 + '_count');
 			p1 += n + ".";
+			scorm.debug(settings.prefix + ": Setting Objective for the first time " + data.id + " " + data.description, 4);
 			result = scorm.setvalue(p1 + 'id', data.id + "");
 			result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled + "");
 			result = scorm.setvalue(p1 + 'score.raw', data.score.raw + "");
 			result = scorm.setvalue(p1 + 'score.min', data.score.min + "");
 			result = scorm.setvalue(p1 + 'score.max', data.score.max + "");
-			result = scorm.setvalue(p1 + 'score.success_status', data.success_status);
-			result = scorm.setvalue(p1 + 'score.completion_status', data.completion_status);
-			result = scorm.setvalue(p1 + 'score.progress_measure', data.progress_measure);
-			result = scorm.setvalue(p1 + 'score.description', data.description);
+			result = scorm.setvalue(p1 + 'success_status', data.success_status);
+			result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
+			result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
+			result = scorm.setvalue(p1 + 'description', data.description);
 		} else {
-			n = scorm.getObjectiveByID(data.id);
-			if(isBadValue(n)) {
-				n = scorm.getvalue('cmi.objectives._count'); // This is a add
-			}
 			p1 += n + '.';		
 			//scorm.setvalue(p1 + '.id', data.id); // shouldn't change this
 			if(!isBadValue(data.score.scaled)) {result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled + "");}
 			if(!isBadValue(data.score.raw)) {result = scorm.setvalue(p1 + 'score.raw', data.score.raw + "");}
 			if(!isBadValue(data.score.min)) {result = scorm.setvalue(p1 + 'score.min', data.score.min + "");}
 			if(!isBadValue(data.score.max)) {result = scorm.setvalue(p1 + 'score.max', data.score.max + "");}
-			if(!isBadValue(data.success_status)) {result = scorm.setvalue(p1 + 'score.success_status', data.success_status);}
-			if(!isBadValue(data.completion_status)) {result = scorm.setvalue(p1 + 'score.completion_status', data.completion_status);}
-			if(!isBadValue(data.progress_measure)) {result = scorm.setvalue(p1 + 'score.progress_measure', data.progress_measure);}
-			if(!isBadValue(data.description)) {result = scorm.setvalue(p1 + 'score.description', data.description);}
+			if(!isBadValue(data.success_status)) {result = scorm.setvalue(p1 + 'success_status', data.success_status);}
+			if(!isBadValue(data.completion_status)) {result = scorm.setvalue(p1 + 'completion_status', data.completion_status);}
+			if(!isBadValue(data.progress_measure)) {result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);}
+			if(!isBadValue(data.description)) {result = scorm.setvalue(p1 + 'description', data.description);}
 		}	
 		return result;
 	};
