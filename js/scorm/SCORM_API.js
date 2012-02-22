@@ -60,7 +60,7 @@ function SCORM_API(options) {
 		modifiedDate : "02/12/2012 12:17PM",
 		debug : false,
 		isActive : false,
-		throw_alerts : true,
+		throw_alerts : false,
 		prefix : "SCORM_API",
 		exit_type : "suspend",
 		success_status : "unknown",
