@@ -299,7 +299,7 @@ function SCOBot(options) {
 			case 'fill_in':
 				// Word
 				// {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
-				if(typeof(value) === "object") {
+				if($.isPlainObject(value)) {
 					// Check for case_matters
 					if(value.case_matters !== undefined) {
 						str += "{case_matters=" + value.case_matters + "}";
@@ -331,7 +331,7 @@ function SCOBot(options) {
 			case 'long_fill_in':
 				// Bunch of text...
 				// {case_matters=true}{lang=en}Bunch of text...
-				if(typeof(value) === "object") {
+				if($.isPlainObject(value)) {
 					// Check for case_matters
 					if(value.case_matters !== undefined) {
 						str += "{case_matters=" + value.case_matters + "}";
@@ -1040,7 +1040,7 @@ function SCOBot(options) {
 			latency, // Reserved for doing the Timestamp to latency conversion (May not exist)
 			namespace, // Reserved for holding the cmi.interaction.n. name space to stop having to re-type it
 			result;  // Result of calling values against the SCORM API
-		if(typeof(data) !== "object") {
+		if(!$.isPlainObject(data)) {
 			scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof(data) + " instead.", 1);
 			return 'false';
 		} else {
@@ -1104,7 +1104,7 @@ function SCOBot(options) {
 				
 				// Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type 
 				//result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
-				if(typeof(data.correct_responses) === "object") {
+				if($.isPlainObject(data.correct_responses)) {
 					for(j=0; j<data.correct_responses.length; j++) {
 						p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
 						scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
@@ -1245,16 +1245,20 @@ function SCOBot(options) {
 		if(isBadValue(n)) {
 			n = scorm.getvalue(p1 + '_count');
 			p1 += n + ".";
-			scorm.debug(settings.prefix + ": Setting Objective for the first time " + data.id + " " + data.description, 4);
-			result = scorm.setvalue(p1 + 'id', data.id + "");
-			result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled + "");
-			result = scorm.setvalue(p1 + 'score.raw', data.score.raw + "");
-			result = scorm.setvalue(p1 + 'score.min', data.score.min + "");
-			result = scorm.setvalue(p1 + 'score.max', data.score.max + "");
-			result = scorm.setvalue(p1 + 'success_status', data.success_status);
-			result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
-			result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
-			result = scorm.setvalue(p1 + 'description', data.description);
+			if($.isPlainObject(data.score)) {
+				scorm.debug(settings.prefix + ": Setting Objective for the first time " + data.id + " " + data.description, 4);
+				result = scorm.setvalue(p1 + 'id', data.id + "");
+				result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled + "");
+				result = scorm.setvalue(p1 + 'score.raw', data.score.raw + "");
+				result = scorm.setvalue(p1 + 'score.min', data.score.min + "");
+				result = scorm.setvalue(p1 + 'score.max', data.score.max + "");
+				result = scorm.setvalue(p1 + 'success_status', data.success_status);
+				result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
+				result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
+				result = scorm.setvalue(p1 + 'description', data.description);
+			} else {
+				scorm.debug(settings.prefix + ": Developer, you didn't pass a score object!", 1);
+			}
 		} else {
 			p1 += n + '.';		
 			//scorm.setvalue(p1 + '.id', data.id); // shouldn't change this
