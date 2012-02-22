@@ -543,6 +543,42 @@ test("SCORM Interactions", function() {
 	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.latency'), 'PT5M', 'Verifying cmi.interactions.'+n+'.latency is PT5M');
 	// End Performance Interaction
 	
+	// Numeric Interaction
+	intID = '10';
+	objID = '10_1';
+	//endTime.setMinutes(startTime.getMinutes() + 15); // Add 5 minutes for latency, result would be PT10M
+	strictEqual(SB.setInteraction({
+		id: intID,                                                    // {String}
+		type: 'numeric',                                              // {String}
+		objectives: [                                                 // {Array}
+			{                                                         // {Object}
+				id: objID                                             // {String}
+			}
+		],
+		timestamp: startTime,                                         // {Object} date start
+		correct_responses:  [                                         // {Array}
+			{                                                         // {Object}
+				pattern: "10.5"                                       // {String}		
+			}
+		],
+		weighting: '1',                                               // {String}
+		learner_response: "10.5",                                     // {String}
+		result: 'correct',                                            // {String} correct, incorrect, neutral
+		latency: endTime,                                             // {Object} date end (optional)
+		description: "Just fill in some random decimal that looks like 10.5." // {String} question commonly
+	}), 'true', "Setting numeric Interaction 6");
+	
+	// Verify Data was set properly, I'm using long-hand scorm calls for this
+	n = scorm.getInteractionByID(intID);
+	m = scorm.getInteractionObjectiveByID(n, objID);
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.type'), 'numeric', 'Verifying cmi.interactions.'+n+'.type is numeric');
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives._count'), '1', 'Verifying cmi.interactions.'+n+'.objectives._count count is 1');
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives.'+m+'.id'), '10_1', 'Verifying cmi.interactions.'+n+'.objectives.'+m+'.id id is 9_1');
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.learner_response'), '10.5', 'Verifying cmi.interactions.'+n+'.learner_response is 10.5');
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.result'), 'correct', 'Verifying cmi.interactions.'+n+'.result is correct');
+	strictEqual(scorm.getvalue('cmi.interactions.'+n+'.latency'), 'PT5M', 'Verifying cmi.interactions.'+n+'.latency is PT5M');
+	// End Performance Interaction
+	
 });
 
 test("SCORM Get Interaction By ID", function() {
