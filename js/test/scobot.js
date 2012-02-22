@@ -1,17 +1,16 @@
 /*global $, JQuery, ok, module, test, strictEqual, equal, SCORM_API, SCOBot, debug, enableDebug, learner_name, learner_id, mode, local */
 var scorm  = new SCORM_API({
-				debug: true,
-				exit_type: 'suspend',
-				success_status: 'passed'
-           }),
+		debug: true,
+		exit_type: 'suspend',
+		success_status: 'passed'
+	}),
 	SB     = new SCOBot({
-				debug: true,
-				exit_type: 'suspend',
-				success_status: 'passed',
-				interaction_mode: 'state'
-           }),
+		interaction_mode: 'state'
+	}),
 	setvalue_calls = 0,
-	getvalue_calls = 0;
+	getvalue_calls = 0,
+	// These things tend to happen during authoring/creation. We'll use this later to put into suspend data
+	character_str = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ˜‌‍‎‏–—―‗‘’‚‛“”„†‡•…‰′″‹›‼‾⁄₣₤₧₪₫€℅ℓ№™Ω℮⅓⅔⅛⅜⅝⅞←↑→↓∂√∞∩∫≠≡■□▲△▼○●♀♂♪";
 $(scorm).on("setvalue", function(e) {
 	setvalue_calls++;
 	return false;
@@ -614,24 +613,28 @@ test("SCORM Set Suspend Data By Page ID", function() {
 	// Save Suspend Data for Page 1
 	strictEqual(SB.setSuspendDataByPageID(1, 'Sample Data 1', {
 		answers: answer_arr,
+		characters: character_str,
 		question: "This <b>is</b> the question?",
 		numtries: 2
 	}), 'true', 'Setting some sample suspend data for page 1');
 	// Verify saved Suspend Data for Page 1
 	result = SB.getSuspendDataByPageID(1);
 	strictEqual(result.answers, answer_arr, "Verify answers: ['a','b','c','d']");
+	strictEqual(result.characters, character_str, "Verify Character String");
 	strictEqual(result.question, 'This <b>is</b> the question?', 'Verify question: This <b>is</b> the question?');
 	strictEqual(result.numtries, 2, 'Verify numtries: 2');
 	// End Test 1
 	// Save Suspend Data for Page 2
 	strictEqual(SB.setSuspendDataByPageID(2, 'Sample Data 2', {
 		short_answer: "This is a short answer with text they typed in.",
+		characters: character_str,
 		question: "How did you feel about the question?",
 		images: images_arr
 	}), 'true', 'Setting some sample suspend data for page 2');
 	// Verify saved Suspend Data for Page 4
 	result = SB.getSuspendDataByPageID(2);
 	strictEqual(result.short_answer, 'This is a short answer with text they typed in.', 'Verify short_answer: This is a short answer with text they typed in.');
+	strictEqual(result.characters, character_str, "Verify Character String");
 	strictEqual(result.question, 'How did you feel about the question?', 'Verify question: How did you feel about the question?');
 	strictEqual(result.images, images_arr, "Verify answers: ['bird.png', 'bug.png', 'helicopter.png']");
 	// End Test 2
