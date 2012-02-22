@@ -438,9 +438,12 @@ function SCOBot(options) {
 				if(typeof(value) === "number") {
 					value = value + "";
 				} else {
-					scorm.debug(settings.prefix + ": Developer, you're not passing a number type for numeric.  I got " + typeof(value) + " instead", 1);
-					value = '';
-				}
+					// Verify number to save some time.
+					str = parseFloat(value);
+					if(str === "NaN") {
+						scorm.debug(settings.prefix + ": Developer, your not passing a number for a numeric interaction.  I got " + value + " instead", 1);	
+					}
+				}	
 			return value;
 			/*
 			 * LikeRT
