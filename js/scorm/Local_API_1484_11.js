@@ -143,7 +143,30 @@ function Local_API_1484_11(options) {
 	// For the above please see: http://scorm.com/wp-content/assets/scorm_ref_poster/RusticiSCORMPoster.pdf
 	
 	// Private
-
+	/** 
+	 * Throw Vocabulary Error
+	 * This sets the errorCode and Diagnostic for the key and value attempted.  
+	 * @param k {String} key
+	 * @param v {String} value
+	 * @returns {String} 'false'
+	 */
+	function throwVocabError(k, v) {
+		settings.diganostic = "The " + k + " of " + v + " must be a proper vocabulary element.";
+		settings.errorCode = 406;
+		return 'false';
+	}
+	
+	/**
+	 * Throw Unimplemented Error
+	 * 402 data model doesn't exist yet.
+	 * @param key {String}
+	 * @returns {String} 'false'
+	 */
+	function throwUnimplemented(key) {
+		settings.errorCode = 402;
+		settings.diagnostic = 'The value for key ' + key + ' has not been created yet.';
+		return 'false';
+	}
 	/**
 	 * Set Data (Private)
 	 * This covers setting key's values against a object even when there are numbers as objects
@@ -190,8 +213,8 @@ function Local_API_1484_11(options) {
 				//scorm.debug(settings.prefix + ":  getData returning -   key:" + ka[0] + " value:" + obj[ka[0]], 4);
 				return obj[ka[0]];
 			} catch (e) {
-				settings.errorCode = 402;
-				return null; // DEVELOPER: Need to throw "Object Not Defined" error	
+				throwUnimplemented(key);
+				return 'false';
 			}
 			//only one part (no dots) in key, just set value
 		} else {
@@ -199,7 +222,7 @@ function Local_API_1484_11(options) {
 			if(obj[v]) {
 				return getData(ka.join("."), obj[v]);
 			} else {
-				settings.errorCode = 402;
+				throwUnimplemented(key);
 				return 'false';
 			}
 			//join the remaining parts back up with dots, and recursively set data on our new "base" obj
@@ -220,15 +243,16 @@ function Local_API_1484_11(options) {
 			case "cmi.exit":
 			case "cmi.session_time":
 				settings.errorCode = 405;
+				settings.diagnostic = "Sorry, this has been specified as a read-only value for " + key;
 				break;
 
 			default:
 				r = getData(key.substr(4, key.length), cmi);
-				//eval(data);
 				scorm.debug(settings.prefix + ": cmiGetValue got " + r, 4);
 				// Filter
 				if(r === undefined || r === null) {
 					settings.errorCode = 401;
+					settings.diagnostic = "Sorry, there was a undefined response from " + key;
 					r = "false";
 				}
 				scorm.debug(settings.prefix + ":  Running: " + self.isRunning() + " GetValue Returning: " + r, 4);
@@ -301,18 +325,6 @@ function Local_API_1484_11(options) {
 			}
 		}
 		return length;
-	}
-	/** 
-	 * Throw Vocabulary Error
-	 * This sets the errorCode and Diagnostic for the key and value attempted.  
-	 * @param k {String} key
-	 * @param v {String} value
-	 * @returns {String} 'false' as dictated by SCORM
-	 */
-	function throwVocabError(k, v) {
-		settings.diganostic = "The " + k + " of " + v + " must be a proper vocabulary element.";
-		settings.errorCode = "406";
-		return 'false';
 	}
 	
 	/**
@@ -439,6 +451,10 @@ function Local_API_1484_11(options) {
 										settings.diagnostic = "The cmi.comments_from_lms element is entirely read only.";
 										return 'false';
 									case "interactions":
+										// Validate
+										if(cmi.interactions._children.indexOf(tiers[3]) === -1) {
+											return throwVocabError(key, v);
+										}
 										//scorm.debug(settings.prefix + ": Checking Interactions .... " + getObjLength(cmi.interactions), 4);
 										cmi.interactions._count = (getObjLength(cmi.interactions) - 2) + ""; // Why -2?  _count and _children
 										
@@ -454,6 +470,11 @@ function Local_API_1484_11(options) {
 												cmi.interactions[tiers[2]].objectives._count = "0";
 												cmi.interactions[tiers[2]].objectives._children = "id,score,success_status,completion_status,description";
 											}
+											// Validate
+											if(cmi.interactions[tiers[2]].objectives._children.indexOf(tiers[5]) === -1) {
+												return throwVocabError(key, v);
+											}
+											
 											cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 1) + ""; // Why -1?  _count and _children
 										}
 										if(tiers[3] === 'correct_responses') {
