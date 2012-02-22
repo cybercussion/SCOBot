@@ -48,17 +48,17 @@ test("SCORM Bookmarking", function() {
 test("SCORM Objectives", function() {
 	// For True False
 	strictEqual(SB.setObjective({
-		id: '1_1',
-		score: {
-			scaled: '0',
-			raw: '0',
-			min: '0',
-			max: '1'
+		id: '1_1',                                                   // {String}
+		score: {                                                     // {Object}
+			scaled: '0',                                             // {String}
+			raw: '0',                                                // {String}
+			min: '0',                                                // {String}
+			max: '1'                                                 // {String}
 		},
-		success_status: 'unknkown',
-		completion_status: 'not attempted',
-		progress_measure: '0',
-		description: 'They will answer a true false interaction'
+		success_status: 'unknkown',                                  // {String} passed, failed, unknown
+		completion_status: 'not attempted',                          // {String} complete, incomplete, not attempted
+		progress_measure: '0',                                       // {String}
+		description: 'They will answer a true false interaction'     // {String}
 	}), 'true', "Setting Objective True False 1_1 unscored");
 	// For Multiple Choice
 	strictEqual(SB.setObjective({
