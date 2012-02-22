@@ -106,7 +106,11 @@ function SCOBot(options) {
 			$(self).triggerHandler({
 				'type': "unload"
 			});
-			self.suspend(); // let the player know were exiting
+			if(scorm.get('exit_type') === "finish") {
+				self.finish();
+			} else {
+				self.suspend();
+			}
 			scorm.debug(settings.prefix + ": SCO is done unloading.", 4);
 		}
 		return isExit;
