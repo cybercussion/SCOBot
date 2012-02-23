@@ -1,5 +1,5 @@
 /*global $, JQuery, scorm, window */
-/*jslint browser: true */
+/*jslint devel: true, browser: true, white: true */
 /**
  * This is a sample SCORM Startup sequence and handicap API's for ease of use.
  * General Concept: When the LMS connects, call var SB = new SCOBOT();
@@ -40,6 +40,7 @@
  */
 function SCOBot(options) {
 	// Constructor ////////////
+	"use strict";
 	/** @default version, createDate, modifiedDate, prefix, interaction_mode, success_status, bookmark, performance, status, suspend_data, mode */
 	var defaults = {
 			version: "1.0",
@@ -82,7 +83,7 @@ function SCOBot(options) {
 	function initSCO() {
 		lmsconnected = scorm.initialize();
 		scorm.debug(settings.prefix + ": SCO Loaded from window.onload " + lmsconnected, 4);
-		if(lmsconnected) {
+		if (lmsconnected) {
 			self.start(); // Things you'd do like getting mode, suspend data
 			// Custom Event Trigger load
 			$(self).triggerHandler({
@@ -91,7 +92,6 @@ function SCOBot(options) {
 		}
 		return lmsconnected;
 	}
-	
 	/**
 	 * Exit SCO
 	 * Commonly done when unload or beforeunload is triggered
@@ -100,13 +100,13 @@ function SCOBot(options) {
 	 * @returns {Boolean} true or false if successfully exited 
 	 */
 	function exitSCO() {
-		if(!isExit) {
+		if (!isExit) {
 			isExit = true;
 			// Custom Event Trigger load
 			$(self).triggerHandler({
 				'type': "unload"
 			});
-			if(scorm.get('exit_type') === "finish") {
+			if (scorm.get('exit_type') === "finish") {
 				self.finish();
 			} else {
 				self.suspend();
@@ -115,7 +115,6 @@ function SCOBot(options) {
 		}
 		return isExit;
 	}
-	
 	/**
 	 * Trigger Warning (internal to this API)
 	 * Throws a console log when a SCORM API Error occurs
@@ -125,47 +124,43 @@ function SCOBot(options) {
 		scorm.debug(error[n], 2);
 		return true;
 	}
-
 	/**
 	 * Is Performing
 	 * This is based on cmi.success_status
 	 * @returns {Boolean} based on if this value has been set (true) or (false) if not
 	 */
 	function isPassed() {
-		if(scorm.get('success_status') !== "passed" && scorm.get('success_status') !== "failed") {
+		if (scorm.get('success_status') !== "passed" && scorm.get('success_status') !== "failed") {
 			return false;
 		}
 		return true;
 	}
-	
 	/**
 	 * Verify cmi score scaled
 	 * Validates if success_status is passed, and exit_type is finish.  Checks that score.max is 1.
 	 * May need to tighten this up later, its mostly for SCO's that default to finish and expect them to be complete.
 	 */
 	function verifyScoreScaled() {
-		if(scorm.get('success_status') === 'passed' && scorm.get('exit_type') === "finish") {
-			if(scorm.getvalue('cmi.score.scaled') === 'false') {
-				if(scorm.getvalue('cmi.score.max') === '1') {
+		if (scorm.get('success_status') === 'passed' && scorm.get('exit_type') === "finish") {
+			if (scorm.getvalue('cmi.score.scaled') === 'false') {
+				if (scorm.getvalue('cmi.score.max') === '1') {
 					scorm.setvalue('cmi.score.scaled', '1');
 				}
 			}
 		}
 	}
-	
 	/**
 	 * Is Bad Value
 	 * We get a variety of responses from an LMS
 	 * @returns {Boolean} true if its bad. 
 	 */
 	function isBadValue(v) {
-		if(badValues.indexOf('|' + v + '|') >= 0) {
+		if (badValues.indexOf('|' + v + '|') >= 0) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
 	/**
 	 * Cleanse Data
 	 * This will escape out characters that may of been cross-contaminated from other proprietary sources.
@@ -175,12 +170,6 @@ function SCOBot(options) {
 		var cleanseExp =  /[^\f\r\n\t\v\0\s\S\w\W\d\D\b\B\cX\xhh\uhhh]/gi; ///(\f\r\n\t\v\0[/b]\s\S\w\W\d\D\b\B\cX\xhh\uhhh)/;
 		return str.replace(cleanseExp, '');
 	}
-	
-	// See $.isArray (JQuery)
-	/*function isArray(obj) {
-		return (obj.constructor.toString().indexOf("Array") != -1);
-	}*/
-	
 	/**
 	 * Is ISO 8601 UTC
 	 * I've got a RegEx to validate ISO 8601 UTC time by the 'Z' at the end.
@@ -192,7 +181,6 @@ function SCOBot(options) {
 		var ISO8601Exp = /(\d{4}-[01]\d\-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+\-][0-2]\d:[0-5]\d|Z))/;
 		return ISO8601Exp.test(v);
 	}
-	
 	/**
 	 * Not Started Yet
 	 * You should never see this message, but I found I may need to trace this more than once.
@@ -202,7 +190,6 @@ function SCOBot(options) {
 		scorm.debug(settings.prefix + ": You didn't call 'Start()' yet, or you already terminated, ignoring.", 2);
 		return 'false';
 	}
-	
 	/**
 	 * Current Time
 	 * @returns {Number} Milliseconds
@@ -211,7 +198,6 @@ function SCOBot(options) {
 		var d = new Date();
 		return d.getTime() + (Date.remoteOffset || 0);
 	}
-	
 	/**
 	 * Find Response Type (May not use this)
 	 * This is designed to check for {case_matters: true/false}, {order_matters: true/false} or {lang: x}
@@ -220,18 +206,18 @@ function SCOBot(options) {
 	 */
 	function findResponseType(type, str) {
 		var reg = 0;
-		switch(type) {
-			case "order_matters":
+		switch (type) {
+		case "order_matters":
 			reg = /^\{order_matters=.*?\}/;
 			break;
-			case "case_matters":
+		case "case_matters":
 			reg = /^\{case_matters=.*?\}/;
 			break;
-			case "lang":
+		case "lang":
 			reg = /^\{lang=.*?\}/;
 			break;
-			default:
-				scorm.debug(settings.prefix + ": Sorry, this is not a valid Response type.", 1);
+		default:
+			scorm.debug(settings.prefix + ": Sorry, this is not a valid Response type.", 1);
 			break;
 		}
 		return reg.exec(str);
@@ -249,224 +235,224 @@ function SCOBot(options) {
 		var str = '',
 			i = 0,
 			arr = [];
-		switch(type) {
-			/*
-			 * True / False
-			 * This will expect a {Boolean}, else it will throw error.
-			 */
-			case 'true_false':
-				value = value + "";
-				if(value === 'true' || value === 'false') {
-					return value;
-				} else {
-					scorm.debug(settings.prefix + ": Developer, you're not passing true or false for true_false.  I got " + value + " instead", 1);
-					value = '';
-				}
+		switch (type) {
+		/*
+		 * True / False
+		 * This will expect a {Boolean}, else it will throw error.
+		 */
+		case 'true_false':
+			value = value.toString();
+			if (value === 'true' || value === 'false') {
+				return value;
+			} else {
+				scorm.debug(settings.prefix + ": Developer, you're not passing true or false for true_false.  I got " + value + " instead", 1);
+				value = '';
+			}
 			return value;
-			/*
-			 *  Multiple Choice
-			 *  This will expect an {Array} value type ["choice_a", "choice_b"]
-			 */
-			case 'multiple_choice':
+		/*
+		 *  Multiple Choice
+		 *  This will expect an {Array} value type ["choice_a", "choice_b"]
+		 */
+		case 'multiple_choice':
 			/*
 			 * Sequencing
 			 * This will expect an {Array}
 			 * Similar to multiple choice
 			 */
-			case 'sequencing':
-				// a[,]b
-				if($.isArray(value)) {
-					str = value.join("[,]");
-					value = str;
-				} else {
-					scorm.debug(settings.prefix + ": Developer, you're not passing a array type for multiple choice.  I got " + typeof(value) + " instead\n" + JSON.stringify(value), 1);
-					value = '';
-				}
+		case 'sequencing':
+			// a[,]b
+			if ($.isArray(value)) {
+				str = value.join("[,]");
+				value = str;
+			} else {
+				scorm.debug(settings.prefix + ": Developer, you're not passing a array type for multiple choice.  I got " + typeof(value) + " instead\n" + JSON.stringify(value), 1);
+				value = '';
+			}
 			return value;
-			/*
-			 * Fill In
-			 * This will expect an {Object} with optional values
-			 * {
-			 *		case_matters: true, // optional {Boolean}
-			 *		order_maters: true, // optional {Boolean}
-			 *		lang: 'en-us',      // optional, can also be alternate letter lang code {String}
-			 *		words: [            // required {Array}
-			 *			'word1',
-			 *			'word2'
-			 *		]
-			 * }
-			 */
-			case 'fill_in':
-				// Word
-				// {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
-				if($.isPlainObject(value)) {
-					// Check for case_matters
-					if(value.case_matters !== undefined) {
-						str += "{case_matters=" + value.case_matters + "}";
-					}
-					// Check for order_matters
-					if(value.order_matters !== undefined) {
-						str += "{order_matters=" + value.order_matters + "}";
-					}
-					// Check for lang
-					if(value.lang !== undefined) {
-						str += "{lang=" + value.lang + "}";
-					}
-					str += value.words.join("[,]");
-					value = str;
-				} else {
-					scorm.debug(settings.prefix + ": Developer, you're not passing a object type for fill in.  I got " + typeof(value) + " instead", 1);
-					value = '';
+		/*
+		 * Fill In
+		 * This will expect an {Object} with optional values
+		 * {
+		 *		case_matters: true, // optional {Boolean}
+		 *		order_maters: true, // optional {Boolean}
+		 *		lang: 'en-us',      // optional, can also be alternate letter lang code {String}
+		 *		words: [            // required {Array}
+		 *			'word1',
+		 *			'word2'
+		 *		]
+		 * }
+		 */
+		case 'fill_in':
+			// Word
+			// {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
+			if ($.isPlainObject(value)) {
+				// Check for case_matters
+				if (value.case_matters !== undefined) {
+					str += "{case_matters=" + value.case_matters + "}";
 				}
-			return value;
-			/*
-			 * Long Fill In
-			 * This will expect an {Object} with optional values
-			 * {
-			 *		case_matters: true,   // Optional {Boolean}
-			 *		lang: 'en-us',        // Optional, can also be alternate letter lang code {String}
-			 *		text: 'Bunch of text' // Required 4000 character limit {String}
-			 * }
-			 */
-			case 'long_fill_in':
-				// Bunch of text...
-				// {case_matters=true}{lang=en}Bunch of text...
-				if($.isPlainObject(value)) {
-					// Check for case_matters
-					if(value.case_matters !== undefined) {
-						str += "{case_matters=" + value.case_matters + "}";
-					}
-					// Check for lang
-					if(value.lang !== undefined) {
-						str += "{lang=" + value.lang + "}";
-					}
-					str += value.text;
-					value = str;
-				} else {
-					scorm.debug(settings.prefix + ": Developer, you're not passing a object type for long fill in.  I got " + typeof(value) + " instead", 1);
-					value = '';
+				// Check for order_matters
+				if (value.order_matters !== undefined) {
+					str += "{order_matters=" + value.order_matters + "}";
 				}
+				// Check for lang
+				if (value.lang !== undefined) {
+					str += "{lang=" + value.lang + "}";
+				}
+				str += value.words.join("[,]");
+				value = str;
+			} else {
+				scorm.debug(settings.prefix + ": Developer, you're not passing a object type for fill in.  I got " + typeof(value) + " instead", 1);
+				value = '';
+			}
 			return value;
-			/*
-			 * Matching
-			 * This will expect {Array} of {Array}'s
-			 * [
-			 *		['tile1', 'target1'],
-			 *		['tile2', 'target3'],
-			 *		['tile3', 'target2']
-			 * ]
-			 */
-			case 'matching':
-				// tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
-				if($.isArray(value)) {
-					for(i=0; i<value.length; i++) {
-						if($.isArray(value[i])) {
+		/*
+		 * Long Fill In
+		 * This will expect an {Object} with optional values
+		 * {
+		 *		case_matters: true,   // Optional {Boolean}
+		 *		lang: 'en-us',        // Optional, can also be alternate letter lang code {String}
+		 *		text: 'Bunch of text' // Required 4000 character limit {String}
+		 * }
+		 */
+		case 'long_fill_in':
+			// Bunch of text...
+			// {case_matters=true}{lang=en}Bunch of text...
+			if ($.isPlainObject(value)) {
+				// Check for case_matters
+				if (value.case_matters !== undefined) {
+					str += "{case_matters=" + value.case_matters + "}";
+				}
+				// Check for lang
+				if (value.lang !== undefined) {
+					str += "{lang=" + value.lang + "}";
+				}
+				str += value.text;
+				value = str;
+			} else {
+				scorm.debug(settings.prefix + ": Developer, you're not passing a object type for long fill in.  I got " + typeof(value) + " instead", 1);
+				value = '';
+			}
+			return value;
+		/*
+		 * Matching
+		 * This will expect {Array} of {Array}'s
+		 * [
+		 *		['tile1', 'target1'],
+		 *		['tile2', 'target3'],
+		 *		['tile3', 'target2']
+		 * ]
+		 */
+		case 'matching':
+			// tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
+			if ($.isArray(value)) {
+				for (i = 0; i < value.length; i += 1) {
+					if ($.isArray(value[i])) {
+						arr.push(value[i].join("[.]")); // this isn't working
+					} else {
+						scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof(value) + " instead", 1);
+						return '';
+					}
+				}
+				str = arr.join("[,]");
+				value = str;
+			} else {
+				scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof(value) + " instead", 1);
+				value = '';
+			}
+			return value;
+		/*
+		 * Performance
+		 * This will expect {Array} of {Array}'s
+		 * Similar to matching, but its optional to pass the step identifier
+		 * Correct Responses Pattern:
+		 * Correct Response Pattern: {Object}
+		 * {
+		 *	order_matters: false,
+		 *	answers: [
+		 *			["step_1", "inspect wound"],
+		 *			["step_2", "clean wound"],
+		 *			["step_3", "apply bandage"]
+		 *		]
+		 *	}
+		 * Learner Response:
+		 * [
+		 *		["step_1", "inspect wound"],
+		 *		["step_2", "clean wound"],
+		 *		["step_3", "apply bandage"]
+		 * ]
+		 */
+		case 'performance':
+			//
+			if (!$.isArray(value)) { // This would be a Correct Response Pattern
+				// Check for order_matters
+				if (value.order_matters !== undefined) {
+					str += "{order_matters=" + value.order_matters + "}";
+				}
+				if ($.isArray(value.answers)) {
+					for (i = 0; i < value.answers.length; i += 1) {
+						if ($.isArray(value.answers[i])) {
+							arr.push(value.answers[i].join("[.]")); // this isn't working
+						} else {
+							scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance correct response.  I got " + typeof(value.answers[i]) + " instead on " + i, 1);
+							scorm.debug(value, 1);
+							return '';
+						}
+					}
+					str += arr.join("[,]");
+				} else {
+					scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance correct response.  I got " + typeof(value.answers) + " instead", 1);
+					scorm.debug(value, 1);
+				}
+			} else {
+				if (typeof($.isArray(value))) { // This would be a Learner Response
+					for (i = 0; i < value.length; i += 1) {
+						if ($.isArray(value[i])) {
 							arr.push(value[i].join("[.]")); // this isn't working
 						} else {
-							scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof(value) + " instead", 1);
+							scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance learner response.  I got " + typeof(value[i]) + " instead on " + i, 1);
+							scorm.debug(value, 1);
 							return '';
 						}
 					}
 					str = arr.join("[,]");
-					value = str;
 				} else {
-					scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof(value) + " instead", 1);
+					scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance learner response.  I got " + typeof(value) + " instead", 1);
 					value = '';
 				}
+			}
+			value = str;
 			return value;
-			/*
-			 * Performance
-			 * This will expect {Array} of {Array}'s
-			 * Similar to matching, but its optional to pass the step identifier
-			 * Correct Responses Pattern:
-			 * Correct Response Pattern: {Object}
-			 * {
-			 *	order_matters: false,
-			 *	answers: [
-			 *			["step_1", "inspect wound"],
-			 *			["step_2", "clean wound"],
-			 *			["step_3", "apply bandage"]
-			 *		]
-			 *	}
-			 * Learner Response:
-			 * [
-			 *		["step_1", "inspect wound"],
-			 *		["step_2", "clean wound"],
-			 *		["step_3", "apply bandage"]
-			 * ]
-			 */
-			case 'performance':
-				//
-				if(!$.isArray(value)) { // This would be a Correct Response Pattern
-					// Check for order_matters
-					if(value.order_matters !== undefined) {
-						str += "{order_matters=" + value.order_matters + "}";
-					}
-					if($.isArray(value.answers)) {
-						for(i=0; i<value.answers.length; i++) {
-							if($.isArray(value.answers[i])) {
-								arr.push(value.answers[i].join("[.]")); // this isn't working
-							} else {
-								scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance correct response.  I got " + typeof(value.answers[i]) + " instead on " + i, 1);
-								scorm.debug(value, 1);
-								return '';
-							}
-						}
-						str += arr.join("[,]");
-					} else {
-						scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance correct response.  I got " + typeof(value.answers) + " instead", 1);
-						scorm.debug(value, 1);
-					}
-				} else {
-					if(typeof($.isArray(value))) { // This would be a Learner Response
-						for(i=0; i<value.length; i++) {
-							if($.isArray(value[i])) {
-								arr.push(value[i].join("[.]")); // this isn't working
-							} else {
-								scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance learner response.  I got " + typeof(value[i]) + " instead on " + i, 1);
-								scorm.debug(value, 1);
-								return '';
-							}
-						}
-						str = arr.join("[,]");
-					} else {
-						scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance learner response.  I got " + typeof(value) + " instead", 1);
-						value = '';
-					}
+		/**
+		 * Numeric
+		 * comments coming
+		 */
+		case 'numeric':
+			if (typeof(value) === "number") {
+				value = value.toString();
+			} else {
+				// Verify number to save some time.
+				str = parseFloat(value);
+				if (str === "NaN") {
+					scorm.debug(settings.prefix + ": Developer, your not passing a number for a numeric interaction.  I got " + value + " instead", 1);	
 				}
-				value = str;
+			}	
 			return value;
-			/**
-			 * Numeric
-			 * comments coming
-			 */
-			case 'numeric':
-				if(typeof(value) === "number") {
-					value = value + "";
-				} else {
-					// Verify number to save some time.
-					str = parseFloat(value);
-					if(str === "NaN") {
-						scorm.debug(settings.prefix + ": Developer, your not passing a number for a numeric interaction.  I got " + value + " instead", 1);	
-					}
-				}	
-			return value;
-			/*
-			 * LikeRT
-			 * No real hands on here, expects a {String}
-			 * This is like 'other', but expects a short identifier type
-			 */
-			case 'likert':
-			/*
-			 * Other
-			 * This will take a {String} and recommended not to go beyond 4000 chars
-			 */
-			case 'other':
-				// Anything up to 4000 characters
-			return value + ""; // Do nothing, but ensure string
-				default:
-				// Invalid
-				scorm.debug(settings.prefix + ": Sorry, invalid interaction type detected for " + type + " on " + value, 1);
+		/*
+		 * LikeRT
+		 * No real hands on here, expects a {String}
+		 * This is like 'other', but expects a short identifier type
+		 */
+		case 'likert':
+		/*
+		 * Other
+		 * This will take a {String} and recommended not to go beyond 4000 chars
+		 */
+		case 'other':
+			// Anything up to 4000 characters
+			return value.toString(); // Do nothing, but ensure string
+		default:
+			// Invalid
+			scorm.debug(settings.prefix + ": Sorry, invalid interaction type detected for " + type + " on " + value, 1);
 			return false;
 		}
 	}
@@ -480,175 +466,172 @@ function SCOBot(options) {
 	 * TODO
 	 */
 	function decodeInteractionType(type, value) {
-		var str = '',
-			i = 0,
+		var i = 0,
 			arr = [],
 			obj = {},
 			match = false;
-		switch(type) {
-			case 'true_false':
+		switch (type) {
+		case 'true_false':
 			return value;
-			case 'multiple_choice':
-			case 'sequencing':
-				// a[,]b to array
-				arr = value.split("[,]");
-				value = arr;
+		case 'multiple_choice':
+		case 'sequencing':
+			// a[,]b to array
+			arr = value.split("[,]");
+			value = arr;
 			return value;
-			/*
-			 * Fill In
-			 * This will expect an {Object} with optional values
-			 * {
-			 *		case_matters: true, // optional {Boolean}
-			 *		order_maters: true, // optional {Boolean}
-			 *		lang: 'en-us',      // optional, can also be alternate letter lang code {String}
-			 *		words: [            // required {Array}
-			 *			'word1',
-			 *			'word2'
-			 *		]
-			 * }
-			 */
-			case 'fill_in':
-				// Word
-				// {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
+		/*
+		 * Fill In
+		 * This will expect an {Object} with optional values
+		 * {
+		 *		case_matters: true, // optional {Boolean}
+		 *		order_maters: true, // optional {Boolean}
+		 *		lang: 'en-us',      // optional, can also be alternate letter lang code {String}
+		 *		words: [            // required {Array}
+		 *			'word1',
+		 *			'word2'
+		 *		]
+		 * }
+		 */
+		case 'fill_in':
+			// Word
+			// {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
+			// Check for case_matters
+			arr = findResponseType('case_matters', value);
+			if (arr !== null) {
+				if (arr[0].search(/^\{case_matters=(true|false)\}$/) !== -1) {
+					obj.case_matters = arr[0].substring('{case_matters='.length, arr[0].length - 1);
+					value = value.substring(arr[0].length, value.length); // trim off
+					scorm.debug("=== case matters" + value, 4);
+				}
+			}
+			// Check for order_matters
+			arr = findResponseType('order_matters', value);
+			if (arr !== null) {
+				if (arr[0].search(/^\{order_matters=(true|false)\}$/) !== -1) {
+					obj.order_matters = arr[0].substring('{order_matters='.length, arr[0].length - 1);
+					value = value.substring(arr[0].length, value.length); // trim off
+					scorm.debug("=== order matters" + value, 4);
+				}
+			}
+			// Check for lang
+			arr = findResponseType('lang', value);
+			if (arr !== null) {
+				if (arr[0].search(/^\{lang=.*?\}$/) !== -1) {
+					obj.lang = arr[0].substring('{lang='.length, arr[0].length - 1); // returns language value
+					value = value.substring(arr[0].length, value.length); // trim off
+				}
+			}
+			obj.words = value.split("[,]");
+			return obj;
+		/*
+		 * Long Fill In
+		 * This will expect an {Object} with optional values
+		 * {
+		 *		case_matters: true,   // Optional {Boolean}
+		 *		lang: 'en-us',        // Optional, can also be alternate letter lang code {String}
+		 *		text: 'Bunch of text' // Required 4000 character limit {String}
+		 * }
+		 */
+		case 'long_fill_in':
+			// Bunch of text...
+			// {case_matters=true}{lang=en}Bunch of text...
 				// Check for case_matters
-				arr = findResponseType('case_matters', value);
-				if(arr !== null) {
-					if(arr[0].search(/^\{case_matters=(true|false)\}$/) !== -1) {
-						obj.case_matters = arr[0].substring('{case_matters='.length, arr[0].length - 1);
-						value = value.substring(arr[0].length, value.length); // trim off
-						scorm.debug("=== case matters" + value, 4);
-					}
+			arr = findResponseType('case_matters', value);
+			if (arr !== null) {
+				if (arr[0].search(/^\{case_matters=(true|false)\}$/) !== -1) {
+					obj.case_matters = arr[0].substring('{case_matters='.length, arr[0].length - 1);
+					value = value.substring(arr[0].length, value.length); // trim off
+					scorm.debug("=== case matters" + value, 4);
 				}
-				// Check for order_matters
-				arr = findResponseType('order_matters', value);
-				if(arr !== null) {
-					if(arr[0].search(/^\{order_matters=(true|false)\}$/) !== -1) {
-						obj.order_matters = arr[0].substring('{order_matters='.length, arr[0].length - 1);
-						value = value.substring(arr[0].length, value.length); // trim off
-						scorm.debug("=== order matters" + value, 4);
-					}
+			}
+			// Check for lang
+			arr = findResponseType('lang', value);
+			if (arr !== null) {
+				if (arr[0].search(/^\{lang=.*?\}$/) !== -1) {
+					obj.lang = arr[0].substring('{lang='.length, arr[0].length - 1); // returns language value
+					value = value.substring(arr[0].length, value.length); // trim off
 				}
-				// Check for lang
-				arr = findResponseType('lang', value);
-				if(arr !== null) {
-					if(arr[0].search(/^\{lang=.*?\}$/) !== -1) {
-						obj.lang = arr[0].substring('{lang='.length, arr[0].length - 1); // returns language value
-						value = value.substring(arr[0].length, value.length); // trim off
-					}
-				}
-				obj.words = value.split("[,]");
+			}
+			obj.text = value;
 			return obj;
-			/*
-			 * Long Fill In
-			 * This will expect an {Object} with optional values
-			 * {
-			 *		case_matters: true,   // Optional {Boolean}
-			 *		lang: 'en-us',        // Optional, can also be alternate letter lang code {String}
-			 *		text: 'Bunch of text' // Required 4000 character limit {String}
-			 * }
-			 */
-			case 'long_fill_in':
-				// Bunch of text...
-				// {case_matters=true}{lang=en}Bunch of text...
-					// Check for case_matters
-				arr = findResponseType('case_matters', value);
-				if(arr !== null) {
-					if(arr[0].search(/^\{case_matters=(true|false)\}$/) !== -1) {
-						obj.case_matters = arr[0].substring('{case_matters='.length, arr[0].length - 1);
-						value = value.substring(arr[0].length, value.length); // trim off
-						scorm.debug("=== case matters" + value, 4);
-					}
-				}
-				// Check for lang
-				arr = findResponseType('lang', value);
-				if(arr !== null) {
-					if(arr[0].search(/^\{lang=.*?\}$/) !== -1) {
-						obj.lang = arr[0].substring('{lang='.length, arr[0].length - 1); // returns language value
-						value = value.substring(arr[0].length, value.length); // trim off
-					}
-				}
-				obj.text = value;
-			return obj;
-			/*
-			 * Matching
-			 * This will expect {Array} of {Array}'s
-			 * [
-			 *		['tile1', 'target1'],
-			 *		['tile2', 'target3'],
-			 *		['tile3', 'target2']
-			 * ]
-			 */
-			case 'matching':
-			// tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
-				arr = value.split("[,]");
-				for(i=0; i<arr.length; i++) {
-					arr[i] = arr[i].split("[.]"); // this isn't working
-				}
+		/*
+		 * Matching
+		 * This will expect {Array} of {Array}'s
+		 * [
+		 *		['tile1', 'target1'],
+		 *		['tile2', 'target3'],
+		 *		['tile3', 'target2']
+		 * ]
+		 */
+		case 'matching':
+		// tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
+			arr = value.split("[,]");
+			for (i = 0; i < arr.length; i += 1) {
+				arr[i] = arr[i].split("[.]"); // this isn't working
+			}
 			return arr;
-			/*
-			 * Performance
-			 * This will expect {Array} of {Array}'s
-			 * Similar to matching, but its optional to pass the step identifier
-			 * Correct Response Pattern: {Object}
-			 * {
-			 *	order_matters: false,
-			 *	answers: [
-			 *			["step_1", "inspect wound"],
-			 *			["step_2", "clean wound"],
-			 *			["step_3", "apply bandage"]
-			 *		]
-			 *	}
-			 * Learner Response: {Array}
-			 * ["step_1", "inspect wound"],
-	         * ["step_2", "clean wound"],
-	         * ["step_3", "apply bandage"]
-			 */
-			case 'performance':
-				// {order_matters=false}tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
-				// Check for order_matters (located in the correct_response pattern)
-				arr = findResponseType('order_matters', value);
-				if(arr !== null) {
-					if(arr[0].search(/^\{order_matters=(true|false)\}$/) !== -1) {
-						match = true; // This is a correct_responses.n.pattern
-						obj.order_matters = arr[0].substring('{order_matters='.length, arr[0].length - 1);
-						value = value.substring(arr[0].length, value.length); // trim off
-						scorm.debug("=== order matters" + value, 4);
-					}
+		/*
+		 * Performance
+		 * This will expect {Array} of {Array}'s
+		 * Similar to matching, but its optional to pass the step identifier
+		 * Correct Response Pattern: {Object}
+		 * {
+		 *	order_matters: false,
+		 *	answers: [
+		 *			["step_1", "inspect wound"],
+		 *			["step_2", "clean wound"],
+		 *			["step_3", "apply bandage"]
+		 *		]
+		 *	}
+		 * Learner Response: {Array}
+		 * ["step_1", "inspect wound"],
+         * ["step_2", "clean wound"],
+         * ["step_3", "apply bandage"]
+		 */
+		case 'performance':
+			// {order_matters=false}tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
+			// Check for order_matters (located in the correct_response pattern)
+			arr = findResponseType('order_matters', value);
+			if (arr !== null) {
+				if (arr[0].search(/^\{order_matters=(true|false)\}$/) !== -1) {
+					match = true; // This is a correct_responses.n.pattern
+					obj.order_matters = arr[0].substring('{order_matters='.length, arr[0].length - 1);
+					value = value.substring(arr[0].length, value.length); // trim off
+					scorm.debug("=== order matters" + value, 4);
 				}
-				arr = value.split("[,]");
-				for(i=0; i<arr.length; i++) {
-					arr[i] = arr[i].split("[.]"); // this isn't working
-				}
-				if(match) {
-					obj.answers = arr;
-					return obj;
-				} else {
-					return arr;
-				}
-			break;
-			/**
-			 * Numeric
-			 * This falls into a simple hand off
-			 */
-			case 'numeric':
+			}
+			arr = value.split("[,]");
+			for (i = 0; i < arr.length; i += 1) {
+				arr[i] = arr[i].split("[.]"); // this isn't working
+			}
+			if (match) {
+				obj.answers = arr;
+				return obj;
+			}
+			return arr;
+		/**
+		 * Numeric
+		 * This falls into a simple hand off
+		 */
+		case 'numeric':
 
-			/*
-			 * LikeRT
-			 * No real hands on here, expects a {String}
-			 * This is like 'other', but expects a short identifier type
-			 */
-			case 'likert':
-			/*
-			 * Other
-			 * This will take a {String} and recommended not to go beyond 4000 chars
-			 */
-			
-			case 'other':
-				// Anything up to 4000 characters
+		/*
+		 * LikeRT
+		 * No real hands on here, expects a {String}
+		 * This is like 'other', but expects a short identifier type
+		 */
+		case 'likert':
+		/*
+		 * Other
+		 * This will take a {String} and recommended not to go beyond 4000 chars
+		 */
+		
+		case 'other':
+			// Anything up to 4000 characters
 			return value; // Do nothing
-				default:
-				// Invalid
-				scorm.debug(settings.prefix + ": Sorry, invalid interaction type detected for " + type + " on " + value, 1);
+		default:
+			// Invalid
+			scorm.debug(settings.prefix + ": Sorry, invalid interaction type detected for " + type + " on " + value, 1);
 			return false;
 		}
 	}
@@ -660,17 +643,11 @@ function SCOBot(options) {
 	function setSuspendData() {
 		var result;
 		// May want to consider updating scoring here at this time
-		result = scorm.setvalue('cmi.suspend_data', cleanseData( JSON.stringify(settings.suspend_data) ) );
-		if(result === 'true') {
-			/*result = scorm.commit();
-			if(result === 'false') {
-				scorm.debug(settings.prefix + ": Sorry, there was an issue committing, please review the SCORM Logs", 1);
-				return result;
-			} else {*/
-				scorm.debug(settings.prefix + ": Suspend Data saved", 4);
-				scorm.debug(settings.suspend_data, 4);
-				return 'true';
-			//}
+		result = scorm.setvalue('cmi.suspend_data', cleanseData(JSON.stringify(settings.suspend_data)));
+		if (result === 'true') {
+			scorm.debug(settings.prefix + ": Suspend Data saved", 4);
+			scorm.debug(settings.suspend_data, 4);
+			return 'true';
 		} else {
 			scorm.debug(settings.prefix + ": Sorry, there was an issue saving your suspend data, please review the SCORM Logs", 1);
 			return 'false';
@@ -705,7 +682,7 @@ function SCOBot(options) {
 			totalKnownObjectives     = parseInt(scorm.getvalue('cmi.objectives._count'), 10),
 			totalKnownInteractions   = parseInt(scorm.getvalue('cmi.interactions._count'), 10);
 
-		if(settings.totalInteractions === 0 || settings.totalObjectives === 0) {
+		if (settings.totalInteractions === 0 || settings.totalObjectives === 0) {
 			// This is a non-starter, if the SCO Player doesn't set these we are flying blind
 			scorm.debug(settings.prefix + ": Sorry, I cannot calculate Progress as the totalInteractions and or Objectives are zero", 2);
 			return false;
@@ -715,27 +692,27 @@ function SCOBot(options) {
 			
 			
 			// Set Score Scaled
-			if((scoreMax - scoreMin) === 0) {
+			if ((scoreMax - scoreMin) === 0) {
 				// Division By Zero
 				scorm.setvalue('cmi.score.scaled', scoreScaled);
 			} else {
-				scoreScaled = (scoreRaw - scoreMin) / (scoreMax - scoreMin) + "";
+				scoreScaled = (scoreRaw - scoreMin) / (scoreMax - scoreMin).toString();
 				scorm.setvalue('cmi.score.scaled', scoreScaled);
 			}
 			
 			// Set Progress Measure
-			progressMeasure = settings.totalObjectivesCompleted / settings.totalObjectives + "";
+			progressMeasure = settings.totalObjectivesCompleted / settings.totalObjectives.toString();
 			scorm.setvalue('cmi.progress_measure', progressMeasure);
 			
 			// Set Completion Status
-			if(progressMeasure >= scorm.getvalue('cmi.completion_threshold')) {
+			if (progressMeasure >= scorm.getvalue('cmi.completion_threshold')) {
 				scorm.setvalue('cmi.completion_status', 'completed');	
 			} else {
 				scorm.setvalue('cmi.completion_status', 'incomplete');
 			}
 			
 			// Set Success Status
-			if(scoreScaled >= settings.scaled_passing_score) {
+			if (scoreScaled >= settings.scaled_passing_score) {
 				scorm.setvalue('cmi.success_status', 'passed');
 			} else {
 				scorm.setvalue('cmi.success_status', 'failed');
@@ -761,10 +738,10 @@ function SCOBot(options) {
 	 * and during the session.
 	 * @returns {Boolean}
 	 */
-	this.start = function() {
+	this.start = function () {
 		var tmpScaledPassingScore = '';
 		scorm.debug(settings.prefix + ": I am starting...", 3);
-		if(!isStarted) {
+		if (!isStarted) {
 			isStarted = true;
 			// Retrieve normal settings/parameters from the LMS
 			// Get SCO Mode (normal, browse, review)
@@ -778,7 +755,7 @@ function SCOBot(options) {
 			 */
 			settings.entry                = scorm.getvalue('cmi.entry'); // ab-initio, resume or empty
 			// Entry Check-up ...
-			if(settings.entry === '' || settings.entry === 'resume') { // Resume, or possible Resume
+			if (settings.entry === '' || settings.entry === 'resume') { // Resume, or possible Resume
 				// Get Bookmark
 				settings.location = scorm.getvalue('cmi.location');
 				
@@ -795,12 +772,14 @@ function SCOBot(options) {
 				 */
 				settings.suspend_data         = (scorm.getvalue('cmi.suspend_data')); // no longer unescaping
 				// Quality control - You'd be surprised at the things a LMS responds with
-				if(settings.suspend_data.length > 0 && !isBadValue(settings.suspend_data)) {
+				if (settings.suspend_data.length > 0 && !isBadValue(settings.suspend_data)) {
 					// Assuming a JSON String
 					scorm.debug(settings.prefix + ": Returning suspend data object from a prior session", 4);
 					settings.suspend_data = JSON.parse(settings.suspend_data); // Turn this back into a object.
 					scorm.debug(settings.suspend_data, 4);
-					if(settings.entry === "") {settings.entry = "resume";} // most definitly its a resume if there is suspend data.
+					if (settings.entry === "") {
+						settings.entry = "resume";
+					} // most definitely its a resume if there is suspend data.
 				} else {
 					scorm.debug(settings.prefix + ": Creating new suspend data object", 4);
 					// Object already created by default see settings.suspend_data
@@ -813,7 +792,7 @@ function SCOBot(options) {
 			}
 			// Scaled Passing Score
 			tmpScaledPassingScore         = scorm.getvalue('cmi.scaled_passing_score'); // This may be empty, default otherwise
-			if(!isBadValue(tmpScaledPassingScore) && tmpScaledPassingScore !== "-1") {
+			if (!isBadValue(tmpScaledPassingScore) && tmpScaledPassingScore !== "-1") {
 				settings.scaled_passing_score = tmpScaledPassingScore;
 				// else it defaults to what its set to prior.  i.e. no change.
 			}
@@ -840,12 +819,20 @@ function SCOBot(options) {
 	 * }
 	 * @returns {String} 'true' or 'false'
 	 */
-	this.setTotals = function(data) {		
-		if(isStarted) {
-			if(!isBadValue(data.totalInteractions)) {settings.totalInteractions = data.totalInteractions;}
-			if(!isBadValue(data.totalObjectives)) {settings.totalInteraction  = data.totalObjectives;}
-			if(!isBadValue(data.scoreMin)) {settings.scoreMin = data.scoreMin;}
-			if(!isBadValue(data.scoreMax)) {settings.scoreMax = data.scoreMax;}	
+	this.setTotals = function (data) {		
+		if (isStarted) {
+			if (!isBadValue(data.totalInteractions)) {
+				settings.totalInteractions = data.totalInteractions;
+			}
+			if (!isBadValue(data.totalObjectives)) {
+				settings.totalInteraction  = data.totalObjectives;
+			}
+			if (!isBadValue(data.scoreMin)) {
+				settings.scoreMin = data.scoreMin;
+			}
+			if (!isBadValue(data.scoreMax)) {
+				settings.scoreMax = data.scoreMax;
+			}	
 			return 'true';
 		} else {
 			return notStartedYet();
@@ -857,8 +844,8 @@ function SCOBot(options) {
 	 * This will return the current SCO Mode we are in (normal, browse, review)
 	 * @returns {String} normal, browse, review
 	 */
-	this.getMode = function() {
-		if(isStarted) {
+	this.getMode = function () {
+		if (isStarted) {
 			return settings.mode;
 		} else {
 			return notStartedYet();
@@ -870,8 +857,8 @@ function SCOBot(options) {
 	 * This will return the entry type (ab-initio, resume or "")
 	 * @returns {String} ab-initio, resume , ""
 	 */
-	this.getEntry = function() {
-		if(isStarted){
+	this.getEntry = function () {
+		if (isStarted) {
 			return settings.entry;
 		} else {
 			return notStartedYet();
@@ -884,9 +871,9 @@ function SCOBot(options) {
 	 * @param v {String} value
 	 * returns {String} 'true' or 'false'.
 	 */
-	this.setBookmark = function(v) {
-		if(isStarted) {
-			settings.location = v + ""; // update local snapshot, ensure string
+	this.setBookmark = function (v) {
+		if (isStarted) {
+			settings.location = v.toString(); // update local snapshot, ensure string
 			return scorm.setvalue('cmi.location', settings.location);
 		} else {
 			return notStartedYet();
@@ -898,8 +885,8 @@ function SCOBot(options) {
 	 * This will return the local snapshot, but is in sync with cmi.location
 	 * @returns {String} bookmark
 	 */
-	this.getBookmark = function() {
-		if(isStarted) {
+	this.getBookmark = function () {
+		if (isStarted) {
 			return settings.location; // return local snapshot
 		} else {
 			return notStartedYet();
@@ -949,11 +936,11 @@ function SCOBot(options) {
 	 * @param data {Object}
 	 * @returns {Boolean}
 	 */
-	this.setSuspendDataByPageID = function(id, title, data) {
+	this.setSuspendDataByPageID = function (id, title, data) {
 		// Suspend data is a array of pages by ID
 		var i;
-		for(i=0; i<settings.suspend_data.pages.length; i++) {
-			if(settings.suspend_data.pages[i].id === id ) {
+		for (i = 0; i < settings.suspend_data.pages.length; i += 1) {
+			if (settings.suspend_data.pages[i].id === id) {
 				// Update Page data
 				settings.suspend_data.pages[i].data = data; // overwrite existing
 				scorm.debug(settings.prefix + ": Suspend Data Set", 4);
@@ -976,11 +963,11 @@ function SCOBot(options) {
 	 * @param id {Mixed}
 	 * @returns {Object} but false if empty.
 	 */
-	this.getSuspendDataByPageID = function(id) {
+	this.getSuspendDataByPageID = function (id) {
 		// Suspend data is a array of pages by ID
 		var i;
-		for(i=0; i<settings.suspend_data.pages.length; i++) {
-			if(settings.suspend_data.pages[i].id === id) {
+		for (i = 0; i < settings.suspend_data.pages.length; i += 1) {
+			if (settings.suspend_data.pages[i].id === id) {
 				return settings.suspend_data.pages[i].data;
 			}
 		}
@@ -991,7 +978,7 @@ function SCOBot(options) {
 	 * Get Time From Start
 	 * 
 	 */
-	this.getSecondsFromStart = function() {
+	this.getSecondsFromStart = function () {
 		return settings.startTime - currentTime(); // turn in to seconds
 	};
 	
@@ -1027,7 +1014,7 @@ function SCOBot(options) {
 	 * @param data {Object} Interaction Object from SCORM
 	 * @returns {String} 'true' or 'false'
 	 */
-	this.setInteraction = function(data) {
+	this.setInteraction = function (data) {
 		var n,       // Reserved for the count within interactions.n
 			m,       // Reserved for the count within interactions.n.objectives.m
 			i,       // Reserved for objective loop
@@ -1040,24 +1027,24 @@ function SCOBot(options) {
 			latency, // Reserved for doing the Timestamp to latency conversion (May not exist)
 			namespace, // Reserved for holding the cmi.interaction.n. name space to stop having to re-type it
 			result;  // Result of calling values against the SCORM API
-		if(!$.isPlainObject(data)) {
+		if (!$.isPlainObject(data)) {
 			scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof(data) + " instead.", 1);
 			return 'false';
 		} else {
-			if(isBadValue(data.id)) {
+			if (isBadValue(data.id)) {
 				// This is a show stopper, try to give them some bread crumb to locate the problem.
 				scorm.debug(settings.prefix + ": Developer, your passing a interaction without a ID\nSee question:\n" + data.description, 1);
 				return 'false';
 			} else {
 				//Time stuff will need to move after ID is added
-				if(typeof(data.timestamp) === "object") {
+				if (typeof(data.timestamp) === "object") {
 					timestamp = scorm.isoDateStringUTC(data.timestamp); // 2012-02-12T00:37:29Z formatted
 				}
 				data.timestamp = timestamp;
-				if(typeof(data.latency) === "object") {
+				if (typeof(data.latency) === "object") {
 					latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
 					data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
-				} else if(data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
+				} else if (data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
 					// may want to force latency?
 					data.latency = new Date();
 					latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
@@ -1065,13 +1052,13 @@ function SCOBot(options) {
 				} // Else you won't record latency as the student didn't touch the question.
 				
 				// Check for Interaction Mode
-				if(settings.interaction_mode === "journaled") {
+				if (settings.interaction_mode === "journaled") {
 					// Explicitly stating they want a history of interactions
 					n = scorm.getvalue(p1 + '_count'); // we want to use cmi.interactions._count
 				} else { 
 					// Default to state, which will update by id
 					n = scorm.getInteractionByID(data.id); // we want to update by interaction id
-					if(isBadValue(n)) {
+					if (isBadValue(n)) {
 						n = scorm.getvalue(p1 + '_count'); // This is a add
 					}
 				}
@@ -1087,28 +1074,28 @@ function SCOBot(options) {
 				// Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
 				// Either ignore value because its already added, or add it based on _count
 				// result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+".id", data.objectives[i].id);
-				if(data.objectives !== undefined) {
-					for(i=0; i<data.objectives.length; i++) {
+				if (data.objectives !== undefined) {
+					for (i = 0; i < data.objectives.length; i += 1) {
 						// We need to find out if the objective is already added
 						m = scorm.getInteractionObjectiveByID(n, data.objectives[i].id); // will return 0 or the locator where it existed or false (not found)
-						if(m === 'false') {
+						if (m === 'false') {
 							m = scorm.getvalue(p1 + 'objectives._count');
 						}
-						result = scorm.setvalue(p1 + 'objectives.'+m+'.id', data.objectives[i].id);
+						result = scorm.setvalue(p1 + 'objectives.' + m + '.id', data.objectives[i].id);
 					}
 				}
 				
-				if(data.timestamp !== undefined) {
+				if (data.timestamp !== undefined) {
 					result = scorm.setvalue(p1 + 'timestamp', data.timestamp);
 				}
 				
 				// Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type 
 				//result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
-				if($.isPlainObject(data.correct_responses)) {
-					for(j=0; j<data.correct_responses.length; j++) {
+				if ($.isPlainObject(data.correct_responses)) {
+					for (j = 0; j < data.correct_responses.length; j += 1) {
 						p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
 						scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
-						if(p === 'false') {
+						if (p === 'false') {
 							p = scorm.getvalue(p1 + 'correct_responses._count');
 							scorm.debug(settings.prefix + ": p is now " + p, 4);
 						}
@@ -1155,16 +1142,16 @@ function SCOBot(options) {
 	 * or
 	 * 'false'
 	 */
-	this.getInteraction = function(id) {
+	this.getInteraction = function (id) {
 		var n = 'false', // Interaction count
 			p1 = 'cmi.interactions.', // Reduction of typing
 			m = 0, // objectives count
 			p = 0, // correct_responses count
 			i = 0, // loop count
 			obj = {}; // Response object
-		if(isStarted) {
+		if (isStarted) {
 			n = scorm.getInteractionByID(id);
-			if(n === 'false') {
+			if (n === 'false') {
 				return n;
 			} else {
 				// Lets rebuild the Interaction object
@@ -1173,21 +1160,21 @@ function SCOBot(options) {
 				obj.type              = scorm.getvalue(p1 + 'type');
 				m                     = scorm.getvalue(p1 + 'objectives._count');
 				obj.objectives        = [];
-				if(m !== 'false') {
-					for(i=0; i<m; i++) {
+				if (m !== 'false') {
+					for (i = 0; i < m; i += 1) {
 						obj.objectives.push({
-							id: scorm.getvalue(p1 + 'objectives.'+i+'.id')
+							id: scorm.getvalue(p1 + 'objectives.' + i + '.id')
 						});
 					}
 				}
 				obj.timestamp         = scorm.getvalue(p1 + 'timestamp'); // TODO need to convert to date object?
 				p                     = scorm.getvalue(p1 + 'correct_responses._count');
 				obj.correct_responses = [];
-				if(p !== 'false') {
+				if (p !== 'false') {
 					// Loop thru and grab the patterns
-					for(i=0; i<p; i++) {
+					for (i = 0; i < p; i += 1) {
 						obj.correct_responses.push({
-							pattern: decodeInteractionType(obj.type, scorm.getvalue(p1 + 'correct_responses.'+i+'.pattern'))
+							pattern: decodeInteractionType(obj.type, scorm.getvalue(p1 + 'correct_responses.' + i + '.pattern'))
 						});
 					}
 				}
@@ -1237,21 +1224,21 @@ function SCOBot(options) {
 	 * @param data {Object} Objective object from SCORM
 	 * @returns {String} 'true' or 'false'
 	 */
-	this.setObjective = function(data) {
+	this.setObjective = function (data) {
 		var p1 = 'cmi.objectives.',
 			n = scorm.getObjectiveByID(data.id),
 			i = 0,
 			result = 'false';
-		if(isBadValue(n)) {
+		if (isBadValue(n)) {
 			n = scorm.getvalue(p1 + '_count');
 			p1 += n + ".";
-			if($.isPlainObject(data.score)) {
+			if ($.isPlainObject(data.score)) {
 				scorm.debug(settings.prefix + ": Setting Objective for the first time " + data.id + " " + data.description, 4);
-				result = scorm.setvalue(p1 + 'id', data.id + "");
-				result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled + "");
-				result = scorm.setvalue(p1 + 'score.raw', data.score.raw + "");
-				result = scorm.setvalue(p1 + 'score.min', data.score.min + "");
-				result = scorm.setvalue(p1 + 'score.max', data.score.max + "");
+				result = scorm.setvalue(p1 + 'id', data.id.toString());
+				result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled.toString());
+				result = scorm.setvalue(p1 + 'score.raw', data.score.raw.toString());
+				result = scorm.setvalue(p1 + 'score.min', data.score.min.toString());
+				result = scorm.setvalue(p1 + 'score.max', data.score.max.toString());
 				result = scorm.setvalue(p1 + 'success_status', data.success_status);
 				result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
 				result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
@@ -1262,14 +1249,30 @@ function SCOBot(options) {
 		} else {
 			p1 += n + '.';		
 			//scorm.setvalue(p1 + '.id', data.id); // shouldn't change this
-			if(!isBadValue(data.score.scaled)) {result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled + "");}
-			if(!isBadValue(data.score.raw)) {result = scorm.setvalue(p1 + 'score.raw', data.score.raw + "");}
-			if(!isBadValue(data.score.min)) {result = scorm.setvalue(p1 + 'score.min', data.score.min + "");}
-			if(!isBadValue(data.score.max)) {result = scorm.setvalue(p1 + 'score.max', data.score.max + "");}
-			if(!isBadValue(data.success_status)) {result = scorm.setvalue(p1 + 'success_status', data.success_status);}
-			if(!isBadValue(data.completion_status)) {result = scorm.setvalue(p1 + 'completion_status', data.completion_status);}
-			if(!isBadValue(data.progress_measure)) {result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);}
-			if(!isBadValue(data.description)) {result = scorm.setvalue(p1 + 'description', data.description);}
+			if (!isBadValue(data.score.scaled)) {
+				result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled.toString());
+			}
+			if (!isBadValue(data.score.raw)) {
+				result = scorm.setvalue(p1 + 'score.raw', data.score.raw.toString());
+			}
+			if (!isBadValue(data.score.min)) {
+				result = scorm.setvalue(p1 + 'score.min', data.score.min.toString());
+			}
+			if (!isBadValue(data.score.max)) {
+				result = scorm.setvalue(p1 + 'score.max', data.score.max.toString());
+			}
+			if (!isBadValue(data.success_status)) {
+				result = scorm.setvalue(p1 + 'success_status', data.success_status);
+			}
+			if (!isBadValue(data.completion_status)) {
+				result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
+			}
+			if (!isBadValue(data.progress_measure)) {
+				result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
+			}
+			if (!isBadValue(data.description)) {
+				result = scorm.setvalue(p1 + 'description', data.description);
+			}
 		}	
 		return result;
 	};
@@ -1295,12 +1298,12 @@ function SCOBot(options) {
 	 * or 
 	 * 'false'
 	 */
-	this.getObjective = function(id) {
-		if(isStarted) {
+	this.getObjective = function (id) {
+		if (isStarted) {
 			var n = scorm.getObjectiveByID(id),
 				p1 = 'cmi.objectives.',
 				obj = {};
-			if(n === 'false') {
+			if (n === 'false') {
 				return n;
 			} else {
 				p1 += n + ".";
@@ -1329,8 +1332,8 @@ function SCOBot(options) {
 	 * This will commit the data stored at the LMS Level to the backend.  Please use sparingly.
 	 * @returns {String} 'true' or 'false'
 	 */
-	this.commit = function() {
-		if(isStarted) {
+	this.commit = function () {
+		if (isStarted) {
 			return scorm.commit('');
 		} else {
 			return notStartedYet();
@@ -1342,16 +1345,16 @@ function SCOBot(options) {
 	 * This will suspend the SCO and ends with terminating.  No data can be saved after this.
 	 * @returns {String} 'true' or 'false'
 	 */
-	this.suspend = function() {
-		if(isStarted) {
+	this.suspend = function () {
+		if (isStarted) {
 			setSuspendData();
 			scorm.debug(settings.prefix + ": I am suspending...", 3);
-			if(!isPassed()) {
+			if (!isPassed()) {
 				scorm.setvalue('cmi.success_status', 'unknown');
 			}
 			verifyScoreScaled();
 			scorm.setvalue('cmi.exit', 'suspend');
-			if(status !== "completed") {
+			if (scorm.get('completion_status') !== "completed") {
 				scorm.setvalue('cmi.completion_status', 'incomplete'); //? May not want to do this
 			}
 			isStarted = false;
@@ -1365,16 +1368,16 @@ function SCOBot(options) {
 	 * This will set success status, exit and completion
 	 * @returns {String} 'true' or 'false'
 	 */
-	this.finish = function() {
-		if(isStarted) {
+	this.finish = function () {
+		if (isStarted) {
 			setSuspendData();
 			scorm.debug(settings.prefix + ": I am finishing...", 3);
-			if(!isPassed()) {
+			if (!isPassed()) {
 				scorm.setvalue('cmi.success_status', settings.success_status);
 			}
 			verifyScoreScaled();
 			scorm.setvalue('cmi.exit', 'normal');
-			if(status !== "completed") {
+			if (scorm.get('completion_status') !== "completed") {
 				scorm.setvalue('cmi.completion_status', 'incomplete'); //? May not want to do this
 			}
 			// This is completed per this call.
@@ -1390,11 +1393,11 @@ function SCOBot(options) {
 	 * This will set success status, exit and completion
 	 * @returns {String} 'true' or 'false'
 	 */
-	this.timeout = function() {
-		if(isStarted) {
+	this.timeout = function () {
+		if (isStarted) {
 			setSuspendData();
 			scorm.debug(settings.prefix + ": I am timing out...", 3);
-			if(!isPassed()) {
+			if (!isPassed()) {
 				scorm.setvalue('cmi.success_status', settings.success_status);
 			}
 			verifyScoreScaled();
@@ -1420,18 +1423,18 @@ function SCOBot(options) {
 	 * @param n {String} name
 	 * @param v (String,Number,Object,Array,Boolean} value
 	 */
-	this.set = function(n, v) {
+	this.set = function (n, v) {
 		// May need to maintain read-only perms here, case them out as needed.
-		switch(n) {
-			case "version":
-			case "createDate":
-			case "modifiedDate":
-			case "prefix":
-				triggerWarning(405);
-				break;
-			default:
-				settings[n] = v;
-				break;
+		switch (n) {
+		case "version":
+		case "createDate":
+		case "modifiedDate":
+		case "prefix":
+			triggerWarning(405);
+			break;
+		default:
+			settings[n] = v;
+			break;
 		}
 		return (isError !== 0) ? false : true;
 	};
@@ -1441,8 +1444,8 @@ function SCOBot(options) {
 	 * @param n {String} name
 	 * @returns value
 	 */
-	this.get = function(n) {
-		if(settings[n] === undefined) {
+	this.get = function (n) {
+		if (settings[n] === undefined) {
 			triggerWarning(404);
 			return false;
 		}
