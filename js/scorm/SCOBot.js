@@ -1,5 +1,5 @@
 /*global $, JQuery, scorm, window */
-/*jslint devel: true, browser: true, white: true */
+/*jslint devel: true, browser: true */
 /**
  * This is a sample SCORM Startup sequence and handicap API's for ease of use.
  * General Concept: When the LMS connects, call var SB = new SCOBOT();
@@ -265,7 +265,7 @@ function SCOBot(options) {
 				str = value.join("[,]");
 				value = str;
 			} else {
-				scorm.debug(settings.prefix + ": Developer, you're not passing a array type for multiple choice.  I got " + typeof(value) + " instead\n" + JSON.stringify(value), 1);
+				scorm.debug(settings.prefix + ": Developer, you're not passing a array type for multiple choice.  I got " + typeof (value) + " instead\n" + JSON.stringify(value), 1);
 				value = '';
 			}
 			return value;
@@ -301,7 +301,7 @@ function SCOBot(options) {
 				str += value.words.join("[,]");
 				value = str;
 			} else {
-				scorm.debug(settings.prefix + ": Developer, you're not passing a object type for fill in.  I got " + typeof(value) + " instead", 1);
+				scorm.debug(settings.prefix + ": Developer, you're not passing a object type for fill in.  I got " + typeof (value) + " instead", 1);
 				value = '';
 			}
 			return value;
@@ -329,7 +329,7 @@ function SCOBot(options) {
 				str += value.text;
 				value = str;
 			} else {
-				scorm.debug(settings.prefix + ": Developer, you're not passing a object type for long fill in.  I got " + typeof(value) + " instead", 1);
+				scorm.debug(settings.prefix + ": Developer, you're not passing a object type for long fill in.  I got " + typeof (value) + " instead", 1);
 				value = '';
 			}
 			return value;
@@ -349,14 +349,14 @@ function SCOBot(options) {
 					if ($.isArray(value[i])) {
 						arr.push(value[i].join("[.]")); // this isn't working
 					} else {
-						scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof(value) + " instead", 1);
+						scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof (value) + " instead", 1);
 						return '';
 					}
 				}
 				str = arr.join("[,]");
 				value = str;
 			} else {
-				scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof(value) + " instead", 1);
+				scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof (value) + " instead", 1);
 				value = '';
 			}
 			return value;
@@ -393,30 +393,30 @@ function SCOBot(options) {
 						if ($.isArray(value.answers[i])) {
 							arr.push(value.answers[i].join("[.]")); // this isn't working
 						} else {
-							scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance correct response.  I got " + typeof(value.answers[i]) + " instead on " + i, 1);
+							scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance correct response.  I got " + typeof (value.answers[i]) + " instead on " + i, 1);
 							scorm.debug(value, 1);
 							return '';
 						}
 					}
 					str += arr.join("[,]");
 				} else {
-					scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance correct response.  I got " + typeof(value.answers) + " instead", 1);
+					scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance correct response.  I got " + typeof (value.answers) + " instead", 1);
 					scorm.debug(value, 1);
 				}
 			} else {
-				if (typeof($.isArray(value))) { // This would be a Learner Response
+				if (typeof ($.isArray(value))) { // This would be a Learner Response
 					for (i = 0; i < value.length; i += 1) {
 						if ($.isArray(value[i])) {
 							arr.push(value[i].join("[.]")); // this isn't working
 						} else {
-							scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance learner response.  I got " + typeof(value[i]) + " instead on " + i, 1);
+							scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance learner response.  I got " + typeof (value[i]) + " instead on " + i, 1);
 							scorm.debug(value, 1);
 							return '';
 						}
 					}
 					str = arr.join("[,]");
 				} else {
-					scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance learner response.  I got " + typeof(value) + " instead", 1);
+					scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance learner response.  I got " + typeof (value) + " instead", 1);
 					value = '';
 				}
 			}
@@ -427,15 +427,15 @@ function SCOBot(options) {
 		 * comments coming
 		 */
 		case 'numeric':
-			if (typeof(value) === "number") {
+			if (typeof (value) === "number") {
 				value = value.toString();
 			} else {
 				// Verify number to save some time.
 				str = parseFloat(value);
 				if (str === "NaN") {
-					scorm.debug(settings.prefix + ": Developer, your not passing a number for a numeric interaction.  I got " + value + " instead", 1);	
+					scorm.debug(settings.prefix + ": Developer, your not passing a number for a numeric interaction.  I got " + value + " instead", 1);
 				}
-			}	
+			}
 			return value;
 		/*
 		 * LikeRT
@@ -456,7 +456,6 @@ function SCOBot(options) {
 			return false;
 		}
 	}
-	
 	/**
 	 * Decode Value By Interaction Type
 	 * This is a data filter to convert input formats from SCORM standard strings to there native JS equivalent.
@@ -614,7 +613,6 @@ function SCOBot(options) {
 		 * This falls into a simple hand off
 		 */
 		case 'numeric':
-
 		/*
 		 * LikeRT
 		 * No real hands on here, expects a {String}
@@ -625,7 +623,6 @@ function SCOBot(options) {
 		 * Other
 		 * This will take a {String} and recommended not to go beyond 4000 chars
 		 */
-		
 		case 'other':
 			// Anything up to 4000 characters
 			return value; // Do nothing
@@ -653,7 +650,6 @@ function SCOBot(options) {
 			return 'false';
 		}
 	}
-	
 	/**
 	 * Check Progress
 	 * This should be used sparingly.  Its going to total up the scoring real-time based on any interactions and objectives.
@@ -689,8 +685,6 @@ function SCOBot(options) {
 		} else {
 			// Set Score Totals (raw, min, max) and count up totalObjectivesCompleted
 			//TODO
-			
-			
 			// Set Score Scaled
 			if ((scoreMax - scoreMin) === 0) {
 				// Division By Zero
@@ -699,18 +693,15 @@ function SCOBot(options) {
 				scoreScaled = (scoreRaw - scoreMin) / (scoreMax - scoreMin).toString();
 				scorm.setvalue('cmi.score.scaled', scoreScaled);
 			}
-			
 			// Set Progress Measure
 			progressMeasure = settings.totalObjectivesCompleted / settings.totalObjectives.toString();
 			scorm.setvalue('cmi.progress_measure', progressMeasure);
-			
 			// Set Completion Status
 			if (progressMeasure >= scorm.getvalue('cmi.completion_threshold')) {
-				scorm.setvalue('cmi.completion_status', 'completed');	
+				scorm.setvalue('cmi.completion_status', 'completed');
 			} else {
 				scorm.setvalue('cmi.completion_status', 'incomplete');
 			}
-			
 			// Set Success Status
 			if (scoreScaled >= settings.scaled_passing_score) {
 				scorm.setvalue('cmi.success_status', 'passed');
@@ -720,7 +711,6 @@ function SCOBot(options) {
 		}
 		return response;
 	}
-	
 	// End Private ////////////
 	///////////////////////////
 	// Public /////////////////
@@ -758,7 +748,6 @@ function SCOBot(options) {
 			if (settings.entry === '' || settings.entry === 'resume') { // Resume, or possible Resume
 				// Get Bookmark
 				settings.location = scorm.getvalue('cmi.location');
-				
 				/* Suspend Data technically should be a JSON String.  Structured data would be best suited to
 				 * be recorded this way.  If you don't want to do this, you'll need to back out this portion.
 				 * Also, in order to eliminate foreign keys and other special characters from messing up some
@@ -784,7 +773,6 @@ function SCOBot(options) {
 					scorm.debug(settings.prefix + ": Creating new suspend data object", 4);
 					// Object already created by default see settings.suspend_data
 				}
-			
 			} else {
 				// First time
 				scorm.debug(settings.prefix + ": First time running this SCO based on LMS entry value.", 4);
@@ -796,7 +784,6 @@ function SCOBot(options) {
 				settings.scaled_passing_score = tmpScaledPassingScore;
 				// else it defaults to what its set to prior.  i.e. no change.
 			}
-			
 			settings.completion_status = scorm.getvalue('cmi.completion_status');
 			settings.success_status    = scorm.getvalue('cmi.success_status');
 		} else {
@@ -805,7 +792,6 @@ function SCOBot(options) {
 		}
 		return true;
 	};
-	
 	/** 
 	 * Set Totals
 	 * This will take in total objectives, interactions, score max and score min to aid
@@ -819,7 +805,7 @@ function SCOBot(options) {
 	 * }
 	 * @returns {String} 'true' or 'false'
 	 */
-	this.setTotals = function (data) {		
+	this.setTotals = function (data) {
 		if (isStarted) {
 			if (!isBadValue(data.totalInteractions)) {
 				settings.totalInteractions = data.totalInteractions;
@@ -832,13 +818,12 @@ function SCOBot(options) {
 			}
 			if (!isBadValue(data.scoreMax)) {
 				settings.scoreMax = data.scoreMax;
-			}	
+			}
 			return 'true';
 		} else {
 			return notStartedYet();
 		}
 	};
-	
 	/**
 	 * Get Mode
 	 * This will return the current SCO Mode we are in (normal, browse, review)
@@ -851,7 +836,6 @@ function SCOBot(options) {
 			return notStartedYet();
 		}
 	};
-	
 	/**
 	 * Get Entry
 	 * This will return the entry type (ab-initio, resume or "")
@@ -864,7 +848,6 @@ function SCOBot(options) {
 			return notStartedYet();
 		}
 	};
-	
 	/**
 	 * Set Bookmark
 	 * This will update the local snap shot, and update SCORM (commit still required)
@@ -879,7 +862,6 @@ function SCOBot(options) {
 			return notStartedYet();
 		}
 	};
-	
 	/**
 	 * Get Bookmark
 	 * This will return the local snapshot, but is in sync with cmi.location
@@ -892,7 +874,6 @@ function SCOBot(options) {
 			return notStartedYet();
 		}
 	};
-	
 	/**
 	 * Get Progress
 	 * Hooks to Private method used possibly elsewhere in this API
@@ -903,8 +884,6 @@ function SCOBot(options) {
 	 * @returns {Object}
 	 */
 	this.getProgress = checkProgress;
-	
-	
 	/**
 	 * Set Suspend Data By Page ID
 	 * This will set the suspend data by id (could be a page ID as long as its unique)
@@ -950,13 +929,10 @@ function SCOBot(options) {
 		}
 		// new page push
 		settings.suspend_data.pages.push({'id': id, 'title': title, 'data': data});
-
 		scorm.debug(settings.prefix + ": Suspend Data set:", 4);
 		scorm.debug(settings.suspend_data, 4);
-		
 		return 'true';
 	};
-	
 	/**
 	 * Get Suspend Data By Page ID
 	 * This will get the suspend data by id 
@@ -973,7 +949,6 @@ function SCOBot(options) {
 		}
 		return 'false';
 	};
-	
 	/**
 	 * Get Time From Start
 	 * 
@@ -981,7 +956,6 @@ function SCOBot(options) {
 	this.getSecondsFromStart = function () {
 		return settings.startTime - currentTime(); // turn in to seconds
 	};
-	
 	/**
 	 * Set Interaction
 	 * This will set an interaction based on Journaling or State.
@@ -1028,7 +1002,7 @@ function SCOBot(options) {
 			namespace, // Reserved for holding the cmi.interaction.n. name space to stop having to re-type it
 			result;  // Result of calling values against the SCORM API
 		if (!$.isPlainObject(data)) {
-			scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof(data) + " instead.", 1);
+			scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof (data) + " instead.", 1);
 			return 'false';
 		} else {
 			if (isBadValue(data.id)) {
@@ -1037,11 +1011,11 @@ function SCOBot(options) {
 				return 'false';
 			} else {
 				//Time stuff will need to move after ID is added
-				if (typeof(data.timestamp) === "object") {
+				if (typeof (data.timestamp) === "object") {
 					timestamp = scorm.isoDateStringUTC(data.timestamp); // 2012-02-12T00:37:29Z formatted
 				}
 				data.timestamp = timestamp;
-				if (typeof(data.latency) === "object") {
+				if (typeof (data.latency) === "object") {
 					latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
 					data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
 				} else if (data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
@@ -1050,12 +1024,11 @@ function SCOBot(options) {
 					latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
 					data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
 				} // Else you won't record latency as the student didn't touch the question.
-				
 				// Check for Interaction Mode
 				if (settings.interaction_mode === "journaled") {
 					// Explicitly stating they want a history of interactions
 					n = scorm.getvalue(p1 + '_count'); // we want to use cmi.interactions._count
-				} else { 
+				} else {
 					// Default to state, which will update by id
 					n = scorm.getInteractionByID(data.id); // we want to update by interaction id
 					if (isBadValue(n)) {
@@ -1070,7 +1043,6 @@ function SCOBot(options) {
 				p1 += n + "."; // Add n to part 1 str
 				result = scorm.setvalue(p1 + 'id', data.id);
 				result = scorm.setvalue(p1 + 'type', data.type);
-				
 				// Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
 				// Either ignore value because its already added, or add it based on _count
 				// result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+".id", data.objectives[i].id);
@@ -1084,11 +1056,9 @@ function SCOBot(options) {
 						result = scorm.setvalue(p1 + 'objectives.' + m + '.id', data.objectives[i].id);
 					}
 				}
-				
 				if (data.timestamp !== undefined) {
 					result = scorm.setvalue(p1 + 'timestamp', data.timestamp);
 				}
-				
 				// Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type 
 				//result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
 				if ($.isPlainObject(data.correct_responses)) {
@@ -1102,18 +1072,15 @@ function SCOBot(options) {
 						result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
 					}
 				}
-				
 				result = scorm.setvalue(p1 + 'weighting', data.weighting);
 				result = scorm.setvalue(p1 + 'learner_response', encodeInteractionType(data.type, data.learner_response)); // will need to format by interaction type
 				result = scorm.setvalue(p1 + 'result', data.result);
 				result = scorm.setvalue(p1 + 'latency', data.latency);
 				result = scorm.setvalue(p1 + 'description', data.description);
-				
 				return result;
 			}
 		}
 	};
-	
 	/**
 	 * Get Interaction
 	 * Returns the full Interaction object 
@@ -1182,7 +1149,7 @@ function SCOBot(options) {
 				obj.learner_response  = decodeInteractionType(obj.type, scorm.getvalue(p1 + 'learner_response'));
 				obj.result            = scorm.getvalue(p1 + 'result');
 				obj.latency           = scorm.getvalue(p1 + 'latency'); // TODO need to convert to date object?
-				obj.description       = scorm.getvalue(p1 + 'description'); 
+				obj.description       = scorm.getvalue(p1 + 'description');
 				return obj;
 				/*
 				 Could return in this format
@@ -1247,7 +1214,7 @@ function SCOBot(options) {
 				scorm.debug(settings.prefix + ": Developer, you didn't pass a score object!", 1);
 			}
 		} else {
-			p1 += n + '.';		
+			p1 += n + '.';
 			//scorm.setvalue(p1 + '.id', data.id); // shouldn't change this
 			if (!isBadValue(data.score.scaled)) {
 				result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled.toString());
@@ -1273,10 +1240,9 @@ function SCOBot(options) {
 			if (!isBadValue(data.description)) {
 				result = scorm.setvalue(p1 + 'description', data.description);
 			}
-		}	
+		}
 		return result;
 	};
-	
 	/**
 	 * Get Objective
 	 * Returns the Objective object by ID
@@ -1326,7 +1292,6 @@ function SCOBot(options) {
 			return notStartedYet();
 		}
 	};
-	
 	/**
 	 * Commit
 	 * This will commit the data stored at the LMS Level to the backend.  Please use sparingly.
@@ -1339,7 +1304,6 @@ function SCOBot(options) {
 			return notStartedYet();
 		}
 	};
-	
 	/**
 	 * Suspend
 	 * This will suspend the SCO and ends with terminating.  No data can be saved after this.
@@ -1387,7 +1351,6 @@ function SCOBot(options) {
 			return notStartedYet();
 		}
 	};
-	
 	/**
 	 * Timeout
 	 * This will set success status, exit and completion
@@ -1410,13 +1373,11 @@ function SCOBot(options) {
 			return notStartedYet();
 		}
 	};
-	
 	/**
 	 * Is ISO 8601 UTC
 	 * @returns {Boolean} true/false
 	 */
 	this.isISO8601UTC = isISO8601UTC; // Public to Private hook
-	
 	/**
 	 * Set
 	 * This locally sets values local to this API
