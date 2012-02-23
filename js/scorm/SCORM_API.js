@@ -59,7 +59,7 @@ function SCORM_API(options) {
 	var defaults = {
 			version : "1.0",
 			createDate : "04/05/2011 08:56AM",
-			modifiedDate : "02/12/2012 12:17PM",
+			modifiedDate : "02/23/2012 10:00AM",
 			debug : false,
 			isActive : false,
 			throw_alerts : false,

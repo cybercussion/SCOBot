@@ -1,5 +1,5 @@
 /*global $, JQuery, scorm, window */
-/*jslint devel: true, browser: true */
+/*jslint devel: true, browser: true, regexp: true */
 /**
  * This is a sample SCORM Startup sequence and handicap API's for ease of use.
  * General Concept: When the LMS connects, call var SB = new SCOBOT();
@@ -45,7 +45,7 @@ function SCOBot(options) {
 	var defaults = {
 			version: "1.0",
 			createDate: "04/07/2011 09:33AM",
-			modifiedDate: "02/23/2012 08:57AM",
+			modifiedDate: "02/23/2012 10:00AM",
 			prefix: "SCOBot",
 			// SCORM buffers and settings
 			interaction_mode: "state", // or journaled
