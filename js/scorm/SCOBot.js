@@ -45,7 +45,7 @@ function SCOBot(options) {
 	var defaults = {
 			version: "1.0",
 			createDate: "04/07/2011 09:33AM",
-			modifiedDate: "02/18/2012 06:56AM",
+			modifiedDate: "02/23/2012 08:57AM",
 			prefix: "SCOBot",
 			// SCORM buffers and settings
 			interaction_mode: "state", // or journaled
