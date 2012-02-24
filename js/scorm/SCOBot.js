@@ -41,16 +41,17 @@
 function SCOBot(options) {
 	// Constructor ////////////
 	"use strict";
-	/** @default version, createDate, modifiedDate, prefix, interaction_mode, success_status, bookmark, performance, status, suspend_data, mode */
+	/** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
 	var defaults = {
 			version: "1.0",
 			createDate: "04/07/2011 09:33AM",
-			modifiedDate: "02/23/2012 10:00AM",
+			modifiedDate: "02/23/2012 10:00PM",
 			prefix: "SCOBot",
 			// SCORM buffers and settings
 			launch_data: {},
 			interaction_mode: "state", // or journaled
 			launch_data_type: "querystring", // or json
+			scorm_edition: "3rd", // or 4th - this is a issue with "editions" of SCORM 2004 that differ 
 			success_status: "unknown",
 			location: "",
 			completion_status: "",
@@ -125,6 +126,17 @@ function SCOBot(options) {
 	function triggerWarning(n) {
 		scorm.debug(error[n], 2);
 		return true;
+	}
+	/** 
+	 * Trigger Exception
+	 * Throws an event the player can listen to in order to handle an exception.
+	 * This would be common to a non-compliance in an LMS and loss of student data.
+	 */
+	function triggerException(msg) {
+		$(self).triggerHandler({
+			'type': 'exception',
+			'error': msg
+		});
 	}
 	/**
 	 * Is Performing
@@ -243,6 +255,7 @@ function SCOBot(options) {
 		 * This will expect a {Boolean}, else it will throw error.
 		 */
 		case 'true_false':
+		case 'true-false':
 			value = value.toString();
 			if (value === 'true' || value === 'false') {
 				return value;
@@ -256,6 +269,7 @@ function SCOBot(options) {
 		 *  This will expect an {Array} value type ["choice_a", "choice_b"]
 		 */
 		case 'multiple_choice':
+		case 'choice':
 			/*
 			 * Sequencing
 			 * This will expect an {Array}
@@ -285,6 +299,7 @@ function SCOBot(options) {
 		 * }
 		 */
 		case 'fill_in':
+		case 'fill-in':
 			// Word
 			// {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
 			if ($.isPlainObject(value)) {
@@ -317,6 +332,7 @@ function SCOBot(options) {
 		 * }
 		 */
 		case 'long_fill_in':
+		case 'long-fill-in':
 			// Bunch of text...
 			// {case_matters=true}{lang=en}Bunch of text...
 			if ($.isPlainObject(value)) {
@@ -473,8 +489,10 @@ function SCOBot(options) {
 			match = false;
 		switch (type) {
 		case 'true_false':
+		case 'true-false':
 			return value;
 		case 'multiple_choice':
+		case 'choice':
 		case 'sequencing':
 			// a[,]b to array
 			arr = value.split("[,]");
@@ -494,6 +512,7 @@ function SCOBot(options) {
 		 * }
 		 */
 		case 'fill_in':
+		case 'fill-in':
 			// Word
 			// {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
 			// Check for case_matters
@@ -534,6 +553,7 @@ function SCOBot(options) {
 		 * }
 		 */
 		case 'long_fill_in':
+		case 'long-fill-in':
 			// Bunch of text...
 			// {case_matters=true}{lang=en}Bunch of text...
 				// Check for case_matters
@@ -741,7 +761,7 @@ function SCOBot(options) {
 			// Get SCO Mode (normal, browse, review)
 			settings.startTime       = currentTime();
 			tmpLaunchData            = scorm.getvalue('cmi.launch_data');
-			// Could possibly turn this into a object and differ between json or querystring formats.
+			// Turn this into a object and differ between json or querystring formats.
 			if (settings.launch_data_type === "json") {
 				settings.launch_data = JSON.parse(tmpLaunchData);
 			} else {
@@ -1023,6 +1043,7 @@ function SCOBot(options) {
 			scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof (data) + " instead.", 1);
 			return 'false';
 		} else {
+			// TODO Check the cmi.interactions._children to locate if hyphens or underscores are used 
 			if (isBadValue(data.id)) {
 				// This is a show stopper, try to give them some bread crumb to locate the problem.
 				scorm.debug(settings.prefix + ": Developer, your passing a interaction without a ID\nSee question:\n" + data.description, 1);
@@ -1058,9 +1079,35 @@ function SCOBot(options) {
 				 * As stated by the standard, if we run into issues they will show in the log from the SCORM API.
 				 * I won't currently do anything at this point to handle them here, as I doubt there is little that could be done.
 				 */
+				if (n === "-1") {
+					n = '0';
+				}
 				p1 += n + "."; // Add n to part 1 str
 				result = scorm.setvalue(p1 + 'id', data.id);
-				result = scorm.setvalue(p1 + 'type', data.type);
+				// Type may error as a result of 3rd or 4th edition changes with "-" vs "_" between the interaction type
+				switch (settings.scorm_edition) {
+				case "3rd":
+					if (data.type === "multiple-choice" || data.type === "multiple_choice") {
+						data.type = "choice";
+					}
+					result = scorm.setvalue(p1 + 'type', data.type.replace(/_/g, "-"));
+					break;
+				case "4th":
+					result = scorm.setvalue(p1 + 'type', data.type.replace(/-/g, "_"));
+					break;
+				default:
+					scorm.debug(settings.prefix + ": Developer, your not specifying a valid edition of SCORM 2004!  See scorm_edition parameter.", 1);
+					break;
+				}
+				// Fool proof, someone may of messed up so, fix it for them.
+				if (result === 'false') {
+					// Need to convert the data type
+					if (data.type.indexOf("-") > 0) {
+						result = scorm.setvalue(p1 + 'type', data.type.replace(/-/g, "_"));
+					} else {
+						result = scorm.setvalue(p1 + 'type', data.type.replace(/_/g, "-"));
+					}
+				}
 				// Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
 				// Either ignore value because its already added, or add it based on _count
 				// result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+".id", data.objectives[i].id);
@@ -1069,7 +1116,7 @@ function SCOBot(options) {
 						// We need to find out if the objective is already added
 						m = scorm.getInteractionObjectiveByID(n, data.objectives[i].id); // will return 0 or the locator where it existed or false (not found)
 						if (m === 'false') {
-							m = scorm.getvalue(p1 + 'objectives._count');
+							m = scorm.getvalue(p1 + 'objectives._count') === '-1' ? 0 : scorm.getvalue(p1 + 'objectives._count');
 						}
 						result = scorm.setvalue(p1 + 'objectives.' + m + '.id', data.objectives[i].id);
 					}
@@ -1084,7 +1131,7 @@ function SCOBot(options) {
 						p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
 						scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
 						if (p === 'false') {
-							p = scorm.getvalue(p1 + 'correct_responses._count');
+							p = scorm.getvalue(p1 + 'correct_responses._count') === '-1' ? 0 : scorm.getvalue(p1 + 'objectives._count');
 							scorm.debug(settings.prefix + ": p is now " + p, 4);
 						}
 						result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
