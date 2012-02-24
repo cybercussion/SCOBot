@@ -1071,9 +1071,6 @@ function SCOBot(options) {
 				 * As stated by the standard, if we run into issues they will show in the log from the SCORM API.
 				 * I won't currently do anything at this point to handle them here, as I doubt there is little that could be done.
 				 */
-				if (n === "-1") {
-					n = '0';
-				}
 				p1 += n + "."; // Add n to part 1 str
 				result = scorm.setvalue(p1 + 'id', data.id);
 				result = scorm.setvalue(p1 + 'type', data.type);
