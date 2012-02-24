@@ -48,7 +48,9 @@ function SCOBot(options) {
 			modifiedDate: "02/23/2012 10:00AM",
 			prefix: "SCOBot",
 			// SCORM buffers and settings
+			launch_data: {},
 			interaction_mode: "state", // or journaled
+			launch_data_type: "querystring", // or json
 			success_status: "unknown",
 			location: "",
 			completion_status: "",
@@ -729,13 +731,29 @@ function SCOBot(options) {
 	 * @returns {Boolean}
 	 */
 	this.start = function () {
-		var tmpScaledPassingScore = '';
+		var tmpScaledPassingScore = '',
+			tmpLaunchData = '',
+			queryStringExp = /\\?([^?=&]+)(=([^&#]*))?/gi;
 		scorm.debug(settings.prefix + ": I am starting...", 3);
 		if (!isStarted) {
 			isStarted = true;
 			// Retrieve normal settings/parameters from the LMS
 			// Get SCO Mode (normal, browse, review)
-			settings.startTime            = currentTime();
+			settings.startTime       = currentTime();
+			tmpLaunchData            = scorm.getvalue('cmi.launch_data');
+			// Could possibly turn this into a object and differ between json or querystring formats.
+			if (settings.launch_data_type === "json") {
+				settings.launch_data = JSON.parse(tmpLaunchData);
+			} else {
+				tmpLaunchData.replace(
+					new RegExp("([^?=&]+)(=([^&]*))?", "g"),
+					function ($0, $1, $2, $3) {
+						settings.launch_data[$1] = $3;
+					}
+				);
+			}
+			scorm.debug(settings.prefix + ": Launch Data:", 4);
+			scorm.debug(settings.launch_data, 4);
 			settings.mode                 = scorm.getvalue('cmi.mode'); // normal, browse, review
 			/*
 			 * Entry is interesting.  You may or may not be able to rely on it. If the LMS sets it you'd
