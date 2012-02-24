@@ -786,15 +786,16 @@ function SCORM_API(options) {
 		var count = self.getvalue("cmi.objectives._count"), // obtain total objectives
 			i,
 			tID;
-		scorm.debug(settings.prefix + ": Objective count is " + count, 4);
-		if (count === '' || count === 'false') {
+		scorm.debug(settings.prefix + ": Set Objective - Begin search, Objective count is " + count, 4);
+		if (count === '' || count === 'false' || count === '-1') {
 			return 'false';
 		} else {
 			count = parseInt(count, 10); // convert from string
 			for (i = count; i >= 0; i -= 1) {
 				tID = self.getvalue("cmi.objectives." + i + ".id");
-				scorm.debug(settings.prefix + ": Objective ID Check for " + i + " : " + tID + " vs " + id, 4);
+				scorm.debug(settings.prefix + ": Objective ID Check for " + i + " : " + id + " vs " + tID, 4);
 				if (id === tID) {
+					scorm.debug(settings.prefix + ": Objective ID Match on " + i, 4);
 					return i;
 				}
 			}

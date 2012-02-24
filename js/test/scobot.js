@@ -232,7 +232,7 @@ test("SCORM Interactions", function() {
 		// True False Interaction
 		strictEqual(SB.setInteraction({
 			id: intID,                 // {String}
-			type: 'true_false',        // {String}
+			type: 'true-false',        // {String}
 			objectives: [              // {Array}
 				{                      // {Object}
 					id: objID          // {String}
@@ -254,9 +254,7 @@ test("SCORM Interactions", function() {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		type = SB.get('scorm_edition') === "3rd" ? "true-false" : "true_false";
-		scorm.debug("Based on SCORM Edition the Type is " + type, 4);
-		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.type'), type, 'Verifying cmi.interactions.'+n+'.type is ' + type);
+		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.type'), 'true-false', 'Verifying cmi.interactions.'+n+'.type is true-false');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives._count'), '1', 'Verifying cmi.interactions.'+n+'.objectives._count count is 1');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives.'+m+'.id'), '1_1', 'Verifying cmi.interactions.'+n+'.objectives.'+m+'.id id is 1_1');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.learner_response'), 'true', 'Verifying cmi.interactions.'+n+'.learner_response is true');
@@ -270,7 +268,7 @@ test("SCORM Interactions", function() {
 		//endTime.setMinutes(startTime.getMinutes() + 10); // Add 5 minutes for latency, result would be PT10M
 		strictEqual(SB.setInteraction({
 			id: intID,                // {String}
-			type: 'multiple_choice',  // {String}
+			type: 'choice',  // {String}
 			objectives: [             // {Array}
 				{                     // {Object}
 					id: objID         // {String}
@@ -292,9 +290,7 @@ test("SCORM Interactions", function() {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		type = SB.get('scorm_edition') === "3rd" ? "choice" : "multiple_choice"; // multiple_choice
-		scorm.debug("Based on SCORM Edition the Type is " + type, 4);
-		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.type'), type, 'Verifying cmi.interactions.'+n+'.type is ' + type);
+		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.type'), "choice", 'Verifying cmi.interactions.'+n+'.type is choice');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives._count'), '1', 'Verifying cmi.interactions.'+n+'.objectives._count count is 1');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives.'+m+'.id'), '2_1', 'Verifying cmi.interactions.'+n+'.objectives.'+m+'.id id is 2_1');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.learner_response'), 'a[,]c', 'Verifying cmi.interactions.'+n+'.learner_response is a[,]c');
@@ -308,7 +304,7 @@ test("SCORM Interactions", function() {
 		//endTime.setMinutes(startTime.getMinutes() + 11); // Add 5 minutes for latency, result would be PT10M
 		strictEqual(SB.setInteraction({
 			id: intID,             // {String}
-			type: 'fill_in',       // {String}
+			type: 'fill-in',       // {String}
 			objectives: [          // {Array}
 				{                  // {Object}
 					id: objID      // {String}
@@ -338,9 +334,7 @@ test("SCORM Interactions", function() {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		type = SB.get('scorm_edition') === "3rd" ? "fill-in" : "fill_in";
-		scorm.debug("Based on SCORM Edition the Type is " + type, 4);
-		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.type'), type, 'Verifying cmi.interactions.'+n+'.type is ' + type);
+		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.type'), 'fill-in', 'Verifying cmi.interactions.'+n+'.type is fill-in');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives._count'), '1', 'Verifying cmi.interactions.'+n+'.objectives._count count is 1');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives.'+m+'.id'), '3_1', 'Verifying cmi.interactions.'+n+'.objectives.'+m+'.id id is 3_1');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.learner_response'), '{lang=en}car[,]automobile', 'Verifying cmi.interactions.'+n+'.learner_response is {lang=en}car[,]automobile');
@@ -390,7 +384,7 @@ test("SCORM Interactions", function() {
 		//endTime.setMinutes(startTime.getMinutes() + 21); // Add 5 minutes for latency, result would be PT10M
 		strictEqual(SB.setInteraction({
 			id: intID,                               // {String}
-			type: 'long_fill_in',                    // {String}
+			type: 'long-fill-in',                    // {String}
 			objectives: [                            // {Array}
 				{                                    // {Object}
 					id: objID                        // {String}
@@ -419,9 +413,7 @@ test("SCORM Interactions", function() {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		type = SB.get('scorm_edition') === "3rd" ? "long-fill-in" : "long_fill_in";
-		scorm.debug("Based on SCORM Edition tye Type is " + type, 4);
-		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.type'), type, 'Verifying cmi.interactions.'+n+'.type is ' + type);
+		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.type'), 'long-fill-in', 'Verifying cmi.interactions.'+n+'.type is long-fill-in');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives._count'), '1', 'Verifying cmi.interactions.'+n+'.objectives._count count is 1');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.objectives.'+m+'.id'), '5_1', 'Verifying cmi.interactions.'+n+'.objectives.'+m+'.id id is 5_1');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.learner_response'), "{lang=en}There was one once, but it's been a long day.", "Verifying cmi.interactions."+n+".learner_response is {lang=en}There was one once, but it's been a long day.");

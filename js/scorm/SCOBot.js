@@ -240,7 +240,7 @@ function SCOBot(options) {
 	 * Set Value By Interaction Type
 	 * This is a data filter to convert input formats into SCORM standard strings.  Please review each interaction for what it expects.
 	 * This will not enforce SCORM char limits, so please mind your logs if your doing something your not suppose to.
-	 * @param type {String} Expects true_false, multiple_choice, fill_in, long_fill_in, matching, performance, sequencing, likert, numeric, other
+	 * @param type {String} Expects true-false, choice, fill-in, long-fill-in, matching, performance, sequencing, likert, numeric, other
 	 * @param value {Mixed} May take Array or Object of arrays depending
 	 * @returns {String} formatted value for interaction type
 	 * TODO
@@ -254,13 +254,12 @@ function SCOBot(options) {
 		 * True / False
 		 * This will expect a {Boolean}, else it will throw error.
 		 */
-		case 'true_false':
 		case 'true-false':
 			value = value.toString();
 			if (value === 'true' || value === 'false') {
 				return value;
 			} else {
-				scorm.debug(settings.prefix + ": Developer, you're not passing true or false for true_false.  I got " + value + " instead", 1);
+				scorm.debug(settings.prefix + ": Developer, you're not passing true or false for true-false.  I got " + value + " instead", 1);
 				value = '';
 			}
 			return value;
@@ -268,7 +267,6 @@ function SCOBot(options) {
 		 *  Multiple Choice
 		 *  This will expect an {Array} value type ["choice_a", "choice_b"]
 		 */
-		case 'multiple_choice':
 		case 'choice':
 			/*
 			 * Sequencing
@@ -281,7 +279,7 @@ function SCOBot(options) {
 				str = value.join("[,]");
 				value = str;
 			} else {
-				scorm.debug(settings.prefix + ": Developer, you're not passing a array type for multiple choice.  I got " + typeof (value) + " instead\n" + JSON.stringify(value), 1);
+				scorm.debug(settings.prefix + ": Developer, you're not passing a array type for sequencing/choice.  I got " + typeof (value) + " instead\n" + JSON.stringify(value), 1);
 				value = '';
 			}
 			return value;
@@ -298,7 +296,6 @@ function SCOBot(options) {
 		 *		]
 		 * }
 		 */
-		case 'fill_in':
 		case 'fill-in':
 			// Word
 			// {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
@@ -331,7 +328,6 @@ function SCOBot(options) {
 		 *		text: 'Bunch of text' // Required 4000 character limit {String}
 		 * }
 		 */
-		case 'long_fill_in':
 		case 'long-fill-in':
 			// Bunch of text...
 			// {case_matters=true}{lang=en}Bunch of text...
@@ -477,7 +473,7 @@ function SCOBot(options) {
 	/**
 	 * Decode Value By Interaction Type
 	 * This is a data filter to convert input formats from SCORM standard strings to there native JS equivalent.
-	 * @param type {String} Expects true_false, multiple_choice, fill_in, long_fill_in, matching, performance, sequencing, likert, numeric, other
+	 * @param type {String} Expects true-false, choice, fill-in, long-fill-in, matching, performance, sequencing, likert, numeric, other
 	 * @param value {String} SCORM 2004 Format for Interaction learner response, or pattern
 	 * @returns {Mixed} formatted value for interaction type
 	 * TODO
@@ -488,10 +484,8 @@ function SCOBot(options) {
 			obj = {},
 			match = false;
 		switch (type) {
-		case 'true_false':
 		case 'true-false':
 			return value;
-		case 'multiple_choice':
 		case 'choice':
 		case 'sequencing':
 			// a[,]b to array
@@ -511,7 +505,6 @@ function SCOBot(options) {
 		 *		]
 		 * }
 		 */
-		case 'fill_in':
 		case 'fill-in':
 			// Word
 			// {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
@@ -552,7 +545,6 @@ function SCOBot(options) {
 		 *		text: 'Bunch of text' // Required 4000 character limit {String}
 		 * }
 		 */
-		case 'long_fill_in':
 		case 'long-fill-in':
 			// Bunch of text...
 			// {case_matters=true}{lang=en}Bunch of text...
@@ -1005,7 +997,7 @@ function SCOBot(options) {
 	 * Example Data Object:
 	 * {
 	 *	id: '1',                             // 4000 chars
-	 *	type: 'true_false',                  // (true_false, multiple_choice, fill_in, long_fill_in, matching, performance, sequencing, likert, numeric, other)
+	 *	type: 'true-false',                  // (true-false, choice, fill-in, long-fill-in, matching, performance, sequencing, likert, numeric, other)
 	 *	objectives: [
 	 *		{
 	 *			id: '12'	
@@ -1066,12 +1058,12 @@ function SCOBot(options) {
 				// Check for Interaction Mode
 				if (settings.interaction_mode === "journaled") {
 					// Explicitly stating they want a history of interactions
-					n = scorm.getvalue(p1 + '_count'); // we want to use cmi.interactions._count
+					n = scorm.getvalue(p1 + '_count') === "-1" ? 0 : scorm.getvalue(p1 + '_count'); // we want to use cmi.interactions._count
 				} else {
 					// Default to state, which will update by id
 					n = scorm.getInteractionByID(data.id); // we want to update by interaction id
 					if (isBadValue(n)) {
-						n = scorm.getvalue(p1 + '_count'); // This is a add
+						n = scorm.getvalue(p1 + '_count') === "-1" ? 0 : scorm.getvalue(p1 + '_count');
 					}
 				}
 				/* 
@@ -1084,30 +1076,7 @@ function SCOBot(options) {
 				}
 				p1 += n + "."; // Add n to part 1 str
 				result = scorm.setvalue(p1 + 'id', data.id);
-				// Type may error as a result of 3rd or 4th edition changes with "-" vs "_" between the interaction type
-				switch (settings.scorm_edition) {
-				case "3rd":
-					if (data.type === "multiple-choice" || data.type === "multiple_choice") {
-						data.type = "choice";
-					}
-					result = scorm.setvalue(p1 + 'type', data.type.replace(/_/g, "-"));
-					break;
-				case "4th":
-					result = scorm.setvalue(p1 + 'type', data.type.replace(/-/g, "_"));
-					break;
-				default:
-					scorm.debug(settings.prefix + ": Developer, your not specifying a valid edition of SCORM 2004!  See scorm_edition parameter.", 1);
-					break;
-				}
-				// Fool proof, someone may of messed up so, fix it for them.
-				if (result === 'false') {
-					// Need to convert the data type
-					if (data.type.indexOf("-") > 0) {
-						result = scorm.setvalue(p1 + 'type', data.type.replace(/-/g, "_"));
-					} else {
-						result = scorm.setvalue(p1 + 'type', data.type.replace(/_/g, "-"));
-					}
-				}
+				result = scorm.setvalue(p1 + 'type', data.type);
 				// Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
 				// Either ignore value because its already added, or add it based on _count
 				// result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+".id", data.objectives[i].id);
@@ -1153,7 +1122,7 @@ function SCOBot(options) {
 	 * @returns {Mixed} object or string 'false'
 	 * {
 	 *	id: '1',                             // 4000 chars
-	 *	type: 'true_false',                  // (true_false, multiple_choice, fill_in, long_fill_in, matching, performance, sequencing, likert, numeric, other)
+	 *	type: 'true-false',                  // (true-false, choice, fill-in, long-fill-in, matching, performance, sequencing, likert, numeric, other)
 	 *	objectives: [
 	 *		{
 	 *			id: '12'	
