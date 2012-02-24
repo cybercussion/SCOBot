@@ -6,7 +6,8 @@ var scorm  = new SCORM_API({
 		success_status: 'passed'
 	}),
 	SB     = new SCOBot({
-		interaction_mode: 'state'
+		interaction_mode: 'state',
+		launch_data_type: 'querystring'
 	}),
 	setvalue_calls = 0,
 	getvalue_calls = 0,
