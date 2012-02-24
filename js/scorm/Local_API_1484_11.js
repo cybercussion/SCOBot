@@ -63,7 +63,7 @@ function Local_API_1484_11(options) {
 				_children : "id,type,objectives,timestamp,correct_responses,weighting,learner_response,result,latency,description",
 				_count : "0"
 			},
-			launch_data : "",
+			launch_data : "?name1=value1&name2=value2&name3=value3", // {\"name1\": \"value1\", \"name2\": \"value2\", \"name3\": \"value3\"} or ?name1=value1&name2=value2&name3=value3
 			learner_id : "100",
 			learner_name : "Simulated User",
 			learner_preference : {
