@@ -1043,7 +1043,7 @@ function SCOBot(options) {
 			} else {
 				//Time stuff will need to move after ID is added
 				if (typeof (data.timestamp) === "object") {
-					timestamp = scorm.isoDateStringUTC(data.timestamp); // 2012-02-12T00:37:29Z formatted
+					timestamp = scorm.isoDateString(data.timestamp); // 2012-02-12T00:37:29 formatted
 				}
 				data.timestamp = timestamp;
 				if (typeof (data.latency) === "object") {

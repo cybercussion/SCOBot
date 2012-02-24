@@ -270,10 +270,18 @@ function SCORM_API(options) {
 	/**
 	 * ISO 8601 Date String UTC
 	 * Converts date object into ISO 8601 standard
-	 * returns {String} ISO 8601
+	 * returns {String} ISO 8601 + UTC
 	 */
 	function isoDateStringUTC(d) {
 	    return d.getUTCFullYear() + '-' + padTime(d.getUTCMonth() + 1) + '-' + padTime(d.getUTCDate()) + 'T' + padTime(d.getUTCHours()) + ':' + padTime(d.getUTCMinutes()) + ':' + padTime(d.getUTCSeconds()) + 'Z';
+	}
+	/**
+	 * ISO 8601 Date String
+	 * Concerts date into ISO 8601 Standard
+	 * @returns {String} ISO 8601
+	 */
+	function isoDateString(d) {
+		return d.getFullYear() + '-' + padTime(d.getMonth() + 1) + '-' + padTime(d.getDate()) + 'T' + padTime(d.getHours()) + ':' + padTime(d.getMinutes()) + ':' + padTime(d.getSeconds());
 	}
 	/**
 	 * Centiseconds To SCORM 1.2 Duration
@@ -973,6 +981,7 @@ function SCORM_API(options) {
 	this.centisecsToSCORM12Duration = centisecsToSCORM12Duration;
 	this.centisecsToISODuration = centisecsToISODuration;
 	this.isoDateStringUTC = isoDateStringUTC;
+	this.isoDateString = isoDateString;
 	this.makeBoolean = makeBoolean;
 	this.debug = debug;
 	// Self Initialize, note you could make this call outside, but later I decided to do it by default.
