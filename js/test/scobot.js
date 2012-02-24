@@ -37,7 +37,7 @@ test("scorm.debug", function() {
 	ok(!sub_method("Bogus Message", 5), "Invalid log message");
 });
 
-test("SCORM ISO 8601 Time", function() {
+test("SCORM ISO 8601 UTC Time", function() {
 	strictEqual(SB.isISO8601UTC('2012-02-12T00:37:29Z'), true, 'Checking a UTC example 2012-02-12T00:37:29Z');
 	strictEqual(SB.isISO8601UTC('2012-02-12T00:37:29'), false, 'Checking a non-UTC example 2012-02-12T00:37:29');
 	strictEqual(SB.isISO8601UTC('2012-02-1200:37:29'), false, 'Checking a non-UTC example 2012-02-1200:37:29Z');
@@ -72,7 +72,7 @@ test("SCORM Bookmarking", function() {
 });
 
 test("SCORM Objectives", function() {
-	if(local || SB.getEntry() !== "resume") {
+	if(SB.getEntry() !== "resume") {
 		// For True False
 		strictEqual(SB.setObjective({
 			id: '1_1',                                                   // {String}
@@ -228,7 +228,7 @@ test("SCORM Interactions", function() {
 		type      = ''; // Interaction Type for 3rd or 4th edition
 	endTime.setMinutes(startTime.getMinutes() + 5); // Add 5 minutes for latency, result would be PT5M
 	
-	if(local || SB.getEntry() !== 'resume') {
+	if(SB.getEntry() !== 'resume') {
 		// True False Interaction
 		strictEqual(SB.setInteraction({
 			id: intID,                 // {String}
