@@ -67,6 +67,7 @@ function SCORM_API(options) {
 			exit_type : "suspend",
 			success_status : "unknown",
 			use_standalone : true,
+			standalone: false,
 			completion_status : "unknown"
 		},
 		// Settings merged with defaults and extended options

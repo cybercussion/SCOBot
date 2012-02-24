@@ -45,7 +45,7 @@ function Local_API_1484_11(options) {
 		// Settings merged with defaults and extended options */
 		settings = $.extend(defaults, options),
 		CMI = {
-			_version : "1.0",
+			_version : "Local 1.0",
 			comments_from_learner : {
 				_children : "comment,location,timestamp",
 				_count : "0"

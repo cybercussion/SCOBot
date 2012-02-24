@@ -1,13 +1,15 @@
-/*global $, JQuery, ok, module, test, strictEqual, equal, SCORM_API, debug, enableDebug, learner_name, learner_id, DEFAULT_EXIT_TYPE, mode, local */
-var scorm;
-// This is required by the Local SCORM API_1484_11
+/*global $, JQuery, ok, module, test, strictEqual, equal, SCORM_API, debug, learner_name, learner_id, mode, isLocal */
+var scorm,
+	isLocal = false,
+	version = '';
+// This is required by the isLocal SCORM API_1484_11
 
 // SCORM API (the long-hand scorm calls a more granular test)
 module("SCORM_API");
 var setvalue_calls = 0,
 	getvalue_calls = 0;
 scorm = new SCORM_API({
-	debug : enableDebug,
+	debug : true,
 	throw_alerts : true
 });
 // Some Events fired from SCORM_API
@@ -34,14 +36,36 @@ test("scorm.debug", function() {
 // Initialize
 test("initialize", function() {
 	ok(scorm.initialize(), "initialize");
+	version = scorm.getvalue('cmi._version');
+	if(version === "Local 1.0") {
+		isLocal = true;
+	} else {
+		isLocal = false;
+	}
+	// Internal SCORM_API get/set tests (not setvalue, getvalue)
+	// Get
+	test("get", function() {
+		if(isLocal) {
+			ok(scorm.get('standalone'), "Standalone checkup - " + scorm.get('standalone'));
+		} else {
+			ok(!scorm.get('standalone'), "Standalone checkup - " + scorm.get('standalone'));
+		}
+		ok(scorm.get('version'), "Get Version: " + scorm.get('version'));
+	});
+	// Set
+	test("set", function() {
+		ok(!scorm.set('version', '2.0'), "Cannot set version, read-only: " + scorm.get('version'));
+		// This is not allowed validate
+	});
 	// This is empty during non-LMS but could be populated if ran on a LMS
 	// GetValue
 	test("getvalue", function() {
 		var getvalue = scorm.getvalue;
-		strictEqual(getvalue('cmi.mode'), mode, "Requested cmi.mode - " + getvalue('cmi.mode'));
+		strictEqual(getvalue('cmi.mode'), 'normal', "Requested cmi.mode - " + getvalue('cmi.mode'));
 		strictEqual(getvalue('cmi.session_time'), 'false', "Requested cmi.session_time - (not allowed, will throw error 405)");
-		if(local) {
-			// First time this will be blank / null, since this is local your pretty much always in the "first time" category
+		if(isLocal) {
+			// First time this will be blank / null, since this is isLocal your pretty much always in the "first time" category
+			strictEqual(getvalue('cmi.launch_data'), '?name1=value1&name2=value2&name3=value3', "Requested cmi.launch_data - " + getvalue('cmi.launch_data'));
 			strictEqual(getvalue('cmi.entry'), 'ab-initio', "Requested cmi.entry - " + getvalue('cmi.entry'));
 			strictEqual(getvalue('cmi.credit'), 'no_credit', "Requested cmi.credit - " + getvalue('cmi.credit'));
 			strictEqual(getvalue('cmi.location'), "", "Getting cmi.location - " + getvalue('cmi.location') + "(this should be empty)");
@@ -60,6 +84,7 @@ test("initialize", function() {
 			 Oh, but it doesn't end there, some LMS's throw "data model element value not initialized" which results in error codes being thrown in SCORM.  This
 			 results in error tracking to kick in resulting in turning something that should be empty, into something undefined or 'false' etc ...
 			 */
+			strictEqual(getvalue('cmi.launch_data'), 'state=NA&learnerlevel=SE&grade=06', "Requested cmi.launch_data - " + getvalue('cmi.launch_data'));
 			if(getvalue('cmi.location') === "") {// SCORM_API should ensure we get empty values when things are null, undefined or any combo there-in.
 				// First time
 				strictEqual(getvalue('cmi.location'), "", "Getting cmi.location - " + getvalue('cmi.location') + "(this should be empty)");
@@ -80,8 +105,8 @@ test("initialize", function() {
 
 			// Some LMS's return Data Not Initialized when calling cmi.suspend_data.  This results in some mixed responses (null, "", undefined, 'false')
 			// Tester, if you have problems with name or ID, you can comment these out, or update them in the qunit.html file.  See learner name and learner id.
-			strictEqual(getvalue('cmi.learner_name'), learner_name, "Getting cmi.learner_name");
-			strictEqual(getvalue('cmi.learner_id'), learner_id, "Getting cmi.learner_id");
+			//strictEqual(getvalue('cmi.learner_name'), learner_name, "Getting cmi.learner_name");
+			//strictEqual(getvalue('cmi.learner_id'), learner_id, "Getting cmi.learner_id");
 		}
 		
 		// Need to set some values within the CMI object ** TEST 1 ()
@@ -103,7 +128,7 @@ test("initialize", function() {
 			ok(setvalue('cmi.score.min', '0'), "Setting cmi.score.min to 0");
 			ok(setvalue('cmi.score.max', '1'), "Setting cmi.score.max to 1");
 			// This is not allowed validate
-			if(local) { // LOCAL
+			if(isLocal) { // isLocal
 				//[BLOCK1]
 				// New Objective
 				strictEqual(setvalue('cmi.objectives.' + objectiveIndex + '.id', '0_1_1'), 'true', 'Setting cmi.objectives.' + objectiveIndex + '.id');
@@ -301,9 +326,9 @@ test("initialize", function() {
 				var getvalue = scorm.getvalue;
 					interactionIndex = scorm.getInteractionByID("0_1"); 
 				scorm.debug(">>>>>>>>>>>> start get value test <<<<<<<<<<<<<<<<<<<", 4);
-				strictEqual(getvalue('cmi.mode'), mode, "Requested cmi.mode - " + getvalue('cmi.mode'));
+				strictEqual(getvalue('cmi.mode'), 'normal', "Requested cmi.mode - " + getvalue('cmi.mode'));
 				strictEqual(getvalue('cmi.location'), "4", 'Getting cmi.location - ' + getvalue('cmi.location') + ' (this should be 4)');
-				if(local) {
+				if(isLocal) {
 					strictEqual(interactionIndex, 2, "Getting Objective by ID 0_1");
 				} else {
 					strictEqual(interactionIndex, interactionIndex, "Getting Objective by ID 0_1");
@@ -313,7 +338,7 @@ test("initialize", function() {
 				strictEqual(getvalue('cmi.interactions.' + interactionIndex + '.result'), 'correct', 'Getting cmi.interactions.' + interactionIndex + '.result - ' + getvalue('cmi.interactions.' + interactionIndex + '.result') + ' (this should be correct)');
 				strictEqual(getvalue('cmi.interactions.' + interactionIndex + '.type'), 'true-false', 'Getting cmi.interactions.' + interactionIndex + '.type - ' + getvalue('cmi.interactions.' + interactionIndex + '.type') + ' (this should be true-false)');
 				
-				if(local) {
+				if(isLocal) {
 					strictEqual(getvalue('cmi.interactions._count'), '3', "Getting Objective Count, expecting 3");
 				} else {
 					strictEqual(getvalue('cmi.interactions._count'), getvalue('cmi.interactions._count'), "Getting Objective Count, expecting " + getvalue('cmi.interactions._count'));
@@ -346,18 +371,4 @@ test("initialize", function() {
 			});
 		});
 	});
-});
-// Get
-test("get", function() {
-	if(local) {
-		ok(scorm.get('standalone'), "Standalone checkup - " + scorm.get('standalone'));
-	} else {
-		ok(!scorm.get('standalone'), "Standalone checkup - " + scorm.get('standalone'));
-	}
-	ok(scorm.get('version'), "Get Version: " + scorm.get('version'));
-});
-// Set
-test("set", function() {
-	ok(!scorm.set('version', '2.0'), "Cannot set version, read-only: " + scorm.get('version'));
-	// This is not allowed validate
 });
