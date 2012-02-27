@@ -40,9 +40,14 @@ test("scorm.debug", function() {
 test("SCORM ISO 8601 UTC Time", function() {
 	strictEqual(SB.isISO8601UTC('2012-02-12T00:37:29Z'), true, 'Checking a UTC example 2012-02-12T00:37:29Z');
 	strictEqual(SB.isISO8601UTC('2012-02-12T00:37:29'), false, 'Checking a non-UTC example 2012-02-12T00:37:29');
-	strictEqual(SB.isISO8601UTC('2012-02-1200:37:29'), false, 'Checking a non-UTC example 2012-02-1200:37:29Z');
+	strictEqual(SB.isISO8601UTC('2012-02-1200:37:29'), false, 'Checking a malformed example 2012-02-1200:37:29');
 });
-
+test("SCORM ISO 8601 Time", function() {
+// non UTC (This was all I could get to work con cloud.scorm.com)
+	strictEqual(SB.isISO8601('2012-02-12T00:37:29'), true, 'Checking a non-UTC example 2012-02-12T00:37:29');
+	strictEqual(SB.isISO8601('2012-02-1200:37:29'), false, 'Checking a malformed example 2012-02-1200:37:29');
+	strictEqual(SB.isISO8601('2012-02-12T00:37:29Z'), false, 'Checking a UTC example 2012-02-12T00:37:29Z');
+});
 // SB.start is fired onload, nothing to really test here.  We could verify settings however.
 test("SCORM Mode", function() {
 	strictEqual(SB.getMode(), 'normal', "Checking that Mode is normal");
