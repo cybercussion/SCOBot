@@ -94,7 +94,7 @@ function SCORM_API(options) {
 		self = this;
 	// Public to Public call hook within the internal API
 	// Set some more 'settings'
-	settings.error = error;	 // Inherit
+	settings.error = error; // Inherit
 	settings.startDate = {}; // Set on Success of Initialize aka "the start time"
 	// End Constructor ////////
 
@@ -272,7 +272,7 @@ function SCORM_API(options) {
 	 * Converts date object into ISO 8601 standard
 	 * returns {String} ISO 8601 + UTC
 	 */
-	function isoDateStringUTC(d) {
+	function isoDateToStringUTC(d) {
 	    return d.getUTCFullYear() + '-' + padTime(d.getUTCMonth() + 1) + '-' + padTime(d.getUTCDate()) + 'T' + padTime(d.getUTCHours()) + ':' + padTime(d.getUTCMinutes()) + ':' + padTime(d.getUTCSeconds()) + 'Z';
 	}
 	/**
@@ -280,8 +280,18 @@ function SCORM_API(options) {
 	 * Concerts date into ISO 8601 Standard
 	 * @returns {String} ISO 8601
 	 */
-	function isoDateString(d) {
+	function isoDateToString(d) {
 		return d.getFullYear() + '-' + padTime(d.getMonth() + 1) + '-' + padTime(d.getDate()) + 'T' + padTime(d.getHours()) + ':' + padTime(d.getMinutes()) + ':' + padTime(d.getSeconds());
+	}
+	/**
+	 * ISO 8601 String to Date
+	 */
+	function isoStringToDate(str) {
+		var MM = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+		return str.replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):\d{2}/, function ($0, $1, $2, $3, $4, $5, $6) {
+			return MM[$2 - 1] + " " + $3 + ", " + $1 + " - " + $4 % 12 + ":" + $5 + (+$4 > 12 ? "PM" : "AM"); // + " " + $6;
+		}
+			);
 	}
 	/**
 	 * Centiseconds To SCORM 1.2 Duration
@@ -292,7 +302,12 @@ function SCORM_API(options) {
 	 */
 	function centisecsToSCORM12Duration(n) {
 		// Format is [HH]HH:MM:SS[.SS]
-		var bTruncated = false, str, nH, nCs, nM, nS;
+		var bTruncated = false,
+			str,
+			nH,
+			nCs,
+			nM,
+			nS;
 		//with (Math) { agrumentavely considered harmful
 		n = Math.round(n);
 		nH = Math.floor(n / 360000);
@@ -980,8 +995,9 @@ function SCORM_API(options) {
 	 */
 	this.centisecsToSCORM12Duration = centisecsToSCORM12Duration;
 	this.centisecsToISODuration = centisecsToISODuration;
-	this.isoDateStringUTC = isoDateStringUTC;
-	this.isoDateString = isoDateString;
+	this.isoDateToStringUTC = isoDateToStringUTC;
+	this.isoDateToString = isoDateToString;
+	this.isoStringToDate = isoStringToDate;
 	this.makeBoolean = makeBoolean;
 	this.debug = debug;
 	// Self Initialize, note you could make this call outside, but later I decided to do it by default.
