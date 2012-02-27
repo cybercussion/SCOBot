@@ -1025,6 +1025,7 @@ function SCOBot(options) {
 			j,       // Reserved for correct responses loop
 			p,       // Reserved for the count within interactions.n.ncorrect_responses.p loop
 			p1 = 'cmi.interactions.', // Reduction of retyping
+			p2 = '',                  // Reduction of retyping
 			orig_timestamp = data.timestamp,
 			timestamp, // Reserved for converting the Timestamp
 			orig_latency = data.latency,
@@ -1056,14 +1057,15 @@ function SCOBot(options) {
 					data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
 				} // Else you won't record latency as the student didn't touch the question.
 				// Check for Interaction Mode
+				p2 = '_count';
 				if (settings.interaction_mode === "journaled") {
 					// Explicitly stating they want a history of interactions
-					n = scorm.getvalue(p1 + '_count') === "-1" ? 0 : scorm.getvalue(p1 + '_count'); // we want to use cmi.interactions._count
+					n = scorm.getvalue(p1 + p2) === "-1" ? '0' : scorm.getvalue(p1 + p2); // we want to use cmi.interactions._count
 				} else {
 					// Default to state, which will update by id
 					n = scorm.getInteractionByID(data.id); // we want to update by interaction id
 					if (isBadValue(n)) {
-						n = scorm.getvalue(p1 + '_count') === "-1" ? 0 : scorm.getvalue(p1 + '_count');
+						n = scorm.getvalue(p1 + p2) === "-1" ? '0' : scorm.getvalue(p1 + p2);
 					}
 				}
 				/* 
@@ -1077,12 +1079,13 @@ function SCOBot(options) {
 				// Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
 				// Either ignore value because its already added, or add it based on _count
 				// result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+".id", data.objectives[i].id);
+				p2 = 'objectives._count';
 				if (data.objectives !== undefined) {
 					for (i = 0; i < data.objectives.length; i += 1) {
 						// We need to find out if the objective is already added
 						m = scorm.getInteractionObjectiveByID(n, data.objectives[i].id); // will return 0 or the locator where it existed or false (not found)
 						if (m === 'false') {
-							m = scorm.getvalue(p1 + 'objectives._count') === '-1' ? 0 : scorm.getvalue(p1 + 'objectives._count');
+							m = scorm.getvalue(p1 + p2) === '-1' ? '0' : scorm.getvalue(p1 + p2);
 						}
 						result = scorm.setvalue(p1 + 'objectives.' + m + '.id', data.objectives[i].id);
 					}
@@ -1092,12 +1095,13 @@ function SCOBot(options) {
 				}
 				// Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type 
 				//result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
+				p2 = 'correct_responses._count';
 				if ($.isPlainObject(data.correct_responses)) {
 					for (j = 0; j < data.correct_responses.length; j += 1) {
 						p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
 						scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
 						if (p === 'false') {
-							p = scorm.getvalue(p1 + 'correct_responses._count') === '-1' ? 0 : scorm.getvalue(p1 + 'objectives._count');
+							p = scorm.getvalue(p1 + p2) === '-1' ? 0 : scorm.getvalue(p1 + p2);
 							scorm.debug(settings.prefix + ": p is now " + p, 4);
 						}
 						result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
