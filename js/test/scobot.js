@@ -47,6 +47,7 @@ test("SCORM ISO 8601 Time", function() {
 	strictEqual(SB.isISO8601('2012-02-12T00:37:29'), true, 'Checking a non-UTC example 2012-02-12T00:37:29');
 	strictEqual(SB.isISO8601('2012-02-1200:37:29'), false, 'Checking a malformed example 2012-02-1200:37:29');
 	strictEqual(SB.isISO8601('2012-02-12T00:37:29Z'), false, 'Checking a UTC example 2012-02-12T00:37:29Z');
+	strictEqual(scorm.isoStringToDate('2012-02-27T15:33:08'), 'February 27, 2012 - 3:33PM', "Checking ISO String back to date");
 });
 // SB.start is fired onload, nothing to really test here.  We could verify settings however.
 test("SCORM Mode", function() {
