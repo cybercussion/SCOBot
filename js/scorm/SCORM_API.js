@@ -285,13 +285,17 @@ function SCORM_API(options) {
 	}
 	/**
 	 * ISO 8601 String to Date
+	 * @param str {Date String} ISO8601
+	 * @return {Object} Date Object or false
 	 */
 	function isoStringToDate(str) {
-		var MM = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-		return str.replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):\d{2}/, function ($0, $1, $2, $3, $4, $5, $6) {
-			return MM[$2 - 1] + " " + $3 + ", " + $1 + " - " + $4 % 12 + ":" + $5 + (+$4 > 12 ? "PM" : "AM"); // + " " + $6;
-		}
-			);
+		var MM = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+			d =  str.replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/, function ($0, $Year, $Month, $Day, $Hour, $Min, $Sec) {
+				return MM[$Month - 1] + " " + $Day + ", " + $Year + " " + $Hour + ":" + $Min + ":" + $Sec;
+			}
+				),
+			dd = new Date(d);
+		return dd;
 	}
 	/**
 	 * Centiseconds To SCORM 1.2 Duration
