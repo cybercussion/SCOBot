@@ -2,14 +2,14 @@
 /*jslint devel: true, browser: true */
 /**
  * SCORM API
- * This is a content API self establishes communication with the LMS in SCORM 2004 or 1.2.
- * Switch Statement will convert SCORM 2004 calls to SCORM 1.2, but you must understand there are limitations
+ * This is a content API, it self establishes communication with the LMS in SCORM 2004 or 1.2.
+ * Switch Statement will convert some SCORM 2004 calls to SCORM 1.2, but you must understand there are limitations
  * on data storage between versions. Example: Suspend Data 64,000 vs 4096 or Bookmark(location) 1000 vs 255.
  * Depending on your usages your content may not squeeze into a SCORM 1.2 space.  Because of this, log messages will
  * be output so you can monitor your cmi "set" value length.  Ultimately, a LMS may block your request because of this.
  * This API is meant to simply common SCORM Tasks, but also offer the ability to use it 'long hand'. Several other
- * public API's are available online, some free some charge based and this is a best effort to boil it all down.
- * Documentation, Samples, Resources, and Credits: ADL, Claude Ostyn, Pipwerks, Rustici
+ * public API's are available online, some free some charge, and this is a best effort to boil it all down.
+ * Documentation, samples, resources, and credits: ADL, Claude Ostyn, Pipwerks, SCORM.com
  * Goals: SCORM For Everyone else, low overhead, simple API's, containment, and transparency.
  *
  * Typical CMI Usage:
