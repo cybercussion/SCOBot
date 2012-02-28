@@ -1468,4 +1468,8 @@ function SCOBot(options) {
 	*/
 	$(window).bind('load', initSCO);
 	$(window).bind('unload', exitSCO);
+	// Listen for SCORM API Exception
+	$(scorm).on('exception', function (e) {
+		triggerException(e.error);
+	});
 }
