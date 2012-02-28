@@ -282,6 +282,8 @@ function SCORM_API(options) {
 	 * @returns {String} ISO 8601
 	 */
 	function isoDateToString(d) {
+		//var offset = d.getTimezoneOffset() > 0 ? '-' : '+';
+		//return d.getFullYear() + '-' + padTime(d.getMonth() + 1) + '-' + padTime(d.getDate()) + 'T' + padTime(d.getHours()) + ':' + padTime(d.getMinutes()) + ':' + padTime(d.getSeconds()) + offset + (d.getTimezoneOffset() / 60) + ':00';
 		return d.getFullYear() + '-' + padTime(d.getMonth() + 1) + '-' + padTime(d.getDate()) + 'T' + padTime(d.getHours()) + ':' + padTime(d.getMinutes()) + ':' + padTime(d.getSeconds());
 	}
 	/**
@@ -383,6 +385,15 @@ function SCORM_API(options) {
 	function triggerWarning(n) {
 		debug(error[n], 2);
 		return true;
+	}
+	/**
+	 * Trigger Exception
+	 */
+	function triggerException(msg) {
+		$(self).triggerHandler({
+			'type': 'exception',
+			'error': msg
+		});
 	}
 	/**
 	 * Get Last LMS Error Code
@@ -745,7 +756,9 @@ function SCORM_API(options) {
 						self.setvalue("cmi.completion_status", "incomplete");
 						break;
 					default:
-						// Do nothing
+						if (API.data.completion_status === '') {
+							triggerException("LMS compatiblity issue, Please notify a administrator.  Completion Status is empty.");
+						}
 						break;
 					}
 					return 'true';
