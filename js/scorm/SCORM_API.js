@@ -10,22 +10,23 @@
  * This API is meant to simply common SCORM Tasks, but also offer the ability to use it 'long hand'. Several other
  * public API's are available online, some free some charge based and this is a best effort to boil it all down.
  * Documentation, Samples, Resources, and Credits: ADL, Claude Ostyn, Pipwerks, Rustici
- * Goals: SCORM For Everyone Else, Low Overhead, Simple API's, Containment, and Transparency.
+ * Goals: SCORM For Everyone else, low overhead, simple API's, containment, and transparency.
  *
  * Typical CMI Usage:
- * var scorm = new SCORM_API({debug: true, exit_type: 'finish'});
- * scorm.initialize()
+ * var scorm = new SCORM_API({debug: true, exit_type: 'finish'}),
+ *     lmsconnected = scorm.initialize();
  * scorm.getvalue('cmi.location');
  * scorm.setvalue('cmi.location', '4');
  * scorm.commit();
  * scorm.terminate();
  *
  * HTML Event Setup:
- * Tips for onload and onunload, onbeforeunload events.  You may need to make init, exit methods to do other things,
- * vs. directly referencing the SCORM API here.  Feel free to make those methods if you need to.  'window.top' is used because
- * some deployments self occur within a popup in a IFRAME will not fire properly on exit, in some mozilla browsers.
- * window.top.onload         = scorm.initialize;
- * window.top.onunload       = scorm.terminate;
+ * If you choose not to use SCOBot tips for onload and onunload, onbeforeunload events.  You may need to make init, exit methods to do other things,
+ * vs. directly referencing the SCORM API here.  Feel free to make those methods if you need to.  'window.top' can be used because
+ * some deployments self occur within a popup in a IFRAME will not fire properly on exit, in some mozilla browsers.  Last checked, window worked with
+ * JQuery 1.7+ however.  If you have issues trapping the unload event, please try window.top.
+ * $(window).bind('load', YOUR_INITIALIZATION_METHOD);
+ * $(window).bind('unload', YOUR_EXIT_METHOD);
  *
  * @author Mark Statkus <mark@cybercussion.com>
  * @requires JQuery
