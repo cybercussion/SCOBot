@@ -1,4 +1,4 @@
-/*global $, JQuery, ok, module, test, strictEqual, equal, SCORM_API, debug, learner_name, learner_id, mode, isLocal */
+/*global $, JQuery, ok, module, test, strictEqual, equal, SCORM_API, debug, learner_name, learner_id, mode */
 var scorm,
 	isLocal = false,
 	version = '';
