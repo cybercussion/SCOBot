@@ -37,12 +37,12 @@ test("scorm.debug", function() {
 	ok(!sub_method("Bogus Message", 5), "Invalid log message");
 });
 
-test("SCORM ISO 8601 UTC Time", function() {
+test("ISO 8601 UTC Time", function() {
 	strictEqual(SB.isISO8601UTC('2012-02-12T00:37:29Z'), true, 'Checking a UTC example 2012-02-12T00:37:29Z');
 	strictEqual(SB.isISO8601UTC('2012-02-12T00:37:29'), false, 'Checking a non-UTC example 2012-02-12T00:37:29');
 	strictEqual(SB.isISO8601UTC('2012-02-1200:37:29'), false, 'Checking a malformed example 2012-02-1200:37:29');
 });
-test("SCORM ISO 8601 Time", function() {
+test("ISO 8601 Time", function() {
 // non UTC (This was all I could get to work con cloud.scorm.com)
 	strictEqual(SB.isISO8601('2012-02-27T15:33:08'), true, 'Checking a non-UTC example 2012-02-27T15:33:08');
 	strictEqual(SB.isISO8601('2012-02-1200:37:29'), false, 'Checking a malformed example 2012-02-1200:37:29');
@@ -51,19 +51,28 @@ test("SCORM ISO 8601 Time", function() {
 	var date = scorm.isoStringToDate('2012-02-27T15:33:08');
 	//strictEqual(String(date), 'Mon Feb 27 2012 15:33:08 GMT-0800 (PST)', 'Checking ISO8601 String to Date equals Mon Feb 27 2012 15:33:08 GMT-0800 (PST)');
 });
+test("Set Totals", function() {
+	strictEqual(SB.setTotals({
+		totalInteractions: '10',
+		totalObjectives: '10',
+		scoreMin: '0',
+		scoreMax: '10'
+	}), 'true', 'Setting SCO totals');
+	// Based on Entry we may be able to tell if we've been ran before.
+	scorm.debug("I am setting totals right now!", 4);
+	version = scorm.getvalue('cmi._version');
+	if(version === "Local 1.0") {
+		local = true;
+	} else {
+		local = false;
+	}
+});
 // SB.start is fired onload, nothing to really test here.  We could verify settings however.
-test("SCORM Mode", function() {
+test("Mode", function() {
 	strictEqual(SB.getMode(), 'normal', "Checking that Mode is normal");
 });
-// Based on Entry we may be able to tell if we've been ran before.
-version = scorm.getvalue('cmi._version');
-if(version === "Local 1.0") {
-	local = true;
-} else {
-	local = false;
-}
 
-test("SCORM Bookmarking", function() {
+test("Bookmarking", function() {
 	if(local) {
 		// There would be no bookmark unless one was manually set
 		strictEqual(SB.setBookmark(2), 'true', 'Setting Bookmark to 2');
@@ -78,7 +87,7 @@ test("SCORM Bookmarking", function() {
 	}
 });
 
-test("SCORM Objectives", function() {
+test("Objectives", function() {
 	if(SB.getEntry() !== "resume") {
 		// For True False
 		strictEqual(SB.setObjective({
@@ -225,7 +234,7 @@ test("SCORM Objectives", function() {
 	}
 });
 
-test("SCORM Interactions", function() {
+test("Interactions", function() {
 	var startTime = new Date(),
 		endTime   = new Date(startTime),
 		intID     = '1',
@@ -650,9 +659,8 @@ test("SCORM Interactions", function() {
 	
 });
 
-test("SCORM Get Interaction By ID", function() {
+test("Get Interaction By ID", function() {
 	var interaction = SB.getInteraction('1'); // True False
-	
 
 	interaction = SB.getInteraction('2'); // Multiple Choice
 
@@ -671,7 +679,7 @@ test("SCORM Get Interaction By ID", function() {
 	strictEqual(SB.getInteraction('999'), 'false', "Getting bogus interaction, should be false");
 
 });
-test("SCORM Get Objective By ID", function() {
+test("Get Objective By ID", function() {
 	var objective = SB.getObjective('1_1');
 	
 	objective = SB.getObjective('2_1');
@@ -696,7 +704,24 @@ test("SCORM Get Objective By ID", function() {
 	
 });
 
-test("SCORM Set Suspend Data By Page ID", function() {
+test("Update Objective By ID", function() {
+	// For True False
+		strictEqual(SB.setObjective({
+			id: '1_1',                                                   // {String}
+			score: {                                                     // {Object}
+				scaled: '1',                                             // {String}
+				raw: '1',                                                // {String}
+				min: '0',                                                // {String}
+				max: '1'                                                 // {String}
+			},
+			success_status: 'passed',                                    // {String} passed, failed, unknown
+			completion_status: 'completed',                              // {String} completed, incomplete, not attempted
+			progress_measure: '1',                                       // {String}
+			description: 'They will answer a true false interaction'     // {String}
+		}), 'true', "Setting Objective True False 1_1 unscored");
+});
+
+test("Set Suspend Data By Page ID", function() {
 	var result,
 		answer_arr = ["a","b","c","d"],
 		images_arr = ["bird.png", "bug.png", "helicopter.png"];
@@ -730,7 +755,7 @@ test("SCORM Set Suspend Data By Page ID", function() {
 	// End Test 2
 });
 
-test("SCORM Suspend SCO", function() {
+test("Suspend SCO", function() {
 	strictEqual(SB.suspend(), 'true', 'Suspending SCO');
 	scorm.debug("SetValue Calls: " + setvalue_calls + "\nGetValue Calls: " + getvalue_calls, 4);
 });

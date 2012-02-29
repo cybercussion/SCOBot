@@ -55,7 +55,7 @@ function Local_API_1484_11(options) {
 				_count : "0"
 			},
 			completion_status : "unknown",
-			completion_threshold : "",
+			completion_threshold : "0.7",
 			credit : "no_credit",
 			entry : "ab-initio",
 			exit : "",
@@ -81,7 +81,7 @@ function Local_API_1484_11(options) {
 				_count : "0"
 			},
 			progress_measure : "",
-			scaled_passing_score : "",
+			scaled_passing_score : "0.7",
 			score : {
 				_children : "scaled,raw,min,max",
 				scaled : "",

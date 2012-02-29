@@ -684,10 +684,10 @@ function SCOBot(options) {
 	 * cmi.progress_measure
 	 * @returns {Object} or false
 	 * {
-	 *	scoreScaled      = '0',
-	 *	successStatus    = 'failed',
-	 *	completionStatus = 'incomplete',
-	 *	progressMeasure  = '0'
+	 *	score_scaled      = '0',
+	 *	success_status    = 'failed',
+	 *	progress_measure  = '0',
+	 *	completion_status = 'incomplete'
 	 * }
 	 * TODO, this is still in progress
 	 */
@@ -701,40 +701,63 @@ function SCOBot(options) {
 			completionStatus         = '',
 			totalObjectivesCompleted = 0,
 			totalKnownObjectives     = parseInt(scorm.getvalue('cmi.objectives._count'), 10),
-			totalKnownInteractions   = parseInt(scorm.getvalue('cmi.interactions._count'), 10);
+			totalKnownInteractions   = parseInt(scorm.getvalue('cmi.interactions._count'), 10),
+			i                        = 0,
+			count                    = 0;
 
 		if (settings.totalInteractions === 0 || settings.totalObjectives === 0) {
 			// This is a non-starter, if the SCO Player doesn't set these we are flying blind
 			scorm.debug(settings.prefix + ": Sorry, I cannot calculate Progress as the totalInteractions and or Objectives are zero", 2);
-			return false;
+			return 'false';
 		} else {
 			// Set Score Totals (raw, min, max) and count up totalObjectivesCompleted
-			//TODO
+			count = parseInt(scorm.getvalue('cmi.objectives._count'), 10);
+			if (count > 0) {
+				count = parseInt(count, 10) - 1; // convert from string
+				for (i = count; i >= 0; i -= 1) {
+					// Count up totalObjectivesCompleted
+					scoreMax += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.max'), 10); // should be un-used, might validate
+					scoreMin += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.min'), 10); // should be un-used, might validate
+					scoreRaw += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.raw'), 10);
+					if (scorm.getvalue('cmi.objectives.' + i + '.completion_status') === 'completed') {
+						totalObjectivesCompleted += 1;
+					}
+				}
+			}
+			// Set Score Raw
+			scorm.setvalue('cmi.score.raw', scoreRaw.toString());
 			// Set Score Scaled
-			if ((scoreMax - scoreMin) === 0) {
+			if ((settings.scoreMax - settings.scoreMin) === 0) {
 				// Division By Zero
+				scorm.debug(settings.prefix + ": Division by Zero for scoreMax - scoreMin " + settings.scoreMax, 4);
 				scorm.setvalue('cmi.score.scaled', scoreScaled);
 			} else {
-				scoreScaled = (scoreRaw - scoreMin) / (scoreMax - scoreMin).toString();
+				scoreScaled = (scoreRaw - settings.scoreMin) / (settings.scoreMax - settings.scoreMin).toString();
 				scorm.setvalue('cmi.score.scaled', scoreScaled);
 			}
 			// Set Progress Measure
-			progressMeasure = settings.totalObjectivesCompleted / settings.totalObjectives.toString();
+			progressMeasure = (totalObjectivesCompleted / settings.totalObjectives).toString();
 			scorm.setvalue('cmi.progress_measure', progressMeasure);
 			// Set Completion Status
-			if (progressMeasure >= scorm.getvalue('cmi.completion_threshold')) {
+			if (parseFloat(progressMeasure, 10) >= parseFloat(scorm.getvalue('cmi.completion_threshold'), 10)) {
 				scorm.setvalue('cmi.completion_status', 'completed');
 			} else {
 				scorm.setvalue('cmi.completion_status', 'incomplete');
 			}
 			// Set Success Status
-			if (scoreScaled >= settings.scaled_passing_score) {
+			if (parseFloat(scoreScaled, 10) >= parseFloat(settings.scaled_passing_score, 10)) {
 				scorm.setvalue('cmi.success_status', 'passed');
 			} else {
 				scorm.setvalue('cmi.success_status', 'failed');
 			}
 		}
-		return response;
+		return {
+			score_scaled: scorm.getvalue('cmi.score.scaled'),
+			success_status: scorm.getvalue('cmi.success_status'),
+			progress_measure: scorm.getvalue('cmi.progress_measure'),
+			completion_status: scorm.getvalue('cmi.completion_status')
+			
+		};
 	}
 	// End Private ////////////
 	///////////////////////////
@@ -852,13 +875,15 @@ function SCOBot(options) {
 				settings.totalInteractions = data.totalInteractions;
 			}
 			if (!isBadValue(data.totalObjectives)) {
-				settings.totalInteraction  = data.totalObjectives;
+				settings.totalObjectives  = data.totalObjectives;
 			}
 			if (!isBadValue(data.scoreMin)) {
 				settings.scoreMin = data.scoreMin;
+				scorm.setvalue('cmi.score.min', data.scoreMin.toString());
 			}
 			if (!isBadValue(data.scoreMax)) {
 				settings.scoreMax = data.scoreMax;
+				scorm.setvalue('cmi.score.max', data.scoreMin.toString());
 			}
 			return 'true';
 		} else {
@@ -916,7 +941,7 @@ function SCOBot(options) {
 		}
 	};
 	/**
-	 * Get Progress
+	 * Progress
 	 * Hooks to Private method used possibly elsewhere in this API
 	 * cmi.score.scaled, 
 	 * cmi.success_status, 
@@ -924,7 +949,7 @@ function SCOBot(options) {
 	 * cmi.progress_measure
 	 * @returns {Object}
 	 */
-	this.getProgress = checkProgress;
+	this.progress = checkProgress;
 	/**
 	 * Set Suspend Data By Page ID
 	 * This will set the suspend data by id (could be a page ID as long as its unique)
@@ -1287,6 +1312,7 @@ function SCOBot(options) {
 				result = scorm.setvalue(p1 + 'description', data.description);
 			}
 		}
+		scorm.debug(settings.prefix + ": Progress\n" + JSON.stringify(checkProgress(), null, " "), 4);
 		return result;
 	};
 	/**
