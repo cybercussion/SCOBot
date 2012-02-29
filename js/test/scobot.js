@@ -98,8 +98,8 @@ test("Objectives", function() {
 				min: '0',                                                // {String}
 				max: '1'                                                 // {String}
 			},
-			success_status: 'unknown',                                  // {String} passed, failed, unknown
-			completion_status: 'not attempted',                          // {String} complete, incomplete, not attempted
+			success_status: 'unknown',                                   // {String} passed, failed, unknown
+			completion_status: 'not attempted',                          // {String} completed, incomplete, not attempted
 			progress_measure: '0',                                       // {String}
 			description: 'They will answer a true false interaction'     // {String}
 		}), 'true', "Setting Objective True False 1_1 unscored");
@@ -705,7 +705,8 @@ test("Get Objective By ID", function() {
 });
 
 test("Update Objective By ID", function() {
-	// For True False
+	if(SB.getEntry() !== "resume") {
+		// For True False
 		strictEqual(SB.setObjective({
 			id: '1_1',                                                   // {String}
 			score: {                                                     // {Object}
@@ -719,6 +720,7 @@ test("Update Objective By ID", function() {
 			progress_measure: '1',                                       // {String}
 			description: 'They will answer a true false interaction'     // {String}
 		}), 'true', "Setting Objective True False 1_1 unscored");
+	}
 });
 
 test("Set Suspend Data By Page ID", function() {

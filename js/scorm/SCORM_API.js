@@ -855,7 +855,7 @@ function SCORM_API(options) {
 		var count = self.getvalue("cmi.interactions._count"), // obtain total objectives
 			i,
 			tID;
-		if (count === "" || count === 'false' || count === '-1' ) {
+		if (count === "" || count === 'false' || count === '-1') {
 			return 'false';
 		} else {
 			count = parseInt(count, 10) - 1; // convert from string

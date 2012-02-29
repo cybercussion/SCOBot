@@ -716,8 +716,8 @@ function SCOBot(options) {
 				count = parseInt(count, 10) - 1; // convert from string
 				for (i = count; i >= 0; i -= 1) {
 					// Count up totalObjectivesCompleted
-					scoreMax += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.max'), 10); // should be un-used, might validate
-					scoreMin += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.min'), 10); // should be un-used, might validate
+					//scoreMax += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.max'), 10); // should be un-used, might validate
+					//scoreMin += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.min'), 10); // should be un-used, might validate
 					scoreRaw += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.raw'), 10);
 					if (scorm.getvalue('cmi.objectives.' + i + '.completion_status') === 'completed') {
 						totalObjectivesCompleted += 1;
@@ -756,7 +756,6 @@ function SCOBot(options) {
 			success_status: scorm.getvalue('cmi.success_status'),
 			progress_measure: scorm.getvalue('cmi.progress_measure'),
 			completion_status: scorm.getvalue('cmi.completion_status')
-			
 		};
 	}
 	// End Private ////////////
