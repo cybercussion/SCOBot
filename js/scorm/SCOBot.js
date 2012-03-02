@@ -57,6 +57,7 @@ function SCOBot(options) {
 			completion_status: "",
 			suspend_data: {pages: []},
 			mode: "",
+			completion_threshold: 0,
 			scaled_passing_score: 0.7,
 			totalInteractions: 0,
 			totalObjectives: 0,
@@ -739,7 +740,7 @@ function SCOBot(options) {
 			progressMeasure = (totalObjectivesCompleted / settings.totalObjectives).toString();
 			scorm.setvalue('cmi.progress_measure', progressMeasure);
 			// Set Completion Status
-			if (parseFloat(progressMeasure, 10) >= parseFloat(scorm.getvalue('cmi.completion_threshold'), 10)) {
+			if (parseFloat(progressMeasure, 10) >= parseFloat(settings.completion_threshold, 10)) {
 				scorm.setvalue('cmi.completion_status', 'completed');
 			} else {
 				scorm.setvalue('cmi.completion_status', 'incomplete');
@@ -776,7 +777,8 @@ function SCOBot(options) {
 	 * @returns {Boolean}
 	 */
 	this.start = function () {
-		var tmpScaledPassingScore = '',
+		var tmpCompletionThreshold = '',
+			tmpScaledPassingScore = '',
 			tmpLaunchData = '',
 			queryStringExp = /\\?([^?=&]+)(=([^&#]*))?/gi;
 		scorm.debug(settings.prefix + ": I am starting...", 3);
@@ -842,6 +844,10 @@ function SCOBot(options) {
 				scorm.debug(settings.prefix + ": Creating new suspend data object", 4);
 			}
 			// Scaled Passing Score
+			tmpCompletionThreshold        = scorm.getvalue('cmi.completion_threshold');
+			if (!isBadValue(tmpCompletionThreshold) && tmpCompletionThreshold !== "-1") {
+				settings.completion_threshold = tmpCompletionThreshold;
+			}
 			tmpScaledPassingScore         = scorm.getvalue('cmi.scaled_passing_score'); // This may be empty, default otherwise
 			if (!isBadValue(tmpScaledPassingScore) && tmpScaledPassingScore !== "-1") {
 				settings.scaled_passing_score = tmpScaledPassingScore;
