@@ -28,6 +28,7 @@
  * $(window).bind('load', YOUR_INITIALIZATION_METHOD);
  * $(window).bind('unload', YOUR_EXIT_METHOD);
  *
+ * https://github.com/cybercussion/SCORM_API
  * @author Mark Statkus <mark@cybercussion.com>
  * @requires JQuery
  * @param options {Object} override default values
