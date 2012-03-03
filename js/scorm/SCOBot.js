@@ -41,14 +41,13 @@
 function SCOBot(options) {
 	// Constructor ////////////
 	"use strict";
-	/** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
+	/** @default version, createDate, modifiedDatimete, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
 	var defaults = {
 			version: "1.0",
 			createDate: "04/07/2011 09:33AM",
 			modifiedDate: "03/02/2012 17:00PM",
 			prefix: "SCOBot",
 			// SCORM buffers and settings
-			time_type: "", // UTC, GMT or ""
 			launch_data: {},
 			interaction_mode: "state", // or journaled
 			launch_data_type: "querystring", // or json
@@ -196,7 +195,7 @@ function SCOBot(options) {
 	 */
 	function isISO8601(v) {
 		var iso8601Exp;
-		switch (settings.time_type) {
+		switch (scorm.get('time_type')) {
 		case "UTC": // AT GMT
 			iso8601Exp = /^(\d{4})-0?(\d+)-0?(\d+)[T ]0?(\d+):0?(\d+):0?(\d+)(?:\.(\d+))(|Z)$/;
 			break;
