@@ -247,14 +247,14 @@ function Local_API_1484_11(options) {
 
 		default:
 			r = getData(key.substr(4, key.length), cmi);
-			scorm.debug(settings.prefix + ": cmiGetValue got " + r, 4);
+			//scorm.debug(settings.prefix + ": cmiGetValue got " + r, 4);
 			// Filter
 			if (r === undefined || r === null) {
 				settings.errorCode = 401;
 				settings.diagnostic = "Sorry, there was a undefined response from " + key;
 				r = "false";
 			}
-			scorm.debug(settings.prefix + ":  Running: " + self.isRunning() + " GetValue Returning: " + r, 4);
+			scorm.debug(settings.prefix + ": GetValue " + key + " = " + r, 4);
 			break;
 		}
 		return r;
@@ -357,7 +357,7 @@ function Local_API_1484_11(options) {
 	 * @returns "true" or "false" depending on if its been initialized prior
 	 */
 	this.GetValue = function (key) {
-		scorm.debug(settings.prefix + ":  Running: " + this.isRunning() + " GetValue: " + key + "...", 4);
+		//scorm.debug(settings.prefix + ":  Running: " + this.isRunning() + " GetValue: " + key + "...", 4);
 		settings.errorCode = 0;
 		var r = "false",
 			k = key.toString(), // ensure string
@@ -371,7 +371,7 @@ function Local_API_1484_11(options) {
 				tiers = k.toLowerCase().split(".");
 				switch (tiers[0]) {
 				case "cmi":
-					scorm.debug(settings.prefix + ": CMI Getting " + k, 4);
+					//scorm.debug(settings.prefix + ": CMI Getting " + k, 4);
 					r = cmiGetValue(k);
 					break;
 				case "ssp":
@@ -395,7 +395,7 @@ function Local_API_1484_11(options) {
 	 * @returns "true" or "" depending on if its been initialized prior
 	 */
 	this.SetValue = function (key, value) {
-		scorm.debug(settings.prefix + ":  Running: " + this.isRunning() + " SetValue: " + key + " :: " + value, 4);
+		scorm.debug(settings.prefix + ": SetValue: " + key + " = " + value, 4);
 		settings.errorCode = 0;
 		var s,
 			tiers = [],
@@ -416,7 +416,7 @@ function Local_API_1484_11(options) {
 				return "false";
 			} else {
 				tiers = k.split(".");
-				scorm.debug(settings.prefix + ": Tiers " + tiers[1], 4);
+				//scorm.debug(settings.prefix + ": Tiers " + tiers[1], 4);
 				switch (tiers[0]) {
 				case "cmi":
 					switch (key) {
