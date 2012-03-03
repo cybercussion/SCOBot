@@ -316,7 +316,7 @@ function SCORM_API(options) {
 			// At this point we have to convert the users offset to the recorded offset to set the date properly.
 			dd = new Date(d);
 			uoffset = dd.getTimezoneOffset() * 60 * 60;
-			if(uoffset !== offset) {
+			if (uoffset !== offset) {
 				dd = new Date(dd.getTime() + offset + uoffset);
 			}
 			return dd;
