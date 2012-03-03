@@ -4,6 +4,7 @@
  * Local API_1484_11
  * Mimic's LMS Connectivity in Local Mode i.e. standalone functionality
  *
+ * https://github.com/cybercussion/SCORM_API
  * @author Mark Statkus <mark@cybercussion.com>
  * @requires JQuery
  * @param options {Object} overwride default values

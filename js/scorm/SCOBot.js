@@ -13,6 +13,7 @@
  * Interactions: {set} Interaction(s)
  * Objectives: {set} Objective(s)
  *
+ * https://github.com/cybercussion/SCORM_API
  * @author Mark Statkus <mark@cybercussion.com>
  * @requires scorm, JQuery
  * @param options {Object} overwride default values
