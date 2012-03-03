@@ -863,7 +863,7 @@ function SCORM_API(options) {
 			count = parseInt(count, 10); // convert from string
 			for (i = count; i >= 0; i -= 1) {
 				tID = self.getvalue("cmi.objectives." + i + ".id");
-				scorm.debug(settings.prefix + ": Objective ID Check for " + i + " : " + id + " vs " + tID, 4);
+				//scorm.debug(settings.prefix + ": Objective ID Check for " + i + " : " + id + " vs " + tID, 4);
 				if (id === tID) {
 					scorm.debug(settings.prefix + ": Objective ID Match on " + i, 4);
 					return i;
@@ -891,7 +891,7 @@ function SCORM_API(options) {
 			scorm.debug(settings.prefix + ": Getting interactions from count " + count, 4);
 			for (i = count; i >= 0; i -= 1) {
 				tID = this.getvalue("cmi.interactions." + i + ".id");
-				scorm.debug(settings.prefix + ": Interaction ID Check for " + i + " : " + tID + " vs " + id, 4);
+				//scorm.debug(settings.prefix + ": Interaction ID Check for " + i + " : " + tID + " vs " + id, 4);
 				if (id === tID) {
 					scorm.debug(settings.prefix + ": Interaction By ID Returning " + i);
 					return i;
@@ -915,7 +915,7 @@ function SCORM_API(options) {
 			scorm.debug(settings.prefix + ": Getting interaction objectives from count " + count, 4);
 			for (i = count; i >= 0; i -= 1) {
 				tID = self.getvalue("cmi.interactions." + n + ".objectives." + i + ".id");
-				scorm.debug(settings.prefix + ": Interaction Objective ID Check for " + i + " : " + tID + " vs " + id, 4);
+				//scorm.debug(settings.prefix + ": Interaction Objective ID Check for " + i + " : " + tID + " vs " + id, 4);
 				if (id === tID) {
 					scorm.debug(settings.prefix + ": Interaction Objective By ID Returning " + i);
 					return i;
@@ -940,7 +940,7 @@ function SCORM_API(options) {
 			scorm.debug(settings.prefix + ": Getting interaction correct responses from count " + count, 4);
 			for (i = count; i >= 0; i -= 1) {
 				p = self.getvalue("cmi.interactions." + n + ".correct_responses." + i + ".pattern");
-				scorm.debug(settings.prefix + ": Interaction Correct Responses Pattern Check for " + i + " : " + p + " vs " + pattern, 4);
+				//scorm.debug(settings.prefix + ": Interaction Correct Responses Pattern Check for " + i + " : " + p + " vs " + pattern, 4);
 				if (pattern === p) {
 					scorm.debug(settings.prefix + ": Interaction Correct Responses By Pattern Returning " + i);
 					return i;
