@@ -60,7 +60,7 @@ function SCORM_API(options) {
 	var defaults = {
 			version : "1.0",
 			createDate : "04/05/2011 08:56AM",
-			modifiedDate : "02/23/2012 10:00AM",
+			modifiedDate : "03/02/2012 17:00AM",
 			debug : false,
 			isActive : false,
 			throw_alerts : false,
@@ -317,7 +317,7 @@ function SCORM_API(options) {
 			dd = new Date(d);
 			uoffset = dd.getTimezoneOffset() * 60 * 60;
 			if (uoffset !== offset) {
-				dd = new Date(dd.getTime() + offset + uoffset);
+				dd = new Date(dd.getTime() + offset + uoffset); // still need to validate this
 			}
 			return dd;
 		default:
