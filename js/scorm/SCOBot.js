@@ -48,6 +48,7 @@ function SCOBot(options) {
 			modifiedDate: "02/23/2012 10:00PM",
 			prefix: "SCOBot",
 			// SCORM buffers and settings
+			time_type: "", // UTC, GMT or ""
 			launch_data: {},
 			interaction_mode: "state", // or journaled
 			launch_data_type: "querystring", // or json
@@ -186,25 +187,26 @@ function SCOBot(options) {
 		return str.replace(cleanseExp, '');
 	}
 	/**
-	 * Is ISO 8601 UTC
-	 * I've got a RegEx to validate ISO 8601 UTC time by the 'Z' at the end.
-	 * This is a great common way to do this so regardless of time zone you can reflect the 
-	 * time this time stamp was referring to.
-	 * @returns {Boolean} true or false
-	 */
-	function isISO8601UTC(v) {
-		var iso8601UTCExp = /(\d{4}-[01]\d\-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+\-][0-2]\d:[0-5]\d|Z))/;
-		return iso8601UTCExp.test(v);
-	}
-	/**
 	 * Is ISO 8601
-	 * I've got a RegEx to validate ISO 8601 time.
+	 * I've got a RegEx to validate ISO 8601 time based on SCORM 2004 Formats.
 	 * This is a great common way to do this so regardless of time zone you can reflect the 
 	 * time this time stamp was referring to.
+	 * Acceptable Format GMT 2012-02-28T15:00:00.0-8:00, UTC 2012-02-28T15:00:00.0-8:00Z, Plain 2012-02-28T15:00:00
 	 * @returns {Boolean} true or false
 	 */
 	function isISO8601(v) {
-		var iso8601Exp = /^(\d{4})-0?(\d+)-0?(\d+)[T ]0?(\d+):0?(\d+):0?(\d+)$/;
+		var iso8601Exp;
+		switch (settings.time_type) {
+		case "UTC": // AT GMT
+			iso8601Exp = /^(\d{4})-0?(\d+)-0?(\d+)[T ]0?(\d+):0?(\d+):0?(\d+)(?:\.(\d+))(|Z)$/;
+			break;
+		case "GMT": // FROM GMT
+			iso8601Exp = /^(\d{4})-0?(\d+)-0?(\d+)[T ]0?(\d+):0?(\d+):0?(\d+)(?:\.(\d+))[\+\-]\d{2}:\d{2}$/;
+			break;
+		default:    // Now, regardless of GMT
+			iso8601Exp = /^(\d{4})-0?(\d+)-0?(\d+)[T ]0?(\d+):0?(\d+):0?(\d+)$/;
+			break;
+		}
 		return iso8601Exp.test(v);
 	}
 	/**
@@ -213,7 +215,7 @@ function SCOBot(options) {
 	 * @returns {String} 'false'
 	 */
 	function notStartedYet() {
-		scorm.debug(settings.prefix + ": You didn't call 'Start()' yet, or you already terminated, ignoring.", 2);
+		scorm.debug(settings.prefix + ": You didn't call 'start()' yet, or you already terminated, ignoring.", 2);
 		return 'false';
 	}
 	/**
@@ -1454,7 +1456,6 @@ function SCOBot(options) {
 	 * Is ISO 8601 UTC
 	 * @returns {Boolean} true/false
 	 */
-	this.isISO8601UTC = isISO8601UTC; // Public to Private hook
 	this.isISO8601 = isISO8601;
 	/**
 	 * Set

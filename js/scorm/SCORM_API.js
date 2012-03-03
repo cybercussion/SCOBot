@@ -69,7 +69,8 @@ function SCORM_API(options) {
 			success_status : "unknown",
 			use_standalone : true,
 			standalone: false,
-			completion_status : "unknown"
+			completion_status : "unknown",
+			time_type: "GMT"
 		},
 		// Settings merged with defaults and extended options
 		settings = $.extend(defaults, options),
@@ -266,15 +267,15 @@ function SCORM_API(options) {
 	 * Pads time with proper formatting (double digits)
 	 */
 	function padTime(n) {
-        return n < 10 ? '0' + n : n;
-    }
+		return n < 10 ? '0' + n : n;
+	}
 	/**
 	 * ISO 8601 Date String UTC
 	 * Converts date object into ISO 8601 standard
 	 * returns {String} ISO 8601 + UTC
 	 */
 	function isoDateToStringUTC(d) {
-	    return d.getUTCFullYear() + '-' + padTime(d.getUTCMonth() + 1) + '-' + padTime(d.getUTCDate()) + 'T' + padTime(d.getUTCHours()) + ':' + padTime(d.getUTCMinutes()) + ':' + padTime(d.getUTCSeconds()) + 'Z';
+		return d.getUTCFullYear() + '-' + padTime(d.getUTCMonth() + 1) + '-' + padTime(d.getUTCDate()) + 'T' + padTime(d.getUTCHours()) + ':' + padTime(d.getUTCMinutes()) + ':' + padTime(d.getUTCSeconds()) + "." + Math.round((d.getUTCMilliseconds() / 1000) % 1000) + 'Z';
 	}
 	/**
 	 * ISO 8601 Date String
@@ -282,23 +283,51 @@ function SCORM_API(options) {
 	 * @returns {String} ISO 8601
 	 */
 	function isoDateToString(d) {
-		//var offset = d.getTimezoneOffset() > 0 ? '-' : '+';
-		//return d.getFullYear() + '-' + padTime(d.getMonth() + 1) + '-' + padTime(d.getDate()) + 'T' + padTime(d.getHours()) + ':' + padTime(d.getMinutes()) + ':' + padTime(d.getSeconds()) + offset + (d.getTimezoneOffset() / 60) + ':00';
-		return d.getFullYear() + '-' + padTime(d.getMonth() + 1) + '-' + padTime(d.getDate()) + 'T' + padTime(d.getHours()) + ':' + padTime(d.getMinutes()) + ':' + padTime(d.getSeconds());
+		var offset = d.getTimezoneOffset() > 0 ? '-' : '+';
+		return d.getFullYear() + '-' + padTime(d.getMonth() + 1) + '-' + padTime(d.getDate()) + 'T' + padTime(d.getHours()) + ':' + padTime(d.getMinutes()) + ':' + padTime(d.getSeconds()) + "." + Math.round((d.getMilliseconds() / 1000) % 1000) + offset + (d.getTimezoneOffset() / 60) + ':00';
+		//return d.getFullYear() + '-' + padTime(d.getMonth() + 1) + '-' + padTime(d.getDate()) + 'T' + padTime(d.getHours()) + ':' + padTime(d.getMinutes()) + ':' + padTime(d.getSeconds());
 	}
 	/**
 	 * ISO 8601 String to Date
+	 * Not extremely clear yet if this is needed at a SCO level.  If not I'll remove it later.
 	 * @param str {Date String} ISO8601
 	 * @return {Object} Date Object or false
 	 */
 	function isoStringToDate(str) {
 		var MM = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+			d,
+			uoffset,
+			offset,
+			dd;
+		switch (settings.time_type) {
+		case "UTC":
+			d =  str.replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))(|Z)/, function ($0, $Year, $Month, $Day, $Hour, $Min, $Sec) {
+				return MM[$Month - 1] + " " + $Day + ", " + $Year + " " + $Hour + ":" + $Min + ":" + $Sec;
+			}
+				);
+			dd = new Date.UTC(d);
+			return dd;
+		case "GMT":
+			d =  str.replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))([\+|\-]\d+:\d+)/, function ($0, $Year, $Month, $Day, $Hour, $Min, $Sec, $Ms, $Offset) {
+				offset = parseInt($Offset.substring(1, $Offset.length), 10) * 60 * 60 * 60;
+				return MM[$Month - 1] + " " + $Day + ", " + $Year + " " + $Hour + ":" + $Min + ":" + $Sec;
+			}
+				);
+			// At this point we have to convert the users offset to the recorded offset to set the date properly.
+			dd = new Date(d);
+			uoffset = dd.getTimezoneOffset() * 60 * 60;
+			if(uoffset !== offset) {
+				dd = new Date(dd.getTime() + offset + uoffset);
+			}
+			return dd;
+		default:
 			d =  str.replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/, function ($0, $Year, $Month, $Day, $Hour, $Min, $Sec) {
 				return MM[$Month - 1] + " " + $Day + ", " + $Year + " " + $Hour + ":" + $Min + ":" + $Sec;
 			}
-				),
+				);
 			dd = new Date(d);
-		return dd;
+			return dd;
+		}
 	}
 	/**
 	 * Centiseconds To SCORM 1.2 Duration

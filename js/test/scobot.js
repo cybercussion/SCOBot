@@ -38,18 +38,24 @@ test("scorm.debug", function() {
 });
 
 test("ISO 8601 UTC Time", function() {
-	strictEqual(SB.isISO8601UTC('2012-02-12T00:37:29Z'), true, 'Checking a UTC example 2012-02-12T00:37:29Z');
-	strictEqual(SB.isISO8601UTC('2012-02-12T00:37:29'), false, 'Checking a non-UTC example 2012-02-12T00:37:29');
-	strictEqual(SB.isISO8601UTC('2012-02-1200:37:29'), false, 'Checking a malformed example 2012-02-1200:37:29');
+	SB.set("time_type", "UTC");
+	strictEqual(SB.isISO8601('2012-02-12T00:37:29.0Z'), true, 'Checking a UTC example 2012-02-12T00:37:29.0Z');
+	strictEqual(SB.isISO8601('2012-02-12T00:37:29'), false, 'Checking a non-UTC example 2012-02-12T00:37:29');
+	strictEqual(SB.isISO8601('2012-02-1200:37:29'), false, 'Checking a malformed example 2012-02-1200:37:29');
 });
 test("ISO 8601 Time", function() {
 // non UTC (This was all I could get to work con cloud.scorm.com)
+	SB.set("time_type", "");
 	strictEqual(SB.isISO8601('2012-02-27T15:33:08'), true, 'Checking a non-UTC example 2012-02-27T15:33:08');
 	strictEqual(SB.isISO8601('2012-02-1200:37:29'), false, 'Checking a malformed example 2012-02-1200:37:29');
 	strictEqual(SB.isISO8601('2012-02-12T00:37:29Z'), false, 'Checking a UTC example 2012-02-12T00:37:29Z');
+	// GMT
+	SB.set("time_type", "GMT");
+	strictEqual(SB.isISO8601('2009-03-24T16:24:32.057+01:00'), true, 'Checking a GMT example 2012-02-27T15:33:08.0-8:00');
+	strictEqual(SB.isISO8601('2012-02-27T15:33:08.08:00'), false, 'Checking a GMT example 2012-02-27T15:33:08.08:00');
 	//strictEqual(scorm.isoStringToDate('2012-02-27T15:33:08'), 'February 27, 2012 - 3:33PM', "Checking ISO String back to date");
-	var date = scorm.isoStringToDate('2012-02-27T15:33:08');
-	//strictEqual(String(date), 'Mon Feb 27 2012 15:33:08 GMT-0800 (PST)', 'Checking ISO8601 String to Date equals Mon Feb 27 2012 15:33:08 GMT-0800 (PST)');
+	var date = scorm.isoStringToDate('2012-02-27T15:33:08.0-8:00');
+	strictEqual(String(date), 'Mon Feb 27 2012 15:33:08 GMT-0800 (PST)', 'Checking ISO8601 String to Date equals Mon Feb 27 2012 15:33:08 GMT-0800 (PST)');
 });
 test("Set Totals", function() {
 	strictEqual(SB.setTotals({
