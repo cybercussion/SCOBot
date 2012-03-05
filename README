@@ -1,11 +1,11 @@
 SCORM_API
 Hi, 
-
-The JavaScript portion of this project is split into the following sections:
+I've kept this project split up into 3 logical portions, leaving room for anyone to add or subtract from the complete package. The main focal point would be 'js/scorm/', as the surrounding files are simply supporting files like JQuery, QUnit, and further README files.
+The portions of this project is split into the following sections:
 
 js/scorm/SCORM_API.js (Required in a deployment)- 
 Tip: This file technically shouldn't be edited.
-This is the main 'long-hand' SCORM 2004 with some additions to rollback to SCORM 1.2.  Please note I've only taken the SCORM 1.2 rollback so far, as it was needed on another project I worked on.  There will be cases where there just isn't enough space to store some items if your going from 2004 to 1.2.  Ok, fair warning.  This supplies the base support of SCORM (Connection to the LMS, initialize, get/set value, commit, terminate).
+This is the main 'long-hand' SCORM 2004 that connects to the LMS 'API_1484_11' (2004) or 'API' (1.2).  With some additions to rollback to SCORM 1.2.  Please note, I've only taken the SCORM 1.2 rollback so far, as it was needed on another project I worked on.  There will be cases where there just isn't enough space to store some items if your going from 2004 to 1.2.  Ok, fair warning.  This supplies the base support of SCORM (Connection to the LMS, initialize, get/set value, commit, terminate).
 
 js/scorm/SCOBot.js (Optional in a deployment)- 
 Tip: This is totally customizeable to fit your needs.  Edit away.
