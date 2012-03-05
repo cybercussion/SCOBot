@@ -1354,7 +1354,7 @@ function SCOBot(options) {
 				p1 += n + ".";
 				// Build Response
 				return {
-					id:  scorm.getvalue(p1 + "success_status"),
+					id:  scorm.getvalue(p1 + "id"),
 					score: {
 						scaled: scorm.getvalue(p1 + "score.scaled"),
 						raw: scorm.getvalue(p1 + "score.raw"),
