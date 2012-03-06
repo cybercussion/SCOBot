@@ -222,10 +222,9 @@ function Local_API_1484_11(options) {
 			v = ka.shift();
 			if (obj[v]) {
 				return getData(ka.join("."), obj[v]);
-			} else {
-				throwUnimplemented(key);
-				return 'false';
 			}
+			throwUnimplemented(key);
+			return 'false';
 			//join the remaining parts back up with dots, and recursively set data on our new "base" obj
 		}
 	}
@@ -273,12 +272,12 @@ function Local_API_1484_11(options) {
 			v = tiers[tiers.length - 1]; // last value
 		if (tiers[0] === "adl" && tiers[4] === "id") {
 			return true;
-		} else if (tiers[1] === "comments_from_lms") {// entirely read only
+		}
+		if (tiers[1] === "comments_from_lms") {// entirely read only
 			return true;
-		} else {
-			if (read_only.indexOf('|' + v + '|') >= 0) {
-				return true;
-			}
+		}
+		if (read_only.indexOf('|' + v + '|') >= 0) {
+			return true;
 		}
 		return false;
 	}
@@ -339,9 +338,8 @@ function Local_API_1484_11(options) {
 	this.isRunning = function () {
 		if (settings.initialized === 1 && settings.terminated === 0) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	};
 	/*jslint nomen: true */
 	this.Initialize = function () {
@@ -368,26 +366,24 @@ function Local_API_1484_11(options) {
 				scorm.debug(settings.prefix + ": This " + k + " is write only", 4);
 				settings.errorCode = 405;
 				return "false";
-			} else {
-				tiers = k.toLowerCase().split(".");
-				switch (tiers[0]) {
-				case "cmi":
-					//scorm.debug(settings.prefix + ": CMI Getting " + k, 4);
-					r = cmiGetValue(k);
-					break;
-				case "ssp":
-
-					break;
-				case "adl":
-
-					break;
-				}
-				return r;
 			}
-		} else {
-			settings.errorCode = 123;
+			tiers = k.toLowerCase().split(".");
+			switch (tiers[0]) {
+			case "cmi":
+				//scorm.debug(settings.prefix + ": CMI Getting " + k, 4);
+				r = cmiGetValue(k);
+				break;
+			case "ssp":
+
+				break;
+			case "adl":
+
+				break;
+			}
 			return r;
 		}
+		settings.errorCode = 123;
+		return r;
 	};
 	/**
 	 * SetValue (SCORM)
@@ -415,131 +411,129 @@ function Local_API_1484_11(options) {
 				scorm.debug(settings.prefix + ": This " + k + " is read only", 4);
 				settings.errorCode = 404;
 				return "false";
-			} else {
-				tiers = k.split(".");
-				//scorm.debug(settings.prefix + ": Tiers " + tiers[1], 4);
-				switch (tiers[0]) {
-				case "cmi":
-					switch (key) {
-					case "cmi.location":
-						if (v.length > 1000) {
-							scorm.debug(settings.prefix + ": Some LMS's might truncate your bookmark as you've passed " + v.length + " characters of bookmarking data", 2);
-						}
-						break;
-					case "cmi.completion_status":
-						if (completion_status.indexOf('|' + v + '|') === -1) {
-							// Invalid value
+			}
+			tiers = k.split(".");
+			//scorm.debug(settings.prefix + ": Tiers " + tiers[1], 4);
+			switch (tiers[0]) {
+			case "cmi":
+				switch (key) {
+				case "cmi.location":
+					if (v.length > 1000) {
+						scorm.debug(settings.prefix + ": Some LMS's might truncate your bookmark as you've passed " + v.length + " characters of bookmarking data", 2);
+					}
+					break;
+				case "cmi.completion_status":
+					if (completion_status.indexOf('|' + v + '|') === -1) {
+						// Invalid value
+						return throwVocabError(key, v);
+					}
+					break;
+				case "cmi.exit":
+					if (exit.indexOf('|' + v + '|') === -1) {
+						// Invalid value
+						return throwVocabError(key, v);
+					}
+					break;
+				default:
+					// Need to dig in to some of these lower level values
+					switch (tiers[1]) {
+					case "comments_from_lms":
+						settings.errorCode = "404";
+						settings.diagnostic = "The cmi.comments_from_lms element is entirely read only.";
+						return 'false';
+					case "interactions":
+						// Validate
+						if (cmi.interactions._children.indexOf(tiers[3]) === -1) {
 							return throwVocabError(key, v);
 						}
-						break;
-					case "cmi.exit":
-						if (exit.indexOf('|' + v + '|') === -1) {
-							// Invalid value
-							return throwVocabError(key, v);
-						}
-						break;
-					default:
-						// Need to dig in to some of these lower level values
-						switch (tiers[1]) {
-						case "comments_from_lms":
-							settings.errorCode = "404";
-							settings.diagnostic = "The cmi.comments_from_lms element is entirely read only.";
-							return 'false';
-						case "interactions":
+						//scorm.debug(settings.prefix + ": Checking Interactions .... " + getObjLength(cmi.interactions), 4);
+						cmi.interactions._count = (getObjLength(cmi.interactions) - 2).toString(); // Why -2?  _count and _children						
+						// Check interactions.n.objectives._count
+						// This one is tricky because if a id is added at tier[3] this means the objective count needs to increase for this interaction.
+						// This is alpha or numeric
+						if (tiers[3] === 'objectives') {
+							// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
+							if (!cmi.interactions[tiers[2]].objectives) {
+								// Setup Objectives for the first time
+								scorm.debug(settings.prefix + ": Constructing objectives object for new interaction", 4);
+								cmi.interactions[tiers[2]].objectives = {};
+								cmi.interactions[tiers[2]].objectives._count = "0";
+								cmi.interactions[tiers[2]].objectives._children = "id,score,success_status,completion_status,description";
+							}
 							// Validate
-							if (cmi.interactions._children.indexOf(tiers[3]) === -1) {
+							if (cmi.interactions[tiers[2]].objectives._children.indexOf(tiers[5]) === -1) {
 								return throwVocabError(key, v);
 							}
-							//scorm.debug(settings.prefix + ": Checking Interactions .... " + getObjLength(cmi.interactions), 4);
-							cmi.interactions._count = (getObjLength(cmi.interactions) - 2).toString(); // Why -2?  _count and _children						
-							// Check interactions.n.objectives._count
-							// This one is tricky because if a id is added at tier[3] this means the objective count needs to increase for this interaction.
-							// This is alpha or numeric
-							if (tiers[3] === 'objectives') {
-								// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
-								if (!cmi.interactions[tiers[2]].objectives) {
-									// Setup Objectives for the first time
-									scorm.debug(settings.prefix + ": Constructing objectives object for new interaction", 4);
-									cmi.interactions[tiers[2]].objectives = {};
-									cmi.interactions[tiers[2]].objectives._count = "0";
-									cmi.interactions[tiers[2]].objectives._children = "id,score,success_status,completion_status,description";
-								}
-								// Validate
-								if (cmi.interactions[tiers[2]].objectives._children.indexOf(tiers[5]) === -1) {
-									return throwVocabError(key, v);
-								}
-								cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 1).toString(); // Why -1?  _count and _children
+							cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 1).toString(); // Why -1?  _count and _children
+						}
+						if (tiers[3] === 'correct_responses') {
+							// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
+							if (!cmi.interactions[tiers[2]].correct_responses) {
+								// Setup Objectives for the first time
+								scorm.debug(settings.prefix + ": Constructing correct responses object for new interaction", 4);
+								cmi.interactions[tiers[2]].correct_responses = {};
+								cmi.interactions[tiers[2]].correct_responses._count = "0";
+								//cmi.interactions[tiers[2]].correct_responses._children = "pattern"; // scorm spec didn't include _children for pattern.
 							}
-							if (tiers[3] === 'correct_responses') {
-								// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
-								if (!cmi.interactions[tiers[2]].correct_responses) {
-									// Setup Objectives for the first time
-									scorm.debug(settings.prefix + ": Constructing correct responses object for new interaction", 4);
-									cmi.interactions[tiers[2]].correct_responses = {};
-									cmi.interactions[tiers[2]].correct_responses._count = "0";
-									//cmi.interactions[tiers[2]].correct_responses._children = "pattern"; // scorm spec didn't include _children for pattern.
-								}
-								cmi.interactions[tiers[2]].correct_responses._count = (getObjLength(cmi.interactions[tiers[2]].correct_responses)).toString(); // Why -1?  _count
-							}
-							// this should work (Subtract _count, and _children)
-							if (parseInt(tiers[2], 10) === "NaN") {
-								return 'false';
-							}
-							break;
-						case "objectives":
-							// Objectives require a unique ID, which to me contradicts journaling
-							if (tiers[3] === "id") {
-								count = parseInt(cmi.objectives._count, 10);
-								for (z = 0; z < count; z += 1) {
-									if (cmi.objectives[z].id === v) {
-										settings.errorCode = "351";
-										settings.diagnostic = "The objectives.id elmeent must be unique.  The value '" + v + "' has already been set in objective #" + z;
-										return 'false';
-									}
-								}
-							}
-							// End Unique ID Check
-							// Now Verify the objective in question even has a ID yet, if not throw error.
-							if (tiers[3] !== "id") {
-								arr = parseInt(tiers[2], 10);
-								if (cmi.objectives[arr] === undefined) {
-									settings.errorCode = "408";
-									settings.diagnostic = "The objectives.id element must be setbefore other elements can be set";
+							cmi.interactions[tiers[2]].correct_responses._count = (getObjLength(cmi.interactions[tiers[2]].correct_responses)).toString(); // Why -1?  _count
+						}
+						// this should work (Subtract _count, and _children)
+						if (parseInt(tiers[2], 10) === "NaN") {
+							return 'false';
+						}
+						break;
+					case "objectives":
+						// Objectives require a unique ID, which to me contradicts journaling
+						if (tiers[3] === "id") {
+							count = parseInt(cmi.objectives._count, 10);
+							for (z = 0; z < count; z += 1) {
+								if (cmi.objectives[z].id === v) {
+									settings.errorCode = "351";
+									settings.diagnostic = "The objectives.id elmeent must be unique.  The value '" + v + "' has already been set in objective #" + z;
 									return 'false';
 								}
 							}
-							// END ID CHeck
-							cmi.objectives._count = (getObjLength(cmi.objectives) - 2).toString(); // Why -2?  _count and _children
-							// ditto
-							if (parseInt(tiers[2], 10) === "NaN") {
+						}
+						// End Unique ID Check
+						// Now Verify the objective in question even has a ID yet, if not throw error.
+						if (tiers[3] !== "id") {
+							arr = parseInt(tiers[2], 10);
+							if (cmi.objectives[arr] === undefined) {
+								settings.errorCode = "408";
+								settings.diagnostic = "The objectives.id element must be setbefore other elements can be set";
 								return 'false';
 							}
-							break;
+						}
+						// END ID CHeck
+						cmi.objectives._count = (getObjLength(cmi.objectives) - 2).toString(); // Why -2?  _count and _children
+						// ditto
+						if (parseInt(tiers[2], 10) === "NaN") {
+							return 'false';
 						}
 						break;
-						// More reenforcement to come ...
 					}
-					// Rip off 'cmi.' before we add this to the model
-					setData(k.substr(4, k.length), v, cmi);
 					break;
-				case "ssp":
-					// Still to do (build off cmi work)
-					break;
-				case "adl":
-					// Still to do (build off cmi work)
-					break;
+					// More reenforcement to come ...
 				}
-				return "true";
+				// Rip off 'cmi.' before we add this to the model
+				setData(k.substr(4, k.length), v, cmi);
+				break;
+			case "ssp":
+				// Still to do (build off cmi work)
+				break;
+			case "adl":
+				// Still to do (build off cmi work)
+				break;
 			}
-		} else {
-			// Determine Error Code
-			if (settings.terminated) {
-				settings.errorCode = 133;
-			} else {
-				settings.errorCode = 132;
-			}
-			return "false";
+			return "true";
 		}
+		// Determine Error Code
+		if (settings.terminated) {
+			settings.errorCode = 133;
+		} else {
+			settings.errorCode = 132;
+		}
+		return "false";
 	};
 	/**
 	 * Commit
@@ -570,12 +564,10 @@ function Local_API_1484_11(options) {
 			var nparam = parseInt(param, 10);
 			if (errors[nparam] !== undefined) {
 				return errors[nparam];
-			} else {
-				return "";
 			}
-		} else {
 			return "";
 		}
+		return "";
 	};
 	/**
 	 * GetLastError (SCORM) - Returns the error number from the last error
