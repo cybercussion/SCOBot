@@ -284,7 +284,7 @@ function SCORM_API(options) {
 	 */
 	function isoDateToString(d) {
 		var offset = d.getTimezoneOffset() > 0 ? '-' : '+';
-		return d.getFullYear() + '-' + padTime(d.getMonth() + 1) + '-' + padTime(d.getDate()) + 'T' + padTime(d.getHours()) + ':' + padTime(d.getMinutes()) + ':' + padTime(d.getSeconds()) + "." + Math.round((d.getMilliseconds() / 1000) % 1000) + offset + (d.getTimezoneOffset() / 60) + ':00';
+		return d.getFullYear() + '-' + padTime(d.getMonth() + 1) + '-' + padTime(d.getDate()) + 'T' + padTime(d.getHours()) + ':' + padTime(d.getMinutes()) + ':' + padTime(d.getSeconds()) + "." + Math.round((d.getMilliseconds() / 1000) % 1000) + offset + padTime(d.getTimezoneOffset() / 60) + ':00';
 		//return d.getFullYear() + '-' + padTime(d.getMonth() + 1) + '-' + padTime(d.getDate()) + 'T' + padTime(d.getHours()) + ':' + padTime(d.getMinutes()) + ':' + padTime(d.getSeconds());
 	}
 	/**
@@ -851,7 +851,7 @@ function SCORM_API(options) {
 		if (count === '' || count === 'false' || count === '-1') {
 			return 'false';
 		}
-		count = parseInt(count, 10); // convert from string
+		count = parseInt(count, 10) - 1; // convert from string
 		for (i = count; i >= 0; i -= 1) {
 			tID = self.getvalue("cmi.objectives." + i + ".id");
 			//scorm.debug(settings.prefix + ": Objective ID Check for " + i + " : " + id + " vs " + tID, 4);
