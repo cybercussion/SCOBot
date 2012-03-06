@@ -46,7 +46,7 @@ function SCOBot(options) {
 	var defaults = {
 			version: "1.0",
 			createDate: "04/07/2011 09:33AM",
-			modifiedDate: "03/02/2012 17:00PM",
+			modifiedDate: "03/05/2012 10:55AM",
 			prefix: "SCOBot",
 			// SCORM buffers and settings
 			launch_data: {},
