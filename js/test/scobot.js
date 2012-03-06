@@ -96,6 +96,7 @@ test("Bookmarking", function() {
 
 test("Objectives", function() {
 	if(SB.getEntry() !== "resume") {
+		scorm.debug("Setting Objectives...", 4);
 		// For True False
 		strictEqual(SB.setObjective({
 			id: '1_1',                                                   // {String}
@@ -239,6 +240,117 @@ test("Objectives", function() {
 	} else {
 		// Could verify Objectives?
 	}
+	var objective = SB.getObjective('1_1');
+	strictEqual(objective.id, "1_1", "Verify Objective id is 1_1");
+	strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
+	strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
+	strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
+	strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+	strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
+	strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
+	strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
+	strictEqual(objective.description, "They will answer a true false interaction", "Verify Objective description is They will answer a true false interaction");
+	
+	objective = SB.getObjective('2_1');
+	strictEqual(objective.id, "2_1", "Verify Objective id is 2_1");
+	strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
+	strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
+	strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
+	strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+	strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
+	strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
+	strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
+	strictEqual(objective.description, "They will answer a multiple choice interaction", "Verify Objective description is They will answer a multiple choice interaction");
+	
+	objective = SB.getObjective('3_1');
+	strictEqual(objective.id, "3_1", "Verify Objective id is 3_1");
+	strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
+	strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
+	strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
+	strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+	strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
+	strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
+	strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
+	strictEqual(objective.description, "They will answer a fill in interaction", "Verify Objective description is They will answer a fill in interaction");
+	
+	objective = SB.getObjective('4_1');
+	strictEqual(objective.id, "4_1", "Verify Objective id is 4_1");
+	strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
+	strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
+	strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
+	strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+	strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
+	strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
+	strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
+	strictEqual(objective.description, "They will answer a sequencing interaction", "Verify Objective description is They will answer a sequencing interaction");
+	
+	objective = SB.getObjective('5_1');
+	strictEqual(objective.id, "5_1", "Verify Objective id is 5_1");
+	strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
+	strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
+	strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
+	strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+	strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
+	strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
+	strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
+	strictEqual(objective.description, "They will answer a long fill in interaction", "Verify Objective description is They will answer a long fill in interaction");
+	
+	objective = SB.getObjective('6_1');
+	strictEqual(objective.id, "6_1", "Verify Objective id is 6_1");
+	strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
+	strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
+	strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
+	strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+	strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
+	strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
+	strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
+	strictEqual(objective.description, "They will answer a matching interaction", "Verify Objective description is They will answer a matching interaction");
+	
+	objective = SB.getObjective('7_1');
+	strictEqual(objective.id, "7_1", "Verify Objective id is 7_1");
+	strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
+	strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
+	strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
+	strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+	strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
+	strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
+	strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
+	strictEqual(objective.description, "They will answer a likert interaction", "Verify Objective description is They will answer a likert interaction");
+	
+	objective = SB.getObjective('8_1');
+	strictEqual(objective.id, "8_1", "Verify Objective id is 8_1");
+	strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
+	strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
+	strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
+	strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+	strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
+	strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
+	strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
+	strictEqual(objective.description, "They will answer a other interaction", "Verify Objective description is They will answer a other interaction");
+	
+	objective = SB.getObjective('9_1');
+	strictEqual(objective.id, "9_1", "Verify Objective id is 9_1");
+	strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
+	strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
+	strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
+	strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+	strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
+	strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
+	strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
+	strictEqual(objective.description, "They will answer a performance interaction", "Verify Objective description is They will answer a performance interaction");
+	
+	objective = SB.getObjective('10_1');
+	strictEqual(objective.id, "10_1", "Verify Objective id is 10_1");
+	strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
+	strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
+	strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
+	strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+	strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
+	strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
+	strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
+	strictEqual(objective.description, "They will answer a numeric interaction", "Verify Objective description is They will answer a numeric interaction");
+	
+	strictEqual(SB.getInteraction('999_9'), 'false', "Getting bogus objective, should be false");
 });
 
 test("Interactions", function() {
@@ -685,30 +797,6 @@ test("Get Interaction By ID", function() {
 	
 	strictEqual(SB.getInteraction('999'), 'false', "Getting bogus interaction, should be false");
 
-});
-test("Get Objective By ID", function() {
-	var objective = SB.getObjective('1_1');
-	
-	objective = SB.getObjective('2_1');
-	
-	objective = SB.getObjective('3_1');
-	
-	objective = SB.getObjective('4_1');
-	
-	objective = SB.getObjective('5_1');
-	
-	objective = SB.getObjective('6_1');
-	
-	objective = SB.getObjective('7_1');
-	
-	objective = SB.getObjective('8_1');
-	
-	objective = SB.getObjective('9_1');
-	
-	objective = SB.getObjective('10_1');
-	
-	strictEqual(SB.getInteraction('999_9'), 'false', "Getting bogus objective, should be false");
-	
 });
 
 test("Update Objective By ID", function() {
