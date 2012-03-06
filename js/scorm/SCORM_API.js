@@ -152,10 +152,9 @@ function SCORM_API(options) {
 				return false;
 			}
 			return true;
-		} else {// Toss to get attention (override in defaults)
-			if (lvl < 3 && settings.throw_alerts) {
-				alert(msg);
-			}
+		}
+		if (lvl < 3 && settings.throw_alerts) {
+			alert(msg);
 		}
 		return false;
 	}
@@ -389,22 +388,22 @@ function SCORM_API(options) {
 		if (str === undefined) {
 			debug(settings.prefix + " : makeBoolean was given empty string, converting to false", 2);
 			return false;
-		} else if (str === true || str === false) {
+		}
+		if (str === true || str === false) {
 			return Boolean(str);
-		} else {
-			switch (str.toLowerCase()) {
-			case "true":
-			case "yes":
-			case "1":
-				return true;
-			case "false":
-			case "no":
-			case "0":
-			case null:
-				return false;
-			default:
-				return Boolean(str);
-			}
+		}
+		switch (str.toLowerCase()) {
+		case "true":
+		case "yes":
+		case "1":
+			return true;
+		case "false":
+		case "no":
+		case "0":
+		case null:
+			return false;
+		default:
+			return Boolean(str);
 		}
 	}
 	/**
@@ -558,9 +557,8 @@ function SCORM_API(options) {
 				}
 				if (ig) {
 					return 'false';
-				} else {
-					v = lms.LMSGetValue(nn);
 				}
+				v = lms.LMSGetValue(nn);
 				break;
 			case "2004":
 				v = lms.GetValue(n);
@@ -577,12 +575,10 @@ function SCORM_API(options) {
 					v = "";
 				}
 				return String(v);
-			} else {
-				debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + "\nDiagnostic: " + getDiagnostic(ec), 1);
 			}
-		} else {
-			debug(settings.prefix + ": " + n + " Get Aborted, connection not initialized! " + API.isActive, 2);
+			debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + "\nDiagnostic: " + getDiagnostic(ec), 1);
 		}
+		debug(settings.prefix + ": " + n + " Get Aborted, connection not initialized! " + API.isActive, 2);
 		return 'false';
 	};
 	/**
@@ -661,9 +657,8 @@ function SCORM_API(options) {
 				}
 				if (ig) {
 					return 'false';
-				} else {
-					s = lms.LMSSetValue(nn, v); //makeBoolean(lms.LMSSetValue(nn, v));
 				}
+				s = lms.LMSSetValue(nn, v); //makeBoolean(lms.LMSSetValue(nn, v));
 				break;
 			case "2004":
 				switch (n) {
@@ -699,12 +694,10 @@ function SCORM_API(options) {
 			// Ensure Error Codes not critical
 			if (ec === 0 || ec === 403) {
 				return s;
-			} else {
-				debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + " for " + n + "\nDiagnostic: " + getDiagnostic(ec), 1);
 			}
-		} else {
-			debug(settings.prefix + ": " + n + " Set Aborted, connection not initialized! Locate where you called it after you Terminated.", 2);
+			debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + " for " + n + "\nDiagnostic: " + getDiagnostic(ec), 1);
 		}
+		debug(settings.prefix + ": " + n + " Set Aborted, connection not initialized! Locate where you called it after you Terminated.", 2);
 		return 'false';
 	};
 	/**
@@ -739,14 +732,12 @@ function SCORM_API(options) {
 			ec = getLastErrorCode();
 			if (ec === 0) {
 				return s;
-			} else {
-				debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + " for Commit.\nDiagnostic: " + getDiagnostic(ec), 1);
-				return 'false';
 			}
-		} else {
-			debug(settings.prefix + ": Commit Aborted, connection not initialized!", 2);
+			debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + " for Commit.\nDiagnostic: " + getDiagnostic(ec), 1);
 			return 'false';
 		}
+		debug(settings.prefix + ": Commit Aborted, connection not initialized!", 2);
+		return 'false';
 	};
 	/**
 	 * Initialize  (SCORM Call)
@@ -792,9 +783,8 @@ function SCORM_API(options) {
 						break;
 					}
 					return 'true';
-				} else {
-					debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + " for Initialize.\nDiagnostic: " + getDiagnostic(ec), 1);
 				}
+				debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + " for Initialize.\nDiagnostic: " + getDiagnostic(ec), 1);
 			} else {
 				debug(settings.prefix + ": Aborted, LMS could not be located!.", 2);
 			}
@@ -860,18 +850,17 @@ function SCORM_API(options) {
 		scorm.debug(settings.prefix + ": Set Objective - Begin search, Objective count is " + count, 4);
 		if (count === '' || count === 'false' || count === '-1') {
 			return 'false';
-		} else {
-			count = parseInt(count, 10); // convert from string
-			for (i = count; i >= 0; i -= 1) {
-				tID = self.getvalue("cmi.objectives." + i + ".id");
-				//scorm.debug(settings.prefix + ": Objective ID Check for " + i + " : " + id + " vs " + tID, 4);
-				if (id === tID) {
-					scorm.debug(settings.prefix + ": Objective ID Match on " + i, 4);
-					return i;
-				}
-			}
-			return 'false';
 		}
+		count = parseInt(count, 10); // convert from string
+		for (i = count; i >= 0; i -= 1) {
+			tID = self.getvalue("cmi.objectives." + i + ".id");
+			//scorm.debug(settings.prefix + ": Objective ID Check for " + i + " : " + id + " vs " + tID, 4);
+			if (id === tID) {
+				scorm.debug(settings.prefix + ": Objective ID Match on " + i, 4);
+				return i;
+			}
+		}
+		return 'false';
 	};
 	/**
 	 * Get Interaction By ID
@@ -887,19 +876,18 @@ function SCORM_API(options) {
 			tID;
 		if (count === "" || count === 'false' || count === '-1') {
 			return 'false';
-		} else {
-			count = parseInt(count, 10) - 1; // convert from string
-			scorm.debug(settings.prefix + ": Getting interactions from count " + count, 4);
-			for (i = count; i >= 0; i -= 1) {
-				tID = this.getvalue("cmi.interactions." + i + ".id");
-				//scorm.debug(settings.prefix + ": Interaction ID Check for " + i + " : " + tID + " vs " + id, 4);
-				if (id === tID) {
-					scorm.debug(settings.prefix + ": Interaction By ID Returning " + i);
-					return i;
-				}
-			}
-			return 'false';
 		}
+		count = parseInt(count, 10) - 1; // convert from string
+		scorm.debug(settings.prefix + ": Getting interactions from count " + count, 4);
+		for (i = count; i >= 0; i -= 1) {
+			tID = this.getvalue("cmi.interactions." + i + ".id");
+			//scorm.debug(settings.prefix + ": Interaction ID Check for " + i + " : " + tID + " vs " + id, 4);
+			if (id === tID) {
+				scorm.debug(settings.prefix + ": Interaction By ID Returning " + i);
+				return i;
+			}
+		}
+		return 'false';
 	};
 	/**
 	 * Get interaction.n.objective By ID
@@ -911,19 +899,18 @@ function SCORM_API(options) {
 			tID;
 		if (count === "" || count === 'false') {
 			return '0';
-		} else {
-			count = parseInt(count, 10) - 1; // convert from string
-			scorm.debug(settings.prefix + ": Getting interaction objectives from count " + count, 4);
-			for (i = count; i >= 0; i -= 1) {
-				tID = self.getvalue("cmi.interactions." + n + ".objectives." + i + ".id");
-				//scorm.debug(settings.prefix + ": Interaction Objective ID Check for " + i + " : " + tID + " vs " + id, 4);
-				if (id === tID) {
-					scorm.debug(settings.prefix + ": Interaction Objective By ID Returning " + i);
-					return i;
-				}
-			}
-			return 'false';
 		}
+		count = parseInt(count, 10) - 1; // convert from string
+		scorm.debug(settings.prefix + ": Getting interaction objectives from count " + count, 4);
+		for (i = count; i >= 0; i -= 1) {
+			tID = self.getvalue("cmi.interactions." + n + ".objectives." + i + ".id");
+			//scorm.debug(settings.prefix + ": Interaction Objective ID Check for " + i + " : " + tID + " vs " + id, 4);
+			if (id === tID) {
+				scorm.debug(settings.prefix + ": Interaction Objective By ID Returning " + i);
+				return i;
+			}
+		}
+		return 'false';
 	};
 	/**
 	 * Get interaction.n.correct_responses By pattern
@@ -936,19 +923,18 @@ function SCORM_API(options) {
 		if (count === "" || count === 'false') {
 			scorm.debug(settings.prefix + ": Correct Responses pattern was empty or false", 4);
 			return '0'; // never created before so go with 0
-		} else {
-			count = parseInt(count, 10) - 1; // convert from string
-			scorm.debug(settings.prefix + ": Getting interaction correct responses from count " + count, 4);
-			for (i = count; i >= 0; i -= 1) {
-				p = self.getvalue("cmi.interactions." + n + ".correct_responses." + i + ".pattern");
-				//scorm.debug(settings.prefix + ": Interaction Correct Responses Pattern Check for " + i + " : " + p + " vs " + pattern, 4);
-				if (pattern === p) {
-					scorm.debug(settings.prefix + ": Interaction Correct Responses By Pattern Returning " + i);
-					return i;
-				}
-			}
-			return 'false';
 		}
+		count = parseInt(count, 10) - 1; // convert from string
+		scorm.debug(settings.prefix + ": Getting interaction correct responses from count " + count, 4);
+		for (i = count; i >= 0; i -= 1) {
+			p = self.getvalue("cmi.interactions." + n + ".correct_responses." + i + ".pattern");
+			//scorm.debug(settings.prefix + ": Interaction Correct Responses Pattern Check for " + i + " : " + p + " vs " + pattern, 4);
+			if (pattern === p) {
+				scorm.debug(settings.prefix + ": Interaction Correct Responses By Pattern Returning " + i);
+				return i;
+			}
+		}
+		return 'false';
 	};
 	// End SCORM Public Utilities 
 	// Internal API Public Calls //////////
@@ -968,20 +954,18 @@ function SCORM_API(options) {
 		if (API.path) {
 			API.connection = true;
 			return 'true';
-		} else {
-			debug(settings.prefix + ": I was unable to locate an API for communication", 2);
-			if (settings.use_standalone) {
-				// Create Local API in SCORM 2004
-				debug(settings.prefix + ": If you included Local_API_1484_11 I'll mimic the LMS.  If not, all SCORM calls will fail.", 4);
-				settings.standalone = true;
-				API.version = "2004";
-				// May or maynot be provided (standalone) if not, this is null (DOA)
-				API.path = typeof (Local_API_1484_11) === 'function' ? new Local_API_1484_11() : null;
-				return true;
-			} else {
-				return false;
-			}
 		}
+		debug(settings.prefix + ": I was unable to locate an API for communication", 2);
+		if (settings.use_standalone) {
+			// Create Local API in SCORM 2004
+			debug(settings.prefix + ": If you included Local_API_1484_11 I'll mimic the LMS.  If not, all SCORM calls will fail.", 4);
+			settings.standalone = true;
+			API.version = "2004";
+			// May or maynot be provided (standalone) if not, this is null (DOA)
+			API.path = typeof (Local_API_1484_11) === 'function' ? new Local_API_1484_11() : null;
+			return true;
+		}
+		return false;
 	};
 	/**
 	 * Get Last Error (Internal API)
