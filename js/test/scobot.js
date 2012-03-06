@@ -52,10 +52,10 @@ test("ISO 8601 Time", function() {
 	strictEqual(SB.isISO8601('2012-02-12T00:37:29Z'), false, 'Checking a UTC example 2012-02-12T00:37:29Z');
 	// GMT
 	scorm.set("time_type", "GMT");
-	strictEqual(SB.isISO8601('2009-03-24T16:24:32.057+01:00'), true, 'Checking a GMT example 2012-02-27T15:33:08.0-8:00');
+	strictEqual(SB.isISO8601('2009-03-24T16:24:32.5+01:00'), true, 'Checking a GMT example 2009-03-24T16:24:32.5+01:00');
 	strictEqual(SB.isISO8601('2012-02-27T15:33:08.08:00'), false, 'Checking a GMT example 2012-02-27T15:33:08.08:00');
 	//strictEqual(scorm.isoStringToDate('2012-02-27T15:33:08'), 'February 27, 2012 - 3:33PM', "Checking ISO String back to date");
-	var date = scorm.isoStringToDate('2012-02-27T15:33:08.0-8:00');
+	var date = scorm.isoStringToDate('2012-02-27T15:33:08.0-08:00');
 	strictEqual(String(date), 'Mon Feb 27 2012 15:33:08 GMT-0800 (PST)', 'Checking ISO8601 String to Date equals Mon Feb 27 2012 15:33:08 GMT-0800 (PST)');
 });
 test("Set Totals", function() {
