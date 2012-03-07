@@ -756,6 +756,35 @@ function SCOBot(options) {
 			completion_status: scorm.getvalue('cmi.completion_status')
 		};
 	}
+	/**
+	 * Get Comments From LMS
+	 * Checks to see if there are any comments from the LMS, and will
+	 * return a complete object back for use with a display.
+	 * @return {Object} or 'false'
+	 */
+	function getCommentsFromLMS() {
+		var p1       = "cmi.comments_from_lms.",
+			count    = scorm.getvalue(p1 + '_count'),
+			response = [],
+			obj      = {},
+			i        = 0;
+		if (isStarted) {
+			if (!isBadValue(count)) {
+				return 'false';
+			}
+			count -= 1;
+			for (i = 0; i <= count; i += 1) {
+				p1 += i + '.';
+				obj.comment = scorm.getvalue(p1 + 'comment');
+				obj.location = scorm.getvalue(p1 + 'location');
+				obj.timestamp = scorm.getvalue(p1 + 'timestamp');
+				response.push(obj);
+				obj = {};
+			}
+			return response;
+		}
+		return notStartedYet();
+	}
 	// End Private ////////////
 	///////////////////////////
 	// Public /////////////////
@@ -852,6 +881,15 @@ function SCOBot(options) {
 			}
 			settings.completion_status = scorm.getvalue('cmi.completion_status');
 			settings.success_status    = scorm.getvalue('cmi.success_status');
+			// Lets check for Comments from the LMS
+			settings.comments_from_lms = getCommentsFromLMS();
+			if (settings.comments_from_lms !== 'false') {
+				// Custom Event Trigger load
+				$(self).triggerHandler({
+					'type': "comments_lms",
+					'data': settings.comments_from_lms
+				});
+			}
 		} else {
 			scorm.debug(settings.prefix + ": You already called start!  I don't see much point in doing this more than once.", 2);
 			return false;
@@ -979,22 +1017,25 @@ function SCOBot(options) {
 	 * @returns {Boolean}
 	 */
 	this.setSuspendDataByPageID = function (id, title, data) {
-		// Suspend data is a array of pages by ID
-		var i;
-		for (i = 0; i < settings.suspend_data.pages.length; i += 1) {
-			if (settings.suspend_data.pages[i].id === id) {
-				// Update Page data
-				settings.suspend_data.pages[i].data = data; // overwrite existing
-				scorm.debug(settings.prefix + ": Suspend Data Set", 4);
-				scorm.debug(settings.suspend_data, 4);
-				return 'true';
+		if (isStarted) {
+			// Suspend data is a array of pages by ID
+			var i;
+			for (i = 0; i < settings.suspend_data.pages.length; i += 1) {
+				if (settings.suspend_data.pages[i].id === id) {
+					// Update Page data
+					settings.suspend_data.pages[i].data = data; // overwrite existing
+					scorm.debug(settings.prefix + ": Suspend Data Set", 4);
+					scorm.debug(settings.suspend_data, 4);
+					return 'true';
+				}
 			}
+			// new page push
+			settings.suspend_data.pages.push({'id': id, 'title': title, 'data': data});
+			scorm.debug(settings.prefix + ": Suspend Data set:", 4);
+			scorm.debug(settings.suspend_data, 4);
+			return 'true';
 		}
-		// new page push
-		settings.suspend_data.pages.push({'id': id, 'title': title, 'data': data});
-		scorm.debug(settings.prefix + ": Suspend Data set:", 4);
-		scorm.debug(settings.suspend_data, 4);
-		return 'true';
+		return notStartedYet();
 	};
 	/**
 	 * Get Suspend Data By Page ID
@@ -1003,14 +1044,17 @@ function SCOBot(options) {
 	 * @returns {Object} but false if empty.
 	 */
 	this.getSuspendDataByPageID = function (id) {
-		// Suspend data is a array of pages by ID
-		var i;
-		for (i = 0; i < settings.suspend_data.pages.length; i += 1) {
-			if (settings.suspend_data.pages[i].id === id) {
-				return settings.suspend_data.pages[i].data;
+		if (isStarted) {
+			// Suspend data is a array of pages by ID
+			var i;
+			for (i = 0; i < settings.suspend_data.pages.length; i += 1) {
+				if (settings.suspend_data.pages[i].id === id) {
+					return settings.suspend_data.pages[i].data;
+				}
 			}
+			return 'false';
 		}
-		return 'false';
+		return notStartedYet();
 	};
 	/**
 	 * Get Time From Start
@@ -1052,99 +1096,102 @@ function SCOBot(options) {
 	 * @returns {String} 'true' or 'false'
 	 */
 	this.setInteraction = function (data) {
-		var n,       // Reserved for the count within interactions.n
-			m,       // Reserved for the count within interactions.n.objectives.m
-			i,       // Reserved for objective loop
-			j,       // Reserved for correct responses loop
-			p,       // Reserved for the count within interactions.n.ncorrect_responses.p loop
-			p1 = 'cmi.interactions.', // Reduction of retyping
-			p2 = '',                  // Reduction of retyping
-			orig_timestamp = data.timestamp,
-			timestamp, // Reserved for converting the Timestamp
-			orig_latency = data.latency,
-			latency, // Reserved for doing the Timestamp to latency conversion (May not exist)
-			namespace, // Reserved for holding the cmi.interaction.n. name space to stop having to re-type it
-			result;  // Result of calling values against the SCORM API
-		if (!$.isPlainObject(data)) {
-			scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof (data) + " instead.", 1);
-			return 'false';
-		}
-		if (isBadValue(data.id)) {
-			// This is a show stopper, try to give them some bread crumb to locate the problem.
-			scorm.debug(settings.prefix + ": Developer, your passing a interaction without a ID\nSee question:\n" + data.description, 1);
-			return 'false';
-		}
-		//Time stuff will need to move after ID is added
-		if (typeof (data.timestamp) === "object") {
-			timestamp = scorm.isoDateToString(data.timestamp); // 2012-02-12T00:37:29 formatted
-		}
-		data.timestamp = timestamp;
-		if (typeof (data.latency) === "object") {
-			latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
-			data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
-		} else if (data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
-			// may want to force latency?
-			data.latency = new Date();
-			latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
-			data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
-		} // Else you won't record latency as the student didn't touch the question.
-		// Check for Interaction Mode
-		p2 = '_count';
-		if (settings.interaction_mode === "journaled") {
-			// Explicitly stating they want a history of interactions
-			n = scorm.getvalue(p1 + p2) === "-1" ? '0' : scorm.getvalue(p1 + p2); // we want to use cmi.interactions._count
-		} else {
-			// Default to state, which will update by id
-			n = scorm.getInteractionByID(data.id); // we want to update by interaction id
-			if (isBadValue(n)) {
-				n = scorm.getvalue(p1 + p2) === "-1" ? '0' : scorm.getvalue(p1 + p2);
+		if (isStarted) {
+			var n,       // Reserved for the count within interactions.n
+				m,       // Reserved for the count within interactions.n.objectives.m
+				i,       // Reserved for objective loop
+				j,       // Reserved for correct responses loop
+				p,       // Reserved for the count within interactions.n.ncorrect_responses.p loop
+				p1 = 'cmi.interactions.', // Reduction of retyping
+				p2 = '',                  // Reduction of retyping
+				orig_timestamp = data.timestamp,
+				timestamp, // Reserved for converting the Timestamp
+				orig_latency = data.latency,
+				latency, // Reserved for doing the Timestamp to latency conversion (May not exist)
+				namespace, // Reserved for holding the cmi.interaction.n. name space to stop having to re-type it
+				result;  // Result of calling values against the SCORM API
+			if (!$.isPlainObject(data)) {
+				scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof (data) + " instead.", 1);
+				return 'false';
 			}
-		}
-		/* 
-		 * We need to make several setvalues now against cmi.interactions.n.x
-		 * As stated by the standard, if we run into issues they will show in the log from the SCORM API.
-		 * I won't currently do anything at this point to handle them here, as I doubt there is little that could be done.
-		 */
-		p1 += n + "."; // Add n to part 1 str
-		result = scorm.setvalue(p1 + 'id', data.id);
-		result = scorm.setvalue(p1 + 'type', data.type);
-		// Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
-		// Either ignore value because its already added, or add it based on _count
-		// result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+".id", data.objectives[i].id);
-		p2 = 'objectives._count';
-		if (data.objectives !== undefined) {
-			for (i = 0; i < data.objectives.length; i += 1) {
-				// We need to find out if the objective is already added
-				m = scorm.getInteractionObjectiveByID(n, data.objectives[i].id); // will return 0 or the locator where it existed or false (not found)
-				if (m === 'false') {
-					m = scorm.getvalue(p1 + p2) === '-1' ? '0' : scorm.getvalue(p1 + p2);
+			if (isBadValue(data.id)) {
+				// This is a show stopper, try to give them some bread crumb to locate the problem.
+				scorm.debug(settings.prefix + ": Developer, your passing a interaction without a ID\nSee question:\n" + data.description, 1);
+				return 'false';
+			}
+			//Time stuff will need to move after ID is added
+			if (typeof (data.timestamp) === "object") {
+				timestamp = scorm.isoDateToString(data.timestamp); // 2012-02-12T00:37:29 formatted
+			}
+			data.timestamp = timestamp;
+			if (typeof (data.latency) === "object") {
+				latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
+				data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
+			} else if (data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
+				// may want to force latency?
+				data.latency = new Date();
+				latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
+				data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
+			} // Else you won't record latency as the student didn't touch the question.
+			// Check for Interaction Mode
+			p2 = '_count';
+			if (settings.interaction_mode === "journaled") {
+				// Explicitly stating they want a history of interactions
+				n = scorm.getvalue(p1 + p2) === "-1" ? '0' : scorm.getvalue(p1 + p2); // we want to use cmi.interactions._count
+			} else {
+				// Default to state, which will update by id
+				n = scorm.getInteractionByID(data.id); // we want to update by interaction id
+				if (isBadValue(n)) {
+					n = scorm.getvalue(p1 + p2) === "-1" ? '0' : scorm.getvalue(p1 + p2);
 				}
-				result = scorm.setvalue(p1 + 'objectives.' + m + '.id', data.objectives[i].id);
 			}
-		}
-		if (data.timestamp !== undefined) {
-			result = scorm.setvalue(p1 + 'timestamp', data.timestamp);
-		}
-		// Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type 
-		//result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
-		p2 = 'correct_responses._count';
-		if ($.isPlainObject(data.correct_responses)) {
-			for (j = 0; j < data.correct_responses.length; j += 1) {
-				p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
-				scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
-				if (p === 'false') {
-					p = scorm.getvalue(p1 + p2) === '-1' ? 0 : scorm.getvalue(p1 + p2);
-					scorm.debug(settings.prefix + ": p is now " + p, 4);
+			/* 
+			 * We need to make several setvalues now against cmi.interactions.n.x
+			 * As stated by the standard, if we run into issues they will show in the log from the SCORM API.
+			 * I won't currently do anything at this point to handle them here, as I doubt there is little that could be done.
+			 */
+			p1 += n + "."; // Add n to part 1 str
+			result = scorm.setvalue(p1 + 'id', data.id);
+			result = scorm.setvalue(p1 + 'type', data.type);
+			// Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
+			// Either ignore value because its already added, or add it based on _count
+			// result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+".id", data.objectives[i].id);
+			p2 = 'objectives._count';
+			if (data.objectives !== undefined) {
+				for (i = 0; i < data.objectives.length; i += 1) {
+					// We need to find out if the objective is already added
+					m = scorm.getInteractionObjectiveByID(n, data.objectives[i].id); // will return 0 or the locator where it existed or false (not found)
+					if (m === 'false') {
+						m = scorm.getvalue(p1 + p2) === '-1' ? '0' : scorm.getvalue(p1 + p2);
+					}
+					result = scorm.setvalue(p1 + 'objectives.' + m + '.id', data.objectives[i].id);
 				}
-				result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
 			}
+			if (data.timestamp !== undefined) {
+				result = scorm.setvalue(p1 + 'timestamp', data.timestamp);
+			}
+			// Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type 
+			//result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
+			p2 = 'correct_responses._count';
+			if ($.isPlainObject(data.correct_responses)) {
+				for (j = 0; j < data.correct_responses.length; j += 1) {
+					p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
+					scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
+					if (p === 'false') {
+						p = scorm.getvalue(p1 + p2) === '-1' ? 0 : scorm.getvalue(p1 + p2);
+						scorm.debug(settings.prefix + ": p is now " + p, 4);
+					}
+					result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
+				}
+			}
+			result = scorm.setvalue(p1 + 'weighting', data.weighting);
+			result = scorm.setvalue(p1 + 'learner_response', encodeInteractionType(data.type, data.learner_response)); // will need to format by interaction type
+			result = scorm.setvalue(p1 + 'result', data.result);
+			result = scorm.setvalue(p1 + 'latency', data.latency);
+			result = scorm.setvalue(p1 + 'description', data.description);
+			return result;
 		}
-		result = scorm.setvalue(p1 + 'weighting', data.weighting);
-		result = scorm.setvalue(p1 + 'learner_response', encodeInteractionType(data.type, data.learner_response)); // will need to format by interaction type
-		result = scorm.setvalue(p1 + 'result', data.result);
-		result = scorm.setvalue(p1 + 'latency', data.latency);
-		result = scorm.setvalue(p1 + 'description', data.description);
-		return result;
+		return notStartedYet();
 	};
 	/**
 	 * Get Interaction
@@ -1175,13 +1222,13 @@ function SCOBot(options) {
 	 * 'false'
 	 */
 	this.getInteraction = function (id) {
-		var n = 'false', // Interaction count
-			p1 = 'cmi.interactions.', // Reduction of typing
-			m = 0, // objectives count
-			p = 0, // correct_responses count
-			i = 0, // loop count
-			obj = {}; // Response object
 		if (isStarted) {
+			var n = 'false', // Interaction count
+				p1 = 'cmi.interactions.', // Reduction of typing
+				m = 0, // objectives count
+				p = 0, // correct_responses count
+				i = 0, // loop count
+				obj = {}; // Response object
 			n = scorm.getInteractionByID(id);
 			if (n === 'false') {
 				return n;
@@ -1193,6 +1240,7 @@ function SCOBot(options) {
 			m                     = scorm.getvalue(p1 + 'objectives._count');
 			obj.objectives        = [];
 			if (m !== 'false') {
+				m -= 1; // Subtract one since the _count is the next avail slot
 				for (i = 0; i < m; i += 1) {
 					obj.objectives.push({
 						id: scorm.getvalue(p1 + 'objectives.' + i + '.id')
@@ -1204,6 +1252,7 @@ function SCOBot(options) {
 			obj.correct_responses = [];
 			if (p !== 'false') {
 				// Loop thru and grab the patterns
+				p -= 1; // Subtract one since the count is the next available slot and it will result in a error.
 				for (i = 0; i < p; i += 1) {
 					obj.correct_responses.push({
 						pattern: decodeInteractionType(obj.type, scorm.getvalue(p1 + 'correct_responses.' + i + '.pattern'))
@@ -1255,57 +1304,60 @@ function SCOBot(options) {
 	 * @returns {String} 'true' or 'false'
 	 */
 	this.setObjective = function (data) {
-		var p1 = 'cmi.objectives.',
-			n = scorm.getObjectiveByID(data.id),
-			i = 0,
-			result = 'false';
-		if (isBadValue(n)) {
-			n = scorm.getvalue(p1 + '_count');
-			p1 += n + ".";
-			if ($.isPlainObject(data.score)) {
-				scorm.debug(settings.prefix + ": Setting Objective for the first time " + data.id + " " + data.description, 4);
-				result = scorm.setvalue(p1 + 'id', data.id.toString());
-				result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled.toString());
-				result = scorm.setvalue(p1 + 'score.raw', data.score.raw.toString());
-				result = scorm.setvalue(p1 + 'score.min', data.score.min.toString());
-				result = scorm.setvalue(p1 + 'score.max', data.score.max.toString());
-				result = scorm.setvalue(p1 + 'success_status', data.success_status);
-				result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
-				result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
-				result = scorm.setvalue(p1 + 'description', data.description);
+		if (isStarted) {
+			var p1 = 'cmi.objectives.',
+				n = scorm.getObjectiveByID(data.id),
+				i = 0,
+				result = 'false';
+			if (isBadValue(n)) {
+				n = scorm.getvalue(p1 + '_count');
+				p1 += n + ".";
+				if ($.isPlainObject(data.score)) {
+					scorm.debug(settings.prefix + ": Setting Objective for the first time " + data.id + " " + data.description, 4);
+					result = scorm.setvalue(p1 + 'id', data.id.toString());
+					result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled.toString());
+					result = scorm.setvalue(p1 + 'score.raw', data.score.raw.toString());
+					result = scorm.setvalue(p1 + 'score.min', data.score.min.toString());
+					result = scorm.setvalue(p1 + 'score.max', data.score.max.toString());
+					result = scorm.setvalue(p1 + 'success_status', data.success_status);
+					result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
+					result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
+					result = scorm.setvalue(p1 + 'description', data.description);
+				} else {
+					scorm.debug(settings.prefix + ": Developer, you didn't pass a score object!", 1);
+				}
 			} else {
-				scorm.debug(settings.prefix + ": Developer, you didn't pass a score object!", 1);
+				p1 += n + '.';
+				//scorm.setvalue(p1 + '.id', data.id); // shouldn't change this
+				if (!isBadValue(data.score.scaled)) {
+					result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled.toString());
+				}
+				if (!isBadValue(data.score.raw)) {
+					result = scorm.setvalue(p1 + 'score.raw', data.score.raw.toString());
+				}
+				if (!isBadValue(data.score.min)) {
+					result = scorm.setvalue(p1 + 'score.min', data.score.min.toString());
+				}
+				if (!isBadValue(data.score.max)) {
+					result = scorm.setvalue(p1 + 'score.max', data.score.max.toString());
+				}
+				if (!isBadValue(data.success_status)) {
+					result = scorm.setvalue(p1 + 'success_status', data.success_status);
+				}
+				if (!isBadValue(data.completion_status)) {
+					result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
+				}
+				if (!isBadValue(data.progress_measure)) {
+					result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
+				}
+				if (!isBadValue(data.description)) {
+					result = scorm.setvalue(p1 + 'description', data.description);
+				}
 			}
-		} else {
-			p1 += n + '.';
-			//scorm.setvalue(p1 + '.id', data.id); // shouldn't change this
-			if (!isBadValue(data.score.scaled)) {
-				result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled.toString());
-			}
-			if (!isBadValue(data.score.raw)) {
-				result = scorm.setvalue(p1 + 'score.raw', data.score.raw.toString());
-			}
-			if (!isBadValue(data.score.min)) {
-				result = scorm.setvalue(p1 + 'score.min', data.score.min.toString());
-			}
-			if (!isBadValue(data.score.max)) {
-				result = scorm.setvalue(p1 + 'score.max', data.score.max.toString());
-			}
-			if (!isBadValue(data.success_status)) {
-				result = scorm.setvalue(p1 + 'success_status', data.success_status);
-			}
-			if (!isBadValue(data.completion_status)) {
-				result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
-			}
-			if (!isBadValue(data.progress_measure)) {
-				result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
-			}
-			if (!isBadValue(data.description)) {
-				result = scorm.setvalue(p1 + 'description', data.description);
-			}
+			scorm.debug(settings.prefix + ": Progress\n" + JSON.stringify(checkProgress(), null, " "), 4);
+			return result;
 		}
-		scorm.debug(settings.prefix + ": Progress\n" + JSON.stringify(checkProgress(), null, " "), 4);
-		return result;
+		return notStartedYet();
 	};
 	/**
 	 * Get Objective
