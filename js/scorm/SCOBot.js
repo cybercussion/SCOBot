@@ -691,70 +691,73 @@ function SCOBot(options) {
 	 * TODO, this is still in progress
 	 */
 	function checkProgress() {
-		var response                 = {},
-			scoreRaw                 = 0,
-			scoreMax                 = 0,
-			scoreMin                 = 0,
-			scoreScaled              = 1,
-			progressMeasure          = 0,
-			completionStatus         = '',
-			totalObjectivesCompleted = 0,
-			totalKnownObjectives     = parseInt(scorm.getvalue('cmi.objectives._count'), 10),
-			totalKnownInteractions   = parseInt(scorm.getvalue('cmi.interactions._count'), 10),
-			i                        = 0,
-			count                    = 0;
-
-		if (settings.totalInteractions === 0 || settings.totalObjectives === 0) {
-			// This is a non-starter, if the SCO Player doesn't set these we are flying blind
-			scorm.debug(settings.prefix + ": Sorry, I cannot calculate Progress as the totalInteractions and or Objectives are zero", 2);
-			return 'false';
-		}
-		// Set Score Totals (raw, min, max) and count up totalObjectivesCompleted
-		count = parseInt(scorm.getvalue('cmi.objectives._count'), 10);
-		if (count > 0) {
-			count = parseInt(count, 10) - 1; // convert from string
-			for (i = count; i >= 0; i -= 1) {
-				// Count up totalObjectivesCompleted
-				//scoreMax += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.max'), 10); // should be un-used, might validate
-				//scoreMin += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.min'), 10); // should be un-used, might validate
-				scoreRaw += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.raw'), 10);
-				if (scorm.getvalue('cmi.objectives.' + i + '.completion_status') === 'completed') {
-					totalObjectivesCompleted += 1;
+		if(isStarted) {
+			var response                 = {},
+				scoreRaw                 = 0,
+				scoreMax                 = 0,
+				scoreMin                 = 0,
+				scoreScaled              = 1,
+				progressMeasure          = 0,
+				completionStatus         = '',
+				totalObjectivesCompleted = 0,
+				totalKnownObjectives     = parseInt(scorm.getvalue('cmi.objectives._count'), 10),
+				totalKnownInteractions   = parseInt(scorm.getvalue('cmi.interactions._count'), 10),
+				i                        = 0,
+				count                    = 0;
+	
+			if (settings.totalInteractions === 0 || settings.totalObjectives === 0) {
+				// This is a non-starter, if the SCO Player doesn't set these we are flying blind
+				scorm.debug(settings.prefix + ": Sorry, I cannot calculate Progress as the totalInteractions and or Objectives are zero", 2);
+				return 'false';
+			}
+			// Set Score Totals (raw, min, max) and count up totalObjectivesCompleted
+			count = parseInt(scorm.getvalue('cmi.objectives._count'), 10);
+			if (count > 0) {
+				count = parseInt(count, 10) - 1; // convert from string
+				for (i = count; i >= 0; i -= 1) {
+					// Count up totalObjectivesCompleted
+					//scoreMax += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.max'), 10); // should be un-used, might validate
+					//scoreMin += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.min'), 10); // should be un-used, might validate
+					scoreRaw += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.raw'), 10);
+					if (scorm.getvalue('cmi.objectives.' + i + '.completion_status') === 'completed') {
+						totalObjectivesCompleted += 1;
+					}
 				}
 			}
+			// Set Score Raw
+			scorm.setvalue('cmi.score.raw', scoreRaw.toString());
+			// Set Score Scaled
+			if ((settings.scoreMax - settings.scoreMin) === 0) {
+				// Division By Zero
+				scorm.debug(settings.prefix + ": Division by Zero for scoreMax - scoreMin " + settings.scoreMax, 4);
+				scorm.setvalue('cmi.score.scaled', scoreScaled);
+			} else {
+				scoreScaled = (scoreRaw - settings.scoreMin) / (settings.scoreMax - settings.scoreMin).toString();
+				scorm.setvalue('cmi.score.scaled', scoreScaled);
+			}
+			// Set Progress Measure
+			progressMeasure = (totalObjectivesCompleted / settings.totalObjectives).toString();
+			scorm.setvalue('cmi.progress_measure', progressMeasure);
+			// Set Completion Status
+			if (parseFloat(progressMeasure, 10) >= parseFloat(settings.completion_threshold, 10)) {
+				scorm.setvalue('cmi.completion_status', 'completed');
+			} else {
+				scorm.setvalue('cmi.completion_status', 'incomplete');
+			}
+			// Set Success Status
+			if (parseFloat(scoreScaled, 10) >= parseFloat(settings.scaled_passing_score, 10)) {
+				scorm.setvalue('cmi.success_status', 'passed');
+			} else {
+				scorm.setvalue('cmi.success_status', 'failed');
+			}
+			return {
+				score_scaled: scorm.getvalue('cmi.score.scaled'),
+				success_status: scorm.getvalue('cmi.success_status'),
+				progress_measure: scorm.getvalue('cmi.progress_measure'),
+				completion_status: scorm.getvalue('cmi.completion_status')
+			};
 		}
-		// Set Score Raw
-		scorm.setvalue('cmi.score.raw', scoreRaw.toString());
-		// Set Score Scaled
-		if ((settings.scoreMax - settings.scoreMin) === 0) {
-			// Division By Zero
-			scorm.debug(settings.prefix + ": Division by Zero for scoreMax - scoreMin " + settings.scoreMax, 4);
-			scorm.setvalue('cmi.score.scaled', scoreScaled);
-		} else {
-			scoreScaled = (scoreRaw - settings.scoreMin) / (settings.scoreMax - settings.scoreMin).toString();
-			scorm.setvalue('cmi.score.scaled', scoreScaled);
-		}
-		// Set Progress Measure
-		progressMeasure = (totalObjectivesCompleted / settings.totalObjectives).toString();
-		scorm.setvalue('cmi.progress_measure', progressMeasure);
-		// Set Completion Status
-		if (parseFloat(progressMeasure, 10) >= parseFloat(settings.completion_threshold, 10)) {
-			scorm.setvalue('cmi.completion_status', 'completed');
-		} else {
-			scorm.setvalue('cmi.completion_status', 'incomplete');
-		}
-		// Set Success Status
-		if (parseFloat(scoreScaled, 10) >= parseFloat(settings.scaled_passing_score, 10)) {
-			scorm.setvalue('cmi.success_status', 'passed');
-		} else {
-			scorm.setvalue('cmi.success_status', 'failed');
-		}
-		return {
-			score_scaled: scorm.getvalue('cmi.score.scaled'),
-			success_status: scorm.getvalue('cmi.success_status'),
-			progress_measure: scorm.getvalue('cmi.progress_measure'),
-			completion_status: scorm.getvalue('cmi.completion_status')
-		};
+		return notStartedYet();
 	}
 	/**
 	 * Get Comments From LMS
@@ -763,12 +766,12 @@ function SCOBot(options) {
 	 * @return {Object} or 'false'
 	 */
 	function getCommentsFromLMS() {
-		var p1       = "cmi.comments_from_lms.",
-			count    = scorm.getvalue(p1 + '_count'),
-			response = [],
-			obj      = {},
-			i        = 0;
 		if (isStarted) {
+			var p1       = "cmi.comments_from_lms.",
+				count    = scorm.getvalue(p1 + '_count'),
+				response = [],
+				obj      = {},
+				i        = 0;
 			if (!isBadValue(count)) {
 				return 'false';
 			}
@@ -1106,7 +1109,6 @@ function SCOBot(options) {
 				p2 = '',                  // Reduction of retyping
 				orig_timestamp = data.timestamp,
 				timestamp, // Reserved for converting the Timestamp
-				orig_latency = data.latency,
 				latency, // Reserved for doing the Timestamp to latency conversion (May not exist)
 				namespace, // Reserved for holding the cmi.interaction.n. name space to stop having to re-type it
 				result;  // Result of calling values against the SCORM API
@@ -1125,12 +1127,12 @@ function SCOBot(options) {
 			}
 			data.timestamp = timestamp;
 			if (typeof (data.latency) === "object") {
-				latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
+				latency        = (data.latency.getTime() - orig_timestamp.getTime()) / 1000;
 				data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
 			} else if (data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
 				// may want to force latency?
 				data.latency = new Date();
-				latency        = (orig_latency.getTime() - orig_timestamp.getTime()) / 1000;
+				latency        = (data.latency.getTime() - orig_timestamp.getTime()) / 1000;
 				data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
 			} // Else you won't record latency as the student didn't touch the question.
 			// Check for Interaction Mode
