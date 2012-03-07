@@ -691,7 +691,7 @@ function SCOBot(options) {
 	 * TODO, this is still in progress
 	 */
 	function checkProgress() {
-		if(isStarted) {
+		if (isStarted) {
 			var response                 = {},
 				scoreRaw                 = 0,
 				scoreMax                 = 0,
@@ -704,7 +704,6 @@ function SCOBot(options) {
 				totalKnownInteractions   = parseInt(scorm.getvalue('cmi.interactions._count'), 10),
 				i                        = 0,
 				count                    = 0;
-	
 			if (settings.totalInteractions === 0 || settings.totalObjectives === 0) {
 				// This is a non-starter, if the SCO Player doesn't set these we are flying blind
 				scorm.debug(settings.prefix + ": Sorry, I cannot calculate Progress as the totalInteractions and or Objectives are zero", 2);
