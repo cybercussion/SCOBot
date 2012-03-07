@@ -447,33 +447,32 @@ function Local_API_1484_11(options) {
 							return throwVocabError(key, v);
 						}
 						//scorm.debug(settings.prefix + ": Checking Interactions .... " + getObjLength(cmi.interactions), 4);
-						cmi.interactions._count = (getObjLength(cmi.interactions) - 2).toString(); // Why -2?  _count and _children						
+						cmi.interactions._count = (getObjLength(cmi.interactions) - 2).toString(); // Why -2?  _count and _children
 						// Check interactions.n.objectives._count
 						// This one is tricky because if a id is added at tier[3] this means the objective count needs to increase for this interaction.
 						// Interactions array values may not exist yet, which is why its important to build these out ahead of time.
 						// this should work (Subtract _count, and _children)
 						if (parseInt(tiers[2], 10) === "NaN") {
 							return 'false';
-						} else {
-							// Interactions uses objectives and correct_repsponses that need to be constructed.
-							if (cmi.interactions[tiers[2]] === undefined) {
-								cmi.interactions[tiers[2]] = {};
-							}
-							if (cmi.interactions[tiers[2]].objectives === undefined) {
-								// Setup Objectives for the first time
-								scorm.debug(settings.prefix + ": Constructing objectives object for new interaction", 4);
-								cmi.interactions[tiers[2]].objectives = {};
-								cmi.interactions[tiers[2]].objectives._count = "-1";
-								cmi.interactions[tiers[2]].objectives._children = "id,score,success_status,completion_status,description";
-							}
-							// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
-							if (cmi.interactions[tiers[2]].correct_responses === undefined) {
-								// Setup Objectives for the first time
-								scorm.debug(settings.prefix + ": Constructing correct responses object for new interaction", 4);
-								cmi.interactions[tiers[2]].correct_responses = {};
-								cmi.interactions[tiers[2]].correct_responses._count = "-1";
-								//cmi.interactions[tiers[2]].correct_responses._children = "pattern"; // scorm spec didn't include _children for pattern.
-							}
+						}
+						// Interactions uses objectives and correct_repsponses that need to be constructed.
+						if (cmi.interactions[tiers[2]] === undefined) {
+							cmi.interactions[tiers[2]] = {};
+						}
+						if (cmi.interactions[tiers[2]].objectives === undefined) {
+							// Setup Objectives for the first time
+							scorm.debug(settings.prefix + ": Constructing objectives object for new interaction", 4);
+							cmi.interactions[tiers[2]].objectives = {};
+							cmi.interactions[tiers[2]].objectives._count = "-1";
+							cmi.interactions[tiers[2]].objectives._children = "id,score,success_status,completion_status,description";
+						}
+						// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
+						if (cmi.interactions[tiers[2]].correct_responses === undefined) {
+							// Setup Objectives for the first time
+							scorm.debug(settings.prefix + ": Constructing correct responses object for new interaction", 4);
+							cmi.interactions[tiers[2]].correct_responses = {};
+							cmi.interactions[tiers[2]].correct_responses._count = "-1";
+							//cmi.interactions[tiers[2]].correct_responses._children = "pattern"; // scorm spec didn't include _children for pattern.
 						}
 						if (tiers[3] === 'objectives') {
 							// Validate
