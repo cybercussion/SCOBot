@@ -577,6 +577,7 @@ function SCORM_API(options) {
 				return String(v);
 			}
 			debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + "\nDiagnostic: " + getDiagnostic(ec), 1);
+			return 'false';
 		}
 		debug(settings.prefix + ": " + n + " Get Aborted, connection not initialized! " + API.isActive, 2);
 		return 'false';
