@@ -4,7 +4,7 @@ var scorm  = new SCORM_API({
 		throw_alerts: false,
 		time_type: 'GMT',
 		exit_type: 'suspend',
-		success_status: 'passed'
+		success_status: 'unknown'
 	}),
 	SB     = new SCOBot({
 		interaction_mode: 'state',
