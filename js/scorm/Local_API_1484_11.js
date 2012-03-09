@@ -342,6 +342,11 @@ function Local_API_1484_11(options) {
 		return false;
 	};
 	/*jslint nomen: true */
+	/**
+	 * Initialize Session (SCORM) only once!
+	 * @param name {String} Appears to be unused
+	 * @returns "true" or "false" depending on if its been initialized prior
+	 */
 	this.Initialize = function () {
 		scorm.debug(settings.prefix + ":  Initializing...", 3);
 		cmi = CMI;
@@ -405,8 +410,6 @@ function Local_API_1484_11(options) {
 			count = 0,
 			arr = [];
 		if (this.isRunning()) {
-			//eval(param + "=" + value +";");
-			//s = data;
 			if (isReadOnly(k)) {
 				scorm.debug(settings.prefix + ": This " + k + " is read only", 4);
 				settings.errorCode = 404;
@@ -539,7 +542,10 @@ function Local_API_1484_11(options) {
 		return "false";
 	};
 	/**
-	 * Commit
+	 * Commit (SCORM)
+	 * @param param {String}
+	 * Typically empty, I'm unaware of anyone ever passing anything.
+	 * @returns "true" or "false"
 	 */
 	this.Commit = function (v) {
 		scorm.debug(settings.prefix + ": Commit CMI Object:", 4);
@@ -568,7 +574,6 @@ function Local_API_1484_11(options) {
 			if (errors[nparam] !== undefined) {
 				return errors[nparam];
 			}
-			return "";
 		}
 		return "";
 	};
