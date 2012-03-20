@@ -1106,7 +1106,7 @@ function SCOBot(options) {
 				p,       // Reserved for the count within interactions.n.ncorrect_responses.p loop
 				p1 = 'cmi.interactions.', // Reduction of retyping
 				p2 = '',                  // Reduction of retyping
-				orig_timestamp = data.timestamp,
+				orig_timestamp = data.timestamp || scorm.isoStringToDate(scorm.getvalue(p1 + scorm.getInteractionByID(data.id) + '.timestamp')),
 				timestamp, // Reserved for converting the Timestamp
 				latency, // Reserved for doing the Timestamp to latency conversion (May not exist)
 				namespace, // Reserved for holding the cmi.interaction.n. name space to stop having to re-type it
@@ -1130,7 +1130,7 @@ function SCOBot(options) {
 				data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
 			} else if (data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
 				// may want to force latency?
-				data.latency = new Date();
+				data.latency   = new Date();
 				latency        = (data.latency.getTime() - orig_timestamp.getTime()) / 1000;
 				data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
 			} // Else you won't record latency as the student didn't touch the question.
@@ -1152,8 +1152,10 @@ function SCOBot(options) {
 			 * I won't currently do anything at this point to handle them here, as I doubt there is little that could be done.
 			 */
 			p1 += n + "."; // Add n to part 1 str
-			result = scorm.setvalue(p1 + 'id', data.id);
-			result = scorm.setvalue(p1 + 'type', data.type);
+			if (!isBadValue(data.id)) { result = scorm.setvalue(p1 + 'id', data.id); }
+			if (!isBadValue(data.type)) {
+				result = scorm.setvalue(p1 + 'type', data.type);
+			}
 			// Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
 			// Either ignore value because its already added, or add it based on _count
 			// result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+".id", data.objectives[i].id);
@@ -1185,11 +1187,11 @@ function SCOBot(options) {
 					result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
 				}
 			}
-			result = scorm.setvalue(p1 + 'weighting', data.weighting);
-			result = scorm.setvalue(p1 + 'learner_response', encodeInteractionType(data.type, data.learner_response)); // will need to format by interaction type
-			result = scorm.setvalue(p1 + 'result', data.result);
-			result = scorm.setvalue(p1 + 'latency', data.latency);
-			result = scorm.setvalue(p1 + 'description', data.description);
+			if (!isBadValue(data.weighting)) { result = scorm.setvalue(p1 + 'weighting', data.weighting); }
+			if (!isBadValue(data.learner_response)) { result = scorm.setvalue(p1 + 'learner_response', encodeInteractionType(data.type, data.learner_response)); } // will need to format by interaction type
+			if (!isBadValue(data.result)) { result = scorm.setvalue(p1 + 'result', data.result); }
+			if (!isBadValue(data.latency)) { result = scorm.setvalue(p1 + 'latency', data.latency); }
+			if (!isBadValue(data.description)) { result = scorm.setvalue(p1 + 'description', data.description); }
 			return result;
 		}
 		return notStartedYet();

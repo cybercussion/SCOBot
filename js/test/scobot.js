@@ -54,9 +54,9 @@ test("ISO 8601 Time", function() {
 	scorm.set("time_type", "GMT");
 	strictEqual(SB.isISO8601('2009-03-24T16:24:32.5+01:00'), true, 'Checking a GMT example 2009-03-24T16:24:32.5+01:00');
 	strictEqual(SB.isISO8601('2012-02-27T15:33:08.08:00'), false, 'Checking a GMT example 2012-02-27T15:33:08.08:00');
-	//strictEqual(scorm.isoStringToDate('2012-02-27T15:33:08'), 'February 27, 2012 - 3:33PM', "Checking ISO String back to date");
-	var date = scorm.isoStringToDate('2012-02-27T15:33:08.0-08:00');
-	strictEqual(String(date), 'Mon Feb 27 2012 15:33:08 GMT-0800 (PST)', 'Checking ISO8601 String to Date equals Mon Feb 27 2012 15:33:08 GMT-0800 (PST)');
+	//strictEqual(scorm.isoStringToDate('2012-03-20T10:47:54.0-07:00'), 'March 20, 2012 - 10:47PM', "Checking ISO String back to date");
+	var date = scorm.isoStringToDate('2012-03-20T10:47:54.0-07:00');
+	strictEqual(String(date), 'Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)', 'Checking ISO8601 String to Date equals - Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)');
 });
 test("Set Totals", function() {
 	strictEqual(SB.setTotals({
@@ -874,6 +874,12 @@ test("Interactions", function() {
 			latency: endTime,                                             // {Object} date end (optional)
 			description: "Just fill in some random decimal that looks like 10.5." // {String} question commonly
 		}), 'true', "Setting numeric Interaction 6");
+		//scorm.debug("I AM CHECKIN A SMALL SUBSET WITH A NEW LATENCY +++++++++++++++++++++++++++++++++", 4);
+		/*strictEqual(SB.setInteraction({
+			id: intID,                                                    // {String}
+			latency: endTime,                                             // {Object} date end (optional)
+			description: "Just fill in some random decimal that looks like 10.5." // {String} question commonly
+		}), 'true', "Setting numeric Interaction 6");*/
 		
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
