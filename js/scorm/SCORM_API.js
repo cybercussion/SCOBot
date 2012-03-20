@@ -100,7 +100,6 @@ function SCORM_API(options) {
 	settings.error = error; // Inherit
 	settings.startDate = {}; // Set on Success of Initialize aka "the start time"
 	// End Constructor ////////
-
 	// Private ////////////////
 	/**
 	 * No Console
@@ -117,7 +116,6 @@ function SCORM_API(options) {
 			'lvl': lvl
 		});
 	}
-
 	/**
 	 * Debug
 	 * Built-In Debug Functionality to output to console (Firebug, Inspector, Dev Tool etc ...)
@@ -298,6 +296,7 @@ function SCORM_API(options) {
 			d,
 			uoffset,
 			offset,
+			mil = 0,
 			dd;
 		switch (settings.time_type) {
 		case "UTC":
@@ -310,7 +309,9 @@ function SCORM_API(options) {
 		case "GMT":
 			d =  str.replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))([\+|\-]\d+:\d+)/, function ($0, $Year, $Month, $Day, $Hour, $Min, $Sec, $Ms, $Offset) {
 				offset = parseInt($Offset.substring(1, $Offset.length), 10) * 60 * 60 * 60;
+				mil = $Ms;
 				return MM[$Month - 1] + " " + $Day + ", " + $Year + " " + $Hour + ":" + $Min + ":" + $Sec;
+				//return $Year + "," + ($Month - 1) + "," + $Day + "," + $Hour + "," + $Min + "," + $Sec + "," + $Ms;
 			}
 				);
 			// At this point we have to convert the users offset to the recorded offset to set the date properly.
@@ -318,6 +319,7 @@ function SCORM_API(options) {
 			uoffset = dd.getTimezoneOffset() * 60 * 60;
 			if (uoffset !== offset) {
 				dd = new Date(dd.getTime() + offset + uoffset); // still need to validate this
+				dd.setMilliseconds(mil);
 			}
 			return dd;
 		default:
