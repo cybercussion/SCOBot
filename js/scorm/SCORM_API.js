@@ -674,6 +674,10 @@ function SCORM_API(options) {
 					API.data.completion_status = v;
 					// set local status
 					break;
+				case "cmi.success_status":
+					API.data.success_status = v;
+					// set local status
+					break;
 				case "cmi.exit":
 					API.data.exit_type = v;
 					// set local status
