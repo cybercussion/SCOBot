@@ -146,7 +146,8 @@ function SCOBot(options) {
 	 * @returns {Boolean} based on if this value has been set (true) or (false) if not
 	 */
 	function isPassed() {
-		if (scorm.get('success_status') !== "passed" && scorm.get('success_status') !== "failed") {
+		var success = scorm.getvalue('cmi.success_status');
+		if (success !== "passed" && success !== "failed") {
 			return false;
 		}
 		return true;
@@ -157,7 +158,8 @@ function SCOBot(options) {
 	 * May need to tighten this up later, its mostly for SCO's that default to finish and expect them to be complete.
 	 */
 	function verifyScoreScaled() {
-		if (scorm.get('success_status') === 'passed' && scorm.get('exit_type') === "finish") {
+		var success = scorm.getvalue('cmi.success_status');
+		if (success === 'passed' && scorm.get('exit_type') === "finish") {
 			if (scorm.getvalue('cmi.score.scaled') === 'false') {
 				if (scorm.getvalue('cmi.score.max') === '1') {
 					scorm.setvalue('cmi.score.scaled', '1');
@@ -786,6 +788,26 @@ function SCOBot(options) {
 			return response;
 		}
 		return notStartedYet();
+	}
+	/**
+	 * Update Status
+	 * Rolled up success/completion status functionality
+	 */
+	function updateStatus() {
+		verifyScoreScaled();
+		if (!isPassed()) {
+			scorm.setvalue('cmi.success_status', 'unknown');
+		}
+		// Default success status
+		if(scorm.get("success_status") === 'passed') {
+			scorm.setvalue('cmi.success_status', 'passed');
+		}
+		if (scorm.getvalue('cmi.completion_status') !== "completed") {
+			scorm.setvalue('cmi.completion_status', 'incomplete'); //? May not want to do this
+		}
+		if(scorm.get("completion_status") === "completed") {
+			scorm.setvalue('cmi.completion_status', 'completed'); //? May not want to do this
+		}
 	}
 	// End Private ////////////
 	///////////////////////////
@@ -1429,14 +1451,8 @@ function SCOBot(options) {
 		if (isStarted) {
 			setSuspendData();
 			scorm.debug(settings.prefix + ": I am suspending...", 3);
-			if (!isPassed()) {
-				scorm.setvalue('cmi.success_status', 'unknown');
-			}
-			verifyScoreScaled();
 			scorm.setvalue('cmi.exit', 'suspend');
-			if (scorm.get('completion_status') !== "completed") {
-				scorm.setvalue('cmi.completion_status', 'incomplete'); //? May not want to do this
-			}
+			updateStatus();
 			isStarted = false;
 			return scorm.terminate();
 		}
@@ -1451,14 +1467,8 @@ function SCOBot(options) {
 		if (isStarted) {
 			setSuspendData();
 			scorm.debug(settings.prefix + ": I am finishing...", 3);
-			if (!isPassed()) {
-				scorm.setvalue('cmi.success_status', settings.success_status);
-			}
-			verifyScoreScaled();
 			scorm.setvalue('cmi.exit', 'normal');
-			if (scorm.get('completion_status') !== "completed") {
-				scorm.setvalue('cmi.completion_status', 'incomplete'); //? May not want to do this
-			}
+			updateStatus();
 			// This is completed per this call.
 			isStarted = false;
 			return scorm.terminate();
@@ -1474,12 +1484,8 @@ function SCOBot(options) {
 		if (isStarted) {
 			setSuspendData();
 			scorm.debug(settings.prefix + ": I am timing out...", 3);
-			if (!isPassed()) {
-				scorm.setvalue('cmi.success_status', settings.success_status);
-			}
-			verifyScoreScaled();
 			scorm.setvalue('cmi.exit', 'timeout');
-			scorm.setvalue('cmi.completion_status', 'completed'); //? May not want to do this
+			updateStatus();
 			// This is completed per this call.
 			isStarted = false;
 			return scorm.terminate();
