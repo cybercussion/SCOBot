@@ -799,13 +799,15 @@ function SCOBot(options) {
 			scorm.setvalue('cmi.success_status', 'unknown');
 		}
 		// Default success status
-		if(scorm.get("success_status") === 'passed') {
+		if (scorm.get("success_status") === 'passed') {
 			scorm.setvalue('cmi.success_status', 'passed');
 		}
+		// Ensure if its not completed its incomplete
 		if (scorm.getvalue('cmi.completion_status') !== "completed") {
 			scorm.setvalue('cmi.completion_status', 'incomplete'); //? May not want to do this
 		}
-		if(scorm.get("completion_status") === "completed") {
+		// Default to completed if its the default status
+		if (scorm.get("completion_status") === "completed") {
 			scorm.setvalue('cmi.completion_status', 'completed'); //? May not want to do this
 		}
 	}
@@ -947,7 +949,7 @@ function SCOBot(options) {
 			}
 			if (!isBadValue(data.scoreMax)) {
 				settings.scoreMax = data.scoreMax;
-				scorm.setvalue('cmi.score.max', data.scoreMin.toString());
+				scorm.setvalue('cmi.score.max', data.scoreMax.toString());
 			}
 			return 'true';
 		}
