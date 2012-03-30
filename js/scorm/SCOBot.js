@@ -730,10 +730,11 @@ function SCOBot(options) {
 			// Set Score Scaled
 			if ((settings.scoreMax - settings.scoreMin) === 0) {
 				// Division By Zero
-				scorm.debug(settings.prefix + ": Division by Zero for scoreMax - scoreMin " + settings.scoreMax, 4);
+				scorm.debug(settings.prefix + ": Division by Zero for scoreMax - scoreMin " + settings.scoreMax, 2);
 				scorm.setvalue('cmi.score.scaled', scoreScaled);
 			} else {
 				scoreScaled = (scoreRaw - settings.scoreMin) / (settings.scoreMax - settings.scoreMin).toString();
+				scorm.debug(settings.prefix + ": Score Scaled = " + scoreScaled, 3);
 				scorm.setvalue('cmi.score.scaled', scoreScaled);
 			}
 			// Set Progress Measure
