@@ -229,7 +229,7 @@ test("initialize", function() {
 				if(objectiveIndex === 'false') { // its new (you may be coming from a prior session)
 					objectiveIndex = '0';
 					strictEqual(setvalue('cmi.objectives.' + objectiveIndex + '.id', '0_1_1'), 'true', 'Setting cmi.objectives.' + objectiveIndex + '.id');
-					objectiveIndex = scorm.getObjectiveByID('0_1_1'); // you must keep your index up
+					//objectiveIndex = scorm.getObjectiveByID('0_1_1'); // you must keep your index up
 				}
 				
 				strictEqual(setvalue('cmi.objectives.' + objectiveIndex + '.score.scaled', '0'), 'true', 'Setting cmi.objectives.' + objectiveIndex + '.score.scaled');
