@@ -258,7 +258,6 @@ function SCOBot(options) {
 	 * @param type {String} Expects true-false, choice, fill-in, long-fill-in, matching, performance, sequencing, likert, numeric, other
 	 * @param value {Mixed} May take Array or Object of arrays depending
 	 * @returns {String} formatted value for interaction type
-	 * TODO
 	 */
 	function encodeInteractionType(type, value) {
 		var str = '',
@@ -489,7 +488,6 @@ function SCOBot(options) {
 	 * @param type {String} Expects true-false, choice, fill-in, long-fill-in, matching, performance, sequencing, likert, numeric, other
 	 * @param value {String} SCORM 2004 Format for Interaction learner response, or pattern
 	 * @returns {Mixed} formatted value for interaction type
-	 * TODO
 	 */
 	function decodeInteractionType(type, value) {
 		var i = 0,
@@ -690,7 +688,6 @@ function SCOBot(options) {
 	 *	progress_measure  = '0',
 	 *	completion_status = 'incomplete'
 	 * }
-	 * TODO, this is still in progress
 	 */
 	function checkProgress() {
 		if (isStarted) {
