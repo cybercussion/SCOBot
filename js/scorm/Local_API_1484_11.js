@@ -485,7 +485,8 @@ function Local_API_1484_11(options) {
 							cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 1).toString(); // Why -1?  _count and _children
 						}
 						if (tiers[3] === 'correct_responses') {
-							cmi.interactions[tiers[2]].correct_responses._count = (getObjLength(cmi.interactions[tiers[2]].correct_responses)).toString(); // Why -1?  _count
+							scorm.debug("Setting correct responses count to " + (getObjLength(cmi.interactions[tiers[2]].correct_responses)).toString());
+							cmi.interactions[tiers[2]].correct_responses._count = (getObjLength(cmi.interactions[tiers[2]].correct_responses)).toString();
 						}
 						break;
 					case "objectives":

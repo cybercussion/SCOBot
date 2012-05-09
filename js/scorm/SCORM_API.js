@@ -710,8 +710,6 @@ function SCORM_API(options) {
 	/**
 	 * Commit (SCORM Call)
 	 * Commits the Data to the Server via the LMS API.  SCORM Time done by default.
-	 * @param n {String} CMI Object Path as String
-	 * @param v {String} Value
 	 * @returns {String} 'true' or 'false'
 	 */
 	this.commit = function () {
