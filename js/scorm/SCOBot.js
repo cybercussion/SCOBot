@@ -184,7 +184,7 @@ function SCOBot(options) {
 	 * These can often result in UTF-8 and other encoding issues and may result in errors.
 	 */
 	function cleanseData(str) {
-		var cleanseExp =  /[^\f\r\n\t\v\0\s\S\w\W\d\D\b\B\cX\xhh\uhhh]/gi; ///(\f\r\n\t\v\0[/b]\s\S\w\W\d\D\b\B\cX\xhh\uhhh)/;
+		var cleanseExp = /[^\f\r\n\t\v\0\s\S\w\W\d\D\b\\B\\cX\\xhh\\uhhh]/gi; ///(\f\r\n\t\v\0[/b]\s\S\w\W\d\D\b\B\cX\xhh\uhhh)/;
 		return str.replace(cleanseExp, '');
 	}
 	/**
@@ -1201,7 +1201,7 @@ function SCOBot(options) {
 			// Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type 
 			//result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
 			p2 = 'correct_responses._count';
-			if ($.isPlainObject(data.correct_responses)) {
+			if ($.isArray(data.correct_responses)) {
 				for (j = 0; j < data.correct_responses.length; j += 1) {
 					p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
 					scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
@@ -1211,6 +1211,8 @@ function SCOBot(options) {
 					}
 					result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
 				}
+			} else {
+				scorm.debug(settings.prefix + "Something went wrong with Correct Responses", 1);
 			}
 			if (!isBadValue(data.weighting)) { result = scorm.setvalue(p1 + 'weighting', data.weighting); }
 			if (!isBadValue(data.learner_response)) { result = scorm.setvalue(p1 + 'learner_response', encodeInteractionType(data.type, data.learner_response)); } // will need to format by interaction type
@@ -1268,7 +1270,7 @@ function SCOBot(options) {
 			m                     = scorm.getvalue(p1 + 'objectives._count');
 			obj.objectives        = [];
 			if (m !== 'false') {
-				m -= 1; // Subtract one since the _count is the next avail slot
+				//m -= 1; // Subtract one since the _count is the next avail slot
 				for (i = 0; i < m; i += 1) {
 					obj.objectives.push({
 						id: scorm.getvalue(p1 + 'objectives.' + i + '.id')
@@ -1280,7 +1282,7 @@ function SCOBot(options) {
 			obj.correct_responses = [];
 			if (p !== 'false') {
 				// Loop thru and grab the patterns
-				p -= 1; // Subtract one since the count is the next available slot and it will result in a error.
+				//p -= 1; // Subtract one since the count is the next available slot and it will result in a error.
 				for (i = 0; i < p; i += 1) {
 					obj.correct_responses.push({
 						pattern: decodeInteractionType(obj.type, scorm.getvalue(p1 + 'correct_responses.' + i + '.pattern'))

@@ -891,15 +891,41 @@ test("Interactions", function() {
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.result'), 'correct', 'Verifying cmi.interactions.'+n+'.result is correct');
 		strictEqual(scorm.getvalue('cmi.interactions.'+n+'.latency'), 'PT5M', 'Verifying cmi.interactions.'+n+'.latency is PT5M');
 		// End Performance Interaction
-	} else {
-		// Verify Interactions??
-	}
+	} 
+	scorm.debug('>>>>>> Verify Interaction Block <<<<<<<');
+	var interaction = SB.getInteraction('1'); // True False
+	scorm.debug(interaction);
+	strictEqual(interaction.id, '1', 'Verify Interaction ID 1');
+	strictEqual(interaction.type, 'true-false', 'Verify Interaction Type true-false');
+	strictEqual(interaction.objectives[0].id, '1_1', 'Verify Interaction Objectives 1_1');
+	strictEqual(interaction.correct_responses[0].pattern, 'true', 'Verify Interaction Correct Responses true');
+	strictEqual(interaction.weighting, '1', 'Verify Interaction weighting 1');
+	strictEqual(interaction.learner_response, 'true', 'Verify Interaction learner response true');
+	strictEqual(interaction.result, 'correct', 'Verify Interaction result correct');
+	strictEqual(interaction.description, 'This is the question?', 'Verify Interaction description "This is the question?"');
 	
+	interaction = SB.getInteraction('2'); // Choice
+	scorm.debug(interaction);
+	strictEqual(interaction.id, '2', 'Verify Interaction ID 2');
+	strictEqual(interaction.type, 'choice', 'Verify Interaction Type choice');
+	strictEqual(interaction.objectives[0].id, '2_1', 'Verify Interaction Objectives 2_1');
+	scorm.debug("Response pattern");
+	scorm.debug(interaction.correct_responses[0].pattern);
+	deepEqual(interaction.correct_responses[0].pattern, ["a", "b"], 'Verify Interaction Correct Responses [a,b]');
+	strictEqual(interaction.weighting, '1', 'Verify Interaction weighting 1');
+	deepEqual(interaction.learner_response, ["a", "c"], 'Verify Interaction learner response [a,c]');
+	strictEqual(interaction.result, 'incorrect', 'Verify Interaction result incorrect');
+	strictEqual(interaction.description, 'Which choices would <b>you</b> pick?', 'Verify Interaction description "Which choices would <b>you</b> pick?"');
+	
+	scorm.debug('>>>>>>>>> End Interaction Verification <<<<<<<<<<');
 });
 
-test("Get Interaction By ID", function() {
-	var interaction = SB.getInteraction('1'); // True False
+/*test("Get Interaction By ID", function() {
+	// Verify Interaction 1
+	
 
+	// End
+	// Verify Interaction 2
 	interaction = SB.getInteraction('2'); // Multiple Choice
 
 	interaction = SB.getInteraction('3'); // Fill In
@@ -916,7 +942,7 @@ test("Get Interaction By ID", function() {
 	
 	strictEqual(SB.getInteraction('999'), 'false', "Getting bogus interaction, should be false");
 
-});
+});*/
 
 test("Update Objective By ID", function() {
 	if(SB.getEntry() !== "resume") {
