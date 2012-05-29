@@ -1010,7 +1010,7 @@ function SCORM_API(options) {
 			settings[n] = v;
 			break;
 		}
-		return !(isError !== 0);
+		return (isError !== 0);
 	};
 	/**
 	 * Get (Internal API)

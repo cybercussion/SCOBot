@@ -298,7 +298,7 @@ function Local_API_1484_11(options) {
 	 */
 	function roundVal(v) {
 		var dec = 2;
-		return  Math.round(v * Math.pow(10, dec)) / Math.pow(10, dec);
+		return Math.round(v * Math.pow(10, dec)) / Math.pow(10, dec);
 	}
 	/** 
 	 * Get Object Length
