@@ -96,7 +96,7 @@ test("Bookmarking", function() {
 
 test("Objectives", function() {
 	if(SB.getEntry() !== "resume") {
-		scorm.debug("Setting Objectives...", 4);
+		scorm.debug(">>>>>>>>> Setting Objective(s) <<<<<<<<<");
 		// For True False
 		strictEqual(SB.setObjective({
 			id: '1_1',                                                   // {String}
@@ -237,7 +237,7 @@ test("Objectives", function() {
 			progress_measure: '0',
 			description: 'They will answer a numeric interaction'
 		}), 'true', "Setting Objective Numeric 8_1 unscored");
-		
+		scorm.debug(">>>>>>>>> End Setting Objective(s) <<<<<<<<<");
 		// Verify These 
 		var objective = SB.getObjective('1_1');
 		strictEqual(objective.id, "1_1", "Verify Objective id is 1_1");
@@ -917,6 +917,8 @@ test("Interactions", function() {
 	strictEqual(interaction.result, 'incorrect', 'Verify Interaction result incorrect');
 	strictEqual(interaction.description, 'Which choices would <b>you</b> pick?', 'Verify Interaction description "Which choices would <b>you</b> pick?"');
 	
+	// TODO Write rest of tests...
+	
 	scorm.debug('>>>>>>>>> End Interaction Verification <<<<<<<<<<');
 });
 
@@ -945,6 +947,7 @@ test("Interactions", function() {
 });*/
 
 test("Update Objective By ID", function() {
+	scorm.debug(">>>>>>>>> Updating Objective(s) <<<<<<<<<");
 	if(SB.getEntry() !== "resume") {
 		// For True False
 		strictEqual(SB.setObjective({
@@ -963,6 +966,7 @@ test("Update Objective By ID", function() {
 	} else {
 		// Do something else?
 	}
+	scorm.debug(">>>>>>>>> End Updating Objective(s) <<<<<<<<<");
 });
 
 test("Set Suspend Data By Page ID", function() {
