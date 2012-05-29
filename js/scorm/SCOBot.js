@@ -147,10 +147,7 @@ function SCOBot(options) {
 	 */
 	function isPassed() {
 		var success = scorm.getvalue('cmi.success_status');
-		if (success !== "passed" && success !== "failed") {
-			return false;
-		}
-		return true;
+		return !(success !== "passed" && success !== "failed");
 	}
 	/**
 	 * Verify cmi score scaled
@@ -173,10 +170,7 @@ function SCOBot(options) {
 	 * @returns {Boolean} true if its bad. 
 	 */
 	function isBadValue(v) {
-		if (badValues.indexOf('|' + v + '|') >= 0) {
-			return true;
-		}
-		return false;
+		return badValues.indexOf('|' + v + '|') >= 0;
 	}
 	/**
 	 * Cleanse Data
@@ -1518,7 +1512,7 @@ function SCOBot(options) {
 			settings[n] = v;
 			break;
 		}
-		return (isError !== 0) ? false : true;
+		return (isError === 0);
 	};
 	/**
 	 * Get 

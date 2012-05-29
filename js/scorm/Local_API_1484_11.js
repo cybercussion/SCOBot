@@ -276,10 +276,7 @@ function Local_API_1484_11(options) {
 		if (tiers[1] === "comments_from_lms") {// entirely read only
 			return true;
 		}
-		if (read_only.indexOf('|' + v + '|') >= 0) {
-			return true;
-		}
-		return false;
+		return read_only.indexOf('|' + v + '|') >= 0;
 	}
 	/**
 	 * Is Write Only?
@@ -291,10 +288,7 @@ function Local_API_1484_11(options) {
 	function isWriteOnly(key) {
 		var tiers = key.split("."),
 			v = tiers[tiers.length - 1]; // last value
-		if (write_only.indexOf('|' + v + '|') >= 0) {
-			return true;
-		}
-		return false;
+		return write_only.indexOf('|' + v + '|') >= 0;
 	}
 	/**
 	 * Round Value
@@ -303,9 +297,8 @@ function Local_API_1484_11(options) {
 	 * @returns {Number}
 	 */
 	function roundVal(v) {
-		var dec = 2,
-			result = Math.round(v * Math.pow(10, dec)) / Math.pow(10, dec);
-		return result;
+		var dec = 2;
+		return  Math.round(v * Math.pow(10, dec)) / Math.pow(10, dec);
 	}
 	/** 
 	 * Get Object Length
@@ -336,10 +329,7 @@ function Local_API_1484_11(options) {
 	 * @returns true or false
 	 */
 	this.isRunning = function () {
-		if (settings.initialized === 1 && settings.terminated === 0) {
-			return true;
-		}
-		return false;
+		return settings.initialized === 1 && settings.terminated === 0;
 	};
 	/*jslint nomen: true */
 	/**
