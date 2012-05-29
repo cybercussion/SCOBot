@@ -1,5 +1,6 @@
 SCORM_API
-Hi, 
+Hi,
+I've added Wiki documentation now, so you can read more about the API support in detail.
 I've kept this project split up into 3 logical portions, leaving room for anyone to add or subtract from the complete package. The main focal point would be 'js/scorm/', as the surrounding files are simply supporting files like JQuery, QUnit, and further README files.
 The portions of this project is split into the following sections:
 
@@ -28,6 +29,7 @@ qunit_SCOBot.html - This will run thru a series of rolled up common functionalit
 
 Further Reading:
 There are additional HTML based 'read me' files I've written up over the months I worked on this.  I based much the work on the fact that it's been many many years since SCORM 2004, and JavaScript has come quite a ways since those days.  Getting this into JSLint, QUnit and some more structured code made good solid sense to me.  Since this is on peoples radar in such a broad audience its extremely difficult to speak in API terms to someone that wants to just record some information, and has no idea where in the spec to put it.  I understand when building e-learning content you are often faced with teams of people that don't fully grasp or aren't working in the realm of SCORM.  Terms won't always line up, and the sequence doesn't always match up.  You may run out of space within a few areas due to character limits.  These things cause architectual directional changes and can create problems when your close to deploying.  So I'd highly recommend getting more reading online in if you're new to this.
+Diagram (from Brandon Bradley) - http://www.xmind.net/share/brandonbradley/xmind-421310/
 
 What else do you need?
 You'll need to have a presentation layer that supports navigation (if you have more than one page).  This has typically been accomplished in HTML or Flash.  You'll need to integrate it with your navigation if you implement Bookmarking (cmi.location).  If you have assessments or quizes and you want to report there interactions and objectives you can use SCOBot to pass data objects that will record or retrieve these for you.  Similarly if you want to suspend data that doesn't fit into a interaction or a objective you can store objects of data that will be submitted as JSON Strings to the LMS, then on resume, will turn them back into Native objects in JavaScript.  This is all organized by Page right now, so if you do something differnet, you'll have to add your own API's.  You may want to consider adding a couple buttons like Save and or Submit.  You could also consider commiting your data between pages incase your worried about a student losing there session.
@@ -50,3 +52,10 @@ I've worked on a variety of e-learning projects since 2001.  I've utilized sever
 At this point, now that I have the core foundation down, I'll be turning my attention to the SCOBOT portion so this is more easily consumable to entry and mid level developers or first time e-learner developers.  Don't feel too horrible if your coming in new to this.  It took years to really consume it.  So much focus is on the content, rarely we get a chance to geek out on what makes a student pass/fail, and all the information thats needed to make that happen.  Course when I finish SCORM 20XX will be out.
 
 Thanks for taking the time to take a look.
+
+Special Thanks to:
+Brandon Bradly - Research, Feedback, Diagrams, Editing/Reviewing, Glyph Bomb (Qunit test)
+Darren Mason - Bug catching, Implementation Feedback
+Tero Potila - Implementation Feedback
+SCORM Cloud - For having somewhere to sanity check
+Claude Oystn - Documenting, explaining and supporting tools/examples
