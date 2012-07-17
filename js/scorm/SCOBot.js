@@ -1428,6 +1428,20 @@ function SCOBot(options) {
 		return notStartedYet();
 	};
 	/**
+	 * Happy Ending
+	 * This will auto-score the student to passed, completed, and scored
+	 * @return {String}
+	 */
+	this.happyEnding = function() {
+		if(isStarted) {
+			scorm.setvalue('cmi.score.scaled', '1');
+			scorm.setvalue('cmi.score.raw', '1');
+			scorm.setvalue('cmi.success_status', 'passed');
+			return scorm.setvalue('cmi.completion_status', 'completed');
+		}
+		return notStartedYet();
+	}
+	/**
 	 * Commit
 	 * This will commit the data stored at the LMS Level to the backend.  Please use sparingly.
 	 * @returns {String} 'true' or 'false'
