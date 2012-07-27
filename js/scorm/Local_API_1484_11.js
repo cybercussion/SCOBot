@@ -2,12 +2,12 @@
 /*jslint devel: true, browser: true, nomen: true */
 /**
  * Local API_1484_11
- * Mimic's LMS Connectivity in Local Mode i.e. standalone functionality
+ * Mimics LMS Connectivity in Local Mode i.e. standalone functionality
  *
  * https://github.com/cybercussion/SCORM_API
  * @author Mark Statkus <mark@cybercussion.com>
  * @requires JQuery
- * @param options {Object} overwride default values
+ * @param options {Object} override default values
  * @constructor
  *
  * The MIT License
@@ -334,7 +334,6 @@ function Local_API_1484_11(options) {
 	/*jslint nomen: true */
 	/**
 	 * Initialize Session (SCORM) only once!
-	 * @param name {String} Appears to be unused
 	 * @returns "true" or "false" depending on if its been initialized prior
 	 */
 	this.Initialize = function () {
@@ -383,7 +382,7 @@ function Local_API_1484_11(options) {
 	/**
 	 * SetValue (SCORM)
 	 * @param key {String}
-	 * @param value {String]
+	 * @param value {String}
 	 * @returns "true" or "" depending on if its been initialized prior
 	 */
 	this.SetValue = function (key, value) {
@@ -393,9 +392,6 @@ function Local_API_1484_11(options) {
 			tiers = [],
 			k = key.toString(),   // ensure string
 			v = value.toString(), // ensure string
-			obj,
-			ka,
-			i = 0,
 			z = 0,
 			count = 0,
 			arr = [];
@@ -534,11 +530,10 @@ function Local_API_1484_11(options) {
 	};
 	/**
 	 * Commit (SCORM)
-	 * @param param {String}
 	 * Typically empty, I'm unaware of anyone ever passing anything.
 	 * @returns "true" or "false"
 	 */
-	this.Commit = function (v) {
+	this.Commit = function () {
 		scorm.debug(settings.prefix + ": Commit CMI Object:", 4);
 		scorm.debug(cmi);
 		scorm.debug(settings.prefix + ": Suspend Data Usage " + suspendDataUsageStatistic());
@@ -570,7 +565,6 @@ function Local_API_1484_11(options) {
 	};
 	/**
 	 * GetLastError (SCORM) - Returns the error number from the last error
-	 * @param param number
 	 * @returns number
 	 */
 	this.GetLastError = function () {
