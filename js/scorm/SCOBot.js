@@ -16,7 +16,7 @@
  * https://github.com/cybercussion/SCORM_API
  * @author Mark Statkus <mark@cybercussion.com>
  * @requires scorm, JQuery
- * @param options {Object} overwride default values
+ * @param options {Object} override default values
  * @constructor
  *
  * The MIT License
@@ -42,7 +42,7 @@
 function SCOBot(options) {
 	// Constructor ////////////
 	"use strict";
-	/** @default version, createDate, modifiedDatimete, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
+	/** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
 	var defaults = {
 			version: "1.0",
 			createDate: "04/07/2011 09:33AM",
