@@ -710,7 +710,7 @@ function SCOBot(options) {
 					// Count up totalObjectivesCompleted
 					//scoreMax += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.max'), 10); // should be un-used, might validate
 					//scoreMin += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.min'), 10); // should be un-used, might validate
-					scoreRaw += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.raw'), 10);
+					scoreRaw += parseFloat(scorm.getvalue('cmi.objectives.' + i + '.score.raw'));
 					if (scorm.getvalue('cmi.objectives.' + i + '.completion_status') === 'completed') {
 						totalObjectivesCompleted += 1;
 					}
@@ -1440,7 +1440,7 @@ function SCOBot(options) {
 			return scorm.setvalue('cmi.completion_status', 'completed');
 		}
 		return notStartedYet();
-	}
+	};
 	/**
 	 * Commit
 	 * This will commit the data stored at the LMS Level to the backend.  Please use sparingly.
