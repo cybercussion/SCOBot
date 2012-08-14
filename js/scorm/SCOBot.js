@@ -710,7 +710,7 @@ function SCOBot(options) {
 					// Count up totalObjectivesCompleted
 					//scoreMax += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.max'), 10); // should be un-used, might validate
 					//scoreMin += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.min'), 10); // should be un-used, might validate
-					scoreRaw += parseFloat(scorm.getvalue('cmi.objectives.' + i + '.score.raw'));
+					scoreRaw += parseFloat(scorm.getvalue('cmi.objectives.' + i + '.score.raw')); // Whoops, said Int instead of Float.  Updated 8/14
 					if (scorm.getvalue('cmi.objectives.' + i + '.completion_status') === 'completed') {
 						totalObjectivesCompleted += 1;
 					}
