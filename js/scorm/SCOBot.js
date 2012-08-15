@@ -221,6 +221,17 @@ function SCOBot(options) {
 		var d = new Date();
 		return d.getTime() + (Date.remoteOffset || 0);
 	}
+
+	/**
+	 * True Round
+	 * May consider using this to fit within real(10,7) scoring in the event the decimal goes over 7 digits
+	 * @param v {Number} value
+	 * @param dec {Number} decimal places
+	 * @return {Number}
+	 */
+	function trueRound(v, dec) {
+		return (Math.round((v * Math.power(10,dec)).toFixed(dec-1)) / Math.power(10, dec)).toFixed(dec);
+	}
 	/**
 	 * Find Response Type (May not use this)
 	 * This is designed to check for {case_matters: true/false}, {order_matters: true/false} or {lang: x}
