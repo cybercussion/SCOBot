@@ -739,7 +739,7 @@ function SCOBot(options) {
 			}
 			// Set Progress Measure
 			progressMeasure = (totalObjectivesCompleted / settings.totalObjectives).toString();
-			scorm.setvalue('cmi.progress_measure', progressMeasure);
+			scorm.setvalue('cmi.progress_measure', trueRound(progressMeasure, 7));
 			// Set Completion Status
 			if (parseFloat(progressMeasure, 10) >= parseFloat(settings.completion_threshold, 10)) {
 				scorm.setvalue('cmi.completion_status', 'completed');
@@ -1351,7 +1351,7 @@ function SCOBot(options) {
 					result = scorm.setvalue(p1 + 'score.max', trueRound(data.score.max, 7).toString());
 					result = scorm.setvalue(p1 + 'success_status', data.success_status);
 					result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
-					result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
+					result = scorm.setvalue(p1 + 'progress_measure', trueRound(data.progress_measure, 7).toString());
 					result = scorm.setvalue(p1 + 'description', data.description);
 				} else {
 					scorm.debug(settings.prefix + ": Developer, you didn't pass a score object!", 1);
@@ -1378,7 +1378,7 @@ function SCOBot(options) {
 					result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
 				}
 				if (!isBadValue(data.progress_measure)) {
-					result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
+					result = scorm.setvalue(p1 + 'progress_measure', trueRound(data.progress_measure, 7));
 				}
 				if (!isBadValue(data.description)) {
 					result = scorm.setvalue(p1 + 'description', data.description);
