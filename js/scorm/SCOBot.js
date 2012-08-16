@@ -73,8 +73,6 @@ function SCOBot(options) {
 		badValues    = '|null|undefined|false|| |',
 		error        = scorm.get('error'), // no sense retyping this
 		self         = this; // Hook
-
-
 	// End Constructor ////////
 	///////////////////////////
 	// Private ////////////////
@@ -221,7 +219,6 @@ function SCOBot(options) {
 		var d = new Date();
 		return d.getTime() + (Date.remoteOffset || 0);
 	}
-
 	/**
 	 * True Round
 	 * May consider using this to fit within real(10,7) scoring in the event the decimal goes over 7 digits
@@ -230,7 +227,8 @@ function SCOBot(options) {
 	 * @return {Number}
 	 */
 	function trueRound(v, dec) {
-		return (Math.round((v * Math.power(10,dec)).toFixed(dec-1)) / Math.power(10, dec)).toFixed(dec);
+		var num = parseFloat(v); // ensure number
+		return parseFloat(num.toPrecision(dec));
 	}
 	/**
 	 * Find Response Type (May not use this)
@@ -737,7 +735,7 @@ function SCOBot(options) {
 			} else {
 				scoreScaled = (scoreRaw - settings.scoreMin) / (settings.scoreMax - settings.scoreMin).toString();
 				scorm.debug(settings.prefix + ": Score Scaled = " + scoreScaled, 3);
-				scorm.setvalue('cmi.score.scaled', scoreScaled);
+				scorm.setvalue('cmi.score.scaled', trueRound(scoreScaled, 7));
 			}
 			// Set Progress Measure
 			progressMeasure = (totalObjectivesCompleted / settings.totalObjectives).toString();
@@ -947,11 +945,11 @@ function SCOBot(options) {
 				settings.totalObjectives  = data.totalObjectives;
 			}
 			if (!isBadValue(data.scoreMin)) {
-				settings.scoreMin = data.scoreMin;
+				settings.scoreMin = trueRound(data.scoreMin, 7);
 				scorm.setvalue('cmi.score.min', data.scoreMin.toString());
 			}
 			if (!isBadValue(data.scoreMax)) {
-				settings.scoreMax = data.scoreMax;
+				settings.scoreMax = trueRound(data.scoreMax, 7);
 				scorm.setvalue('cmi.score.max', data.scoreMax.toString());
 			}
 			return 'true';
@@ -1347,10 +1345,10 @@ function SCOBot(options) {
 				if ($.isPlainObject(data.score)) {
 					scorm.debug(settings.prefix + ": Setting Objective for the first time " + data.id + " " + data.description, 4);
 					result = scorm.setvalue(p1 + 'id', data.id.toString());
-					result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled.toString());
-					result = scorm.setvalue(p1 + 'score.raw', data.score.raw.toString());
-					result = scorm.setvalue(p1 + 'score.min', data.score.min.toString());
-					result = scorm.setvalue(p1 + 'score.max', data.score.max.toString());
+					result = scorm.setvalue(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString());
+					result = scorm.setvalue(p1 + 'score.raw', trueRound(data.score.raw, 7).toString());
+					result = scorm.setvalue(p1 + 'score.min', trueRound(data.score.min, 7).toString());
+					result = scorm.setvalue(p1 + 'score.max', trueRound(data.score.max, 7).toString());
 					result = scorm.setvalue(p1 + 'success_status', data.success_status);
 					result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
 					result = scorm.setvalue(p1 + 'progress_measure', data.progress_measure);
@@ -1362,16 +1360,16 @@ function SCOBot(options) {
 				p1 += n + '.';
 				//scorm.setvalue(p1 + '.id', data.id); // shouldn't change this
 				if (!isBadValue(data.score.scaled)) {
-					result = scorm.setvalue(p1 + 'score.scaled', data.score.scaled.toString());
+					result = scorm.setvalue(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString());
 				}
 				if (!isBadValue(data.score.raw)) {
-					result = scorm.setvalue(p1 + 'score.raw', data.score.raw.toString());
+					result = scorm.setvalue(p1 + 'score.raw', trueRound(data.score.raw, 7).toString());
 				}
 				if (!isBadValue(data.score.min)) {
-					result = scorm.setvalue(p1 + 'score.min', data.score.min.toString());
+					result = scorm.setvalue(p1 + 'score.min', trueRound(data.score.min, 7).toString());
 				}
 				if (!isBadValue(data.score.max)) {
-					result = scorm.setvalue(p1 + 'score.max', data.score.max.toString());
+					result = scorm.setvalue(p1 + 'score.max', trueRound(data.score.max, 7).toString());
 				}
 				if (!isBadValue(data.success_status)) {
 					result = scorm.setvalue(p1 + 'success_status', data.success_status);
