@@ -63,7 +63,7 @@ test("Set Totals", function() {
 		totalInteractions: '10',
 		totalObjectives: '10',
 		scoreMin: '0',
-		scoreMax: '10'
+		scoreMax: '16.083'
 	}), 'true', 'Setting SCO totals');
 	// Based on Entry we may be able to tell if we've been ran before.
 	scorm.debug("I am setting totals right now!", 4);
@@ -104,7 +104,7 @@ test("Objectives", function() {
 				scaled: '0',                                             // {String}
 				raw: '0',                                                // {String}
 				min: '0',                                                // {String}
-				max: '1'                                                 // {String}
+				max: '1.5'                                               // {String}
 			},
 			success_status: 'unknown',                                   // {String} passed, failed, unknown
 			completion_status: 'not attempted',                          // {String} completed, incomplete, not attempted
@@ -118,7 +118,7 @@ test("Objectives", function() {
 				scaled: '0',
 				raw: '0',
 				min: '0',
-				max: '1'
+				max: '2'
 			},
 			success_status: 'unknown',
 			completion_status: 'not attempted',
@@ -132,7 +132,7 @@ test("Objectives", function() {
 				scaled: '0',
 				raw: '0',
 				min: '0',
-				max: '1'
+				max: '5.25'
 			},
 			success_status: 'unknown',
 			completion_status: 'not attempted',
@@ -146,7 +146,7 @@ test("Objectives", function() {
 				scaled: '0',
 				raw: '0',
 				min: '0',
-				max: '1'
+				max: '1.333'
 			},
 			success_status: 'unknown',
 			completion_status: 'not attempted',
@@ -244,7 +244,7 @@ test("Objectives", function() {
 		strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
 		strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
 		strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
-		strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+		strictEqual(objective.score.max, "1.5", "Verify Objective score max is 1.5");
 		strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
 		strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
 		strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
@@ -255,7 +255,7 @@ test("Objectives", function() {
 		strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
 		strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
 		strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
-		strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+		strictEqual(objective.score.max, "2", "Verify Objective score max is 2");
 		strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
 		strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
 		strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
@@ -266,7 +266,7 @@ test("Objectives", function() {
 		strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
 		strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
 		strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
-		strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+		strictEqual(objective.score.max, "5.25", "Verify Objective score max is 5.25");
 		strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
 		strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
 		strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
@@ -277,7 +277,7 @@ test("Objectives", function() {
 		strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
 		strictEqual(objective.score.raw, "0", "Verify Objective score raw is 0");
 		strictEqual(objective.score.min, "0", "Verify Objective score min is 0");
-		strictEqual(objective.score.max, "1", "Verify Objective score max is 1");
+		strictEqual(objective.score.max, "1.333", "Verify Objective score max is 1.333");
 		strictEqual(objective.success_status, "unknown", "Verify Objective success_status is unknown");
 		strictEqual(objective.completion_status, "not attempted", "Verify Objective completion_status is not attempted");
 		strictEqual(objective.progress_measure, "0", "Verify Objective progress_measure is 0");
@@ -954,14 +954,66 @@ test("Update Objective By ID", function() {
 			id: '1_1',                                                   // {String}
 			score: {                                                     // {Object}
 				scaled: '1',                                             // {String}
-				raw: '1',                                                // {String}
-				min: '0',                                                // {String}
-				max: '1'                                                 // {String}
+				raw: '1.5'                                               // {String}
 			},
 			success_status: 'passed',                                    // {String} passed, failed, unknown
 			completion_status: 'completed',                              // {String} completed, incomplete, not attempted
-			progress_measure: '1',                                       // {String}
-			description: 'They will answer a true false interaction'     // {String}
+			progress_measure: '1'                                        // {String}
+		}), 'true', "Setting Objective True False 1_1 unscored");
+		// For True False
+		strictEqual(SB.setObjective({
+			id: '2_1',                                                   // {String}
+			score: {                                                     // {Object}
+				scaled: '1',                                             // {String}
+				raw: '2'                                                 // {String}
+			},
+			success_status: 'passed',                                    // {String} passed, failed, unknown
+			completion_status: 'completed',                              // {String} completed, incomplete, not attempted
+			progress_measure: '1'                                        // {String}
+		}), 'true', "Setting Objective True False 1_1 unscored");
+		// For True False
+		strictEqual(SB.setObjective({
+			id: '3_1',                                                   // {String}
+			score: {                                                     // {Object}
+				scaled: '1',                                             // {String}
+				raw: '5.25'                                              // {String}
+			},
+			success_status: 'passed',                                    // {String} passed, failed, unknown
+			completion_status: 'completed',                              // {String} completed, incomplete, not attempted
+			progress_measure: '1'                                        // {String}
+		}), 'true', "Setting Objective True False 1_1 unscored");
+		// For True False
+		strictEqual(SB.setObjective({
+			id: '4_1',                                                   // {String}
+			score: {                                                     // {Object}
+				scaled: '1',                                             // {String}
+				raw: '1.333'                                             // {String}
+			},
+			success_status: 'passed',                                    // {String} passed, failed, unknown
+			completion_status: 'completed',                              // {String} completed, incomplete, not attempted
+			progress_measure: '1'                                       // {String}
+		}), 'true', "Setting Objective True False 1_1 unscored");
+		// For True False
+		strictEqual(SB.setObjective({
+			id: '5_1',                                                   // {String}
+			score: {                                                     // {Object}
+				scaled: '1',                                             // {String}
+				raw: '1'                                             // {String}
+			},
+			success_status: 'passed',                                    // {String} passed, failed, unknown
+			completion_status: 'completed',                              // {String} completed, incomplete, not attempted
+			progress_measure: '1'                                       // {String}
+		}), 'true', "Setting Objective True False 1_1 unscored");
+		// For True False
+		strictEqual(SB.setObjective({
+			id: '6_1',                                                   // {String}
+			score: {                                                     // {Object}
+				scaled: '1',                                             // {String}
+				raw: '1'                                             // {String}
+			},
+			success_status: 'passed',                                    // {String} passed, failed, unknown
+			completion_status: 'completed',                              // {String} completed, incomplete, not attempted
+			progress_measure: '1'                                       // {String}
 		}), 'true', "Setting Objective True False 1_1 unscored");
 	} else {
 		// Do something else?
