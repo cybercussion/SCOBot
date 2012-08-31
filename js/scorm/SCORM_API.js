@@ -611,87 +611,97 @@ function SCORM_API(options) {
 			// Handy if you don't want to go thru all your content calls...
 			switch (API.version) {
 			case "1.2":
-				switch (n) {
-				case "cmi.location":
-					if (v.length > 255) {
-						debug(settings.prefix + ": Warning, your bookmark is over the limit!!", 2);
+				if (lms.LMSGetValue('cmi.core.lesson_mode') === "normal") {
+					switch (n) {
+					case "cmi.location":
+						if (v.length > 255) {
+							debug(settings.prefix + ": Warning, your bookmark is over the limit!!", 2);
+						}
+						nn = "cmi.core.lesson_location";
+						break;
+					case "cmi.completion_threshold":
+						// unsupported
+						ig = true;
+						break;
+					case "cmi.mode":
+						nn = "cmi.core.lesson_mode";
+						break;
+					case "cmi.exit":
+						nn = "cmi.core.exit";
+						API.exit_type = v;
+						break;
+					case "cmi.score.raw":
+						nn = "cmi.core.score.raw";
+						break;
+					case "cmi.score.min":
+						nn = "cmi.core.score.min";
+						break;
+					case "cmi.score.max":
+						nn = "cmi.core.score.max";
+						break;
+					case "cmi.success_status":
+					case "cmi.completion_status":
+						nn = "cmi.core.lesson_status";
+						API.data.completion_status = v;
+						// set local status
+						break;
+					case "cmi.session_time":
+						nn = "cmi.core.session_time";
+						break;
+					// Possibly need more here, review further later.
+					case "cmi.suspend_data":
+						if (v.length > 4096) {
+							debug(settings.prefix + ": Warning, your suspend data is over the limit!!", 2);
+						}
+						nn = n;
+						break;
+					default:
+						nn = n;
+						break;
 					}
-					nn = "cmi.core.lesson_location";
-					break;
-				case "cmi.completion_threshold":
-					// unsupported
-					ig = true;
-					break;
-				case "cmi.mode":
-					nn = "cmi.core.lesson_mode";
-					break;
-				case "cmi.exit":
-					nn = "cmi.core.exit";
-					API.exit_type = v;
-					break;
-				case "cmi.score.raw":
-					nn = "cmi.core.score.raw";
-					break;
-				case "cmi.score.min":
-					nn = "cmi.core.score.min";
-					break;
-				case "cmi.score.max":
-					nn = "cmi.core.score.max";
-					break;
-				case "cmi.success_status":
-				case "cmi.completion_status":
-					nn = "cmi.core.lesson_status";
-					API.data.completion_status = v;
-					// set local status
-					break;
-				case "cmi.session_time":
-					nn = "cmi.core.session_time";
-					break;
-				// Possibly need more here, review further later.
-				case "cmi.suspend_data":
-					if (v.length > 4096) {
-						debug(settings.prefix + ": Warning, your suspend data is over the limit!!", 2);
+					if (ig) {
+						return 'false';
 					}
-					nn = n;
-					break;
-				default:
-					nn = n;
-					break;
-				}
-				if (ig) {
+					s = lms.LMSSetValue(nn, v); //makeBoolean(lms.LMSSetValue(nn, v));
+				} else {
+					debug(settings.prefix + ": Warning, you are not in normal mode.  Ignoring 'set' requests.", 2);
 					return 'false';
 				}
-				s = lms.LMSSetValue(nn, v); //makeBoolean(lms.LMSSetValue(nn, v));
 				break;
 			case "2004":
-				switch (n) {
-				case "cmi.location":
-					if (v.length > 1000) {
-						debug(settings.prefix + ": Warning, your bookmark is over the limit!!", 2);
+				if (lms.GetValue('cmi.mode') === "normal") {
+					switch (n) {
+					case "cmi.location":
+						if (v.length > 1000) {
+							debug(settings.prefix + ": Warning, your bookmark is over the limit!!", 2);
+						}
+						break;
+					case "cmi.completion_status":
+						API.data.completion_status = v;
+						// set local status
+						break;
+					case "cmi.success_status":
+						API.data.success_status = v;
+						// set local status
+						break;
+					case "cmi.exit":
+						API.data.exit_type = v;
+						// set local status
+						break;
+					case "suspend_data":
+						if (v.length > 64000) {
+							debug(settings.prefix + ": Warning, your suspend data is over the limit!!", 2);
+						}
+						break;
+					default:
+						// any other handling?
+						break;
 					}
-					break;
-				case "cmi.completion_status":
-					API.data.completion_status = v;
-					// set local status
-					break;
-				case "cmi.success_status":
-					API.data.success_status = v;
-					// set local status
-					break;
-				case "cmi.exit":
-					API.data.exit_type = v;
-					// set local status
-					break;
-				case "suspend_data":
-					if (v.length > 64000) {
-						debug(settings.prefix + ": Warning, your suspend data is over the limit!!", 2);
-					}
-					break;
-				default:
-					// any other handling?
-					break;
+					s = lms.SetValue(n, v); //makeBoolean(lms.SetValue(n, v));
+				} else {
+					debug(settings.prefix + ": Warning, you are not in normal mode.  Ignoring 'set' requests.", 2);
+					return 'false';
 				}
-				s = lms.SetValue(n, v); //makeBoolean(lms.SetValue(n, v));
 				break;
 			default:
 				// handle non-LMS?
