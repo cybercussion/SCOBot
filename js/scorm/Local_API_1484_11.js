@@ -76,7 +76,7 @@ function Local_API_1484_11(options) {
 			},
 			location : "",
 			max_time_allowed : "",
-			mode : "normal",
+			mode : "browse",
 			objectives : {
 				_children : "id,score,success_status,completion_status,description",
 				_count : "0"
