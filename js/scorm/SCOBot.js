@@ -696,6 +696,7 @@ function SCOBot(options) {
 		if (isStarted) {
 			var response                 = {},
 				scoreRaw                 = 0,
+				tmpRaw                   = 0,
 				scoreMax                 = 0,
 				scoreMin                 = 0,
 				scoreScaled              = 1,
@@ -713,27 +714,34 @@ function SCOBot(options) {
 			}
 			// Set Score Totals (raw, min, max) and count up totalObjectivesCompleted
 			count = parseInt(scorm.getvalue('cmi.objectives._count'), 10);
+			scorm.debug(settings.prefix + " Count is " + count);
 			if (count > 0) {
-				count = parseInt(count, 10) - 1; // convert from string
+				count = count - 1; //subtract 1 (max count)
 				for (i = count; i >= 0; i -= 1) {
 					// Count up totalObjectivesCompleted
 					//scoreMax += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.max'), 10); // should be un-used, might validate
 					//scoreMin += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.min'), 10); // should be un-used, might validate
-					scoreRaw += parseFloat(scorm.getvalue('cmi.objectives.' + i + '.score.raw')); // Whoops, said Int instead of Float.  Updated 8/14
+					tmpRaw = parseFloat(scorm.getvalue('cmi.objectives.' + i + '.score.raw'));
+					scorm.debug('Score Raw: ' + tmpRaw);
+					if (!isNaN(tmpRaw)) {
+						scoreRaw += parseFloat(tmpRaw); // Whoops, said Int instead of Float.  Updated 8/14
+					} else {
+						scorm.debug(settings.prefix + " We got a NaN converting objectives." + i + ".score.raw", 2);
+					}
 					if (scorm.getvalue('cmi.objectives.' + i + '.completion_status') === 'completed') {
 						totalObjectivesCompleted += 1;
 					}
 				}
 			}
 			// Set Score Raw
-			scorm.setvalue('cmi.score.raw', scoreRaw.toString());
+			scorm.debug(settings.prefix + "Setting score " + scorm.setvalue('cmi.score.raw', scoreRaw.toString()));
 			// Set Score Scaled
 			if ((settings.scoreMax - settings.scoreMin) === 0) {
 				// Division By Zero
 				scorm.debug(settings.prefix + ": Division by Zero for scoreMax - scoreMin " + settings.scoreMax, 2);
 				scorm.setvalue('cmi.score.scaled', scoreScaled);
 			} else {
-				scoreScaled = (scoreRaw - settings.scoreMin) / (settings.scoreMax - settings.scoreMin).toString();
+				scoreScaled = ((scoreRaw - settings.scoreMin) / (settings.scoreMax - settings.scoreMin)).toString();
 				scorm.debug(settings.prefix + ": Score Scaled = " + scoreScaled, 3);
 				scorm.setvalue('cmi.score.scaled', trueRound(scoreScaled, 7));
 			}
@@ -1339,11 +1347,13 @@ function SCOBot(options) {
 				n = scorm.getObjectiveByID(data.id),
 				i = 0,
 				result = 'false';
+			scorm.debug(settings.prefix + ": Setting Objective at " + n + " (This may be false)");
 			if (isBadValue(n)) {
 				n = scorm.getvalue(p1 + '_count');
+				scorm.debug(settings.prefix + ": Objective " + data.id + " was not found.  Adding new at " + n + " " + data.description);
 				p1 += n + ".";
 				if ($.isPlainObject(data.score)) {
-					scorm.debug(settings.prefix + ": Setting Objective for the first time " + data.id + " " + data.description, 4);
+					//scorm.debug(settings.prefix + ": Setting Objective for the first time @ " + n + " " + data.id + " " + data.description, 4);
 					result = scorm.setvalue(p1 + 'id', data.id.toString());
 					result = scorm.setvalue(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString());
 					result = scorm.setvalue(p1 + 'score.raw', trueRound(data.score.raw, 7).toString());

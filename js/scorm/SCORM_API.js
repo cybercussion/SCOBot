@@ -711,8 +711,10 @@ function SCORM_API(options) {
 			// Ensure Error Codes not critical
 			if (ec === 0 || ec === 403) {
 				return s;
+			} else {
+				debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + " for " + n + "\nDiagnostic: " + getDiagnostic(ec), 1);
+				return s;
 			}
-			debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + " for " + n + "\nDiagnostic: " + getDiagnostic(ec), 1);
 		}
 		debug(settings.prefix + ": " + n + " Set Aborted, connection not initialized! Locate where you called it after you Terminated.", 2);
 		return 'false';
@@ -793,7 +795,7 @@ function SCORM_API(options) {
 						break;
 					default:
 						if (API.data.completion_status === '') {
-							triggerException("LMS compatiblity issue, Please notify a administrator.  Completion Status is empty.");
+							triggerException("LMS compatibility issue, Please notify a administrator.  Completion Status is empty.");
 						}
 						break;
 					}
