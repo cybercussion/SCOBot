@@ -86,6 +86,7 @@ function SCORM_API(options) {
 		API = {
 			connection : false,
 			version : "none", // 2004, 1.2 or none
+			mode: "",
 			path : false, // Set Path to LMS API or maybe something local later by default?
 			data : {// Defaults, I'm moving a few of the SCORM defaults into this data object, they will be maintained here thereafter.
 				completion_status : settings.completion_status,
@@ -611,7 +612,8 @@ function SCORM_API(options) {
 			// Handy if you don't want to go thru all your content calls...
 			switch (API.version) {
 			case "1.2":
-				if (lms.LMSGetValue('cmi.core.lesson_mode') === "normal") {
+				API.mode = API.mode === "" ? lms.LMSGetValue('cmi.core.lesson_mode') : API.mode;
+				if (API.mode === "normal") {
 					switch (n) {
 					case "cmi.location":
 						if (v.length > 255) {
@@ -669,7 +671,8 @@ function SCORM_API(options) {
 				}
 				break;
 			case "2004":
-				if (lms.GetValue('cmi.mode') === "normal") {
+				API.mode = API.mode === "" ? lms.GetValue('cmi.mode') : API.mode;
+				if (API.mode === "normal") {
 					switch (n) {
 					case "cmi.location":
 						if (v.length > 1000) {
