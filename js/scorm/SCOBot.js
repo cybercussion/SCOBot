@@ -1451,8 +1451,8 @@ function SCOBot(options) {
 	 * This will auto-score the student to passed, completed, and scored
 	 * @return {String}
 	 */
-	this.happyEnding = function() {
-		if(isStarted) {
+	this.happyEnding = function () {
+		if (isStarted) {
 			scorm.setvalue('cmi.score.scaled', '1');
 			scorm.setvalue('cmi.score.raw', '1');
 			scorm.setvalue('cmi.success_status', 'passed');
