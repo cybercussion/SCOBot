@@ -1210,6 +1210,7 @@ function SCOBot(options) {
 			//result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
 			p2 = 'correct_responses._count';
 			if ($.isArray(data.correct_responses)) {
+				// !! Important, some only support 1 correct response pattern (likert, other) !!
 				for (j = 0; j < data.correct_responses.length; j += 1) {
 					p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
 					scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
@@ -1220,7 +1221,7 @@ function SCOBot(options) {
 					result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
 				}
 			} else {
-				scorm.debug(settings.prefix + "Something went wrong with Correct Responses", 1);
+				scorm.debug(settings.prefix + "Something went wrong with Correct Responses, it wasn't an Array.", 1);
 			}
 			if (!isBadValue(data.weighting)) { result = scorm.setvalue(p1 + 'weighting', data.weighting); }
 			if (!isBadValue(data.learner_response)) { result = scorm.setvalue(p1 + 'learner_response', encodeInteractionType(data.type, data.learner_response)); } // will need to format by interaction type
