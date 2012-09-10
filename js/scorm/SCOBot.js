@@ -1347,29 +1347,24 @@ function SCOBot(options) {
 			var p1 = 'cmi.objectives.',
 				n = scorm.getObjectiveByID(data.id),
 				i = 0,
-				result = 'false';
+				result = 'false',
+				f = false;
 			scorm.debug(settings.prefix + ": Setting Objective at " + n + " (This may be false)");
-			if (isBadValue(n)) {
+			if (isBadValue(n)) { // First Run
 				n = scorm.getvalue(p1 + '_count');
 				scorm.debug(settings.prefix + ": Objective " + data.id + " was not found.  Adding new at " + n + " " + data.description);
-				p1 += n + ".";
-				if ($.isPlainObject(data.score)) {
-					//scorm.debug(settings.prefix + ": Setting Objective for the first time @ " + n + " " + data.id + " " + data.description, 4);
-					result = scorm.setvalue(p1 + 'id', data.id.toString());
-					result = scorm.setvalue(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString());
-					result = scorm.setvalue(p1 + 'score.raw', trueRound(data.score.raw, 7).toString());
-					result = scorm.setvalue(p1 + 'score.min', trueRound(data.score.min, 7).toString());
-					result = scorm.setvalue(p1 + 'score.max', trueRound(data.score.max, 7).toString());
-					result = scorm.setvalue(p1 + 'success_status', data.success_status);
-					result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
-					result = scorm.setvalue(p1 + 'progress_measure', trueRound(data.progress_measure, 7).toString());
-					result = scorm.setvalue(p1 + 'description', data.description);
-				} else {
-					scorm.debug(settings.prefix + ": Developer, you didn't pass a score object!", 1);
+				f = true;
+			}
+			p1 += n + '.';
+			if (f) {
+				if (!isBadValue(data.id)) {
+					scorm.setvalue(p1 + 'id', data.id.toString());
+				} else { // Show stopper
+					scorm.debug(settings.prefix + ": You did not pass an objective ID!!", 1);
+					return 'false';
 				}
-			} else {
-				p1 += n + '.';
-				//scorm.setvalue(p1 + '.id', data.id); // shouldn't change this
+			}
+			if ($.isPlainObject(data.score)) {
 				if (!isBadValue(data.score.scaled)) {
 					result = scorm.setvalue(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString());
 				}
@@ -1382,18 +1377,20 @@ function SCOBot(options) {
 				if (!isBadValue(data.score.max)) {
 					result = scorm.setvalue(p1 + 'score.max', trueRound(data.score.max, 7).toString());
 				}
-				if (!isBadValue(data.success_status)) {
-					result = scorm.setvalue(p1 + 'success_status', data.success_status);
-				}
-				if (!isBadValue(data.completion_status)) {
-					result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
-				}
-				if (!isBadValue(data.progress_measure)) {
-					result = scorm.setvalue(p1 + 'progress_measure', trueRound(data.progress_measure, 7));
-				}
-				if (!isBadValue(data.description)) {
-					result = scorm.setvalue(p1 + 'description', data.description);
-				}
+			} else {
+				scorm.debug(settings.prefix + ": Did not receive a score object.  May or may not be an issue.", 4);
+			}
+			if (!isBadValue(data.success_status)) {
+				result = scorm.setvalue(p1 + 'success_status', data.success_status);
+			}
+			if (!isBadValue(data.completion_status)) {
+				result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
+			}
+			if (!isBadValue(data.progress_measure)) {
+				result = scorm.setvalue(p1 + 'progress_measure', trueRound(data.progress_measure, 7));
+			}
+			if (!isBadValue(data.description)) {
+				result = scorm.setvalue(p1 + 'description', data.description);
 			}
 			scorm.debug(settings.prefix + ": Progress\n" + JSON.stringify(checkProgress(), null, " "), 4);
 			return result;
