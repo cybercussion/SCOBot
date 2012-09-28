@@ -18,7 +18,10 @@
  * @requires scorm, JQuery
  * @param options {Object} override default values
  * @constructor
- *
+ */
+ /*!
+ * SCOBot
+ * Copyright (c) 2011-2012 Mark Statkus <mark@cybercussion.com>
  * The MIT License
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -865,7 +868,7 @@ function SCOBot(options) {
 			settings.mode                 = scorm.getvalue('cmi.mode'); // normal, browse, review
 			/*
 			 * Entry is interesting.  You may or may not be able to rely on it. If the LMS sets it you'd
-			 * be able identify if this is the first time (ab-intio), or if your resuming.  This would let you know if 
+			 * be able identify if this is the first time (ab-intio), or if your resuming.  This would let you know if
 			 * there was even a bookmark, suspend data to even fetch.  Else, you may have to plug at it anyway.
 			 * So is it really worth it to bother with this?
 			 */
