@@ -9,7 +9,10 @@
  * @requires JQuery
  * @param options {Object} override default values
  * @constructor
- *
+ */
+/*!
+ * Local_API_1484_11
+ * Copyright (c) 2011-2012 Mark Statkus <mark@cybercussion.com>
  * The MIT License
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
