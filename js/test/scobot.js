@@ -96,19 +96,32 @@ test("Bookmarking", function () {
 		}
 	}
 });
+
+test("Max Time Allowed", function() {
+	var max_time_allowed = scorm.getvalue('cmi.max_time_allowed');
+	strictEqual(max_time_allowed, '', "Checking max time allowed ('')");
+	// Note, if you update the CAM to pass imsss:attemptAbsoluteDurationLimit please update this test!
+});
+
 test("Comments from LMS", function () {
 	strictEqual(scorm.getvalue('cmi.comments_from_lms._count'), '0', "Getting Comments from LMS count '0'");
 	// UPDATE YOUR TESTS HERE IF YOU INTEND TO CHECK FOR COMMENTS
 });
 
-test("Comments from Learner", function () {
+test("Check Comments from Learner", function () {
 	var learner_comment_count = scorm.getvalue('cmi.comments_from_learner._count');
 	if (SB.getEntry() !== "resume") {
 		// Verify previous comments
 		strictEqual(learner_comment_count, '0', "Getting Comments from Learner count '0'");
 	} else {
-		strictEqual(learner_comment_count, '0', "Getting Comments from Learner count '0'");
+		strictEqual(learner_comment_count, '1', "Getting Comments from Learner count '1'");
 	}
+});
+
+test("Set Comment from Learner", function() {
+	var commentTime = new Date();
+	strictEqual(SB.setCommentFromLearner("This is a comment from learner", "QUnit Test", commentTime), 'true', "Setting comment from learner.");
+	// Expand later if you like, but please update the expected count above.
 });
 
 test("Objectives", function () {
