@@ -1511,6 +1511,7 @@ function SCOBot(options) {
 		} else {
 			scorm.setvalue('cmi.success_status', 'failed');
 		}
+		return 'true';
 	};
 	/**
 	 * Happy Ending
