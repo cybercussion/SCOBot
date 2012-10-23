@@ -1569,6 +1569,7 @@ function SCOBot(options) {
 	 * different behavior once I incorporated it.  So at this point I'm using window not window.top.
 	*/
 	$(window).bind('load', initSCO);
+	//$(window).bind('beforeunload', exitSCO); // You want to confirm exit?
 	$(window).bind('unload', exitSCO);
 	// Listen for SCORM API Exception
 	$(scorm).on('exception', function (e) {
