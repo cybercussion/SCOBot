@@ -1355,6 +1355,10 @@ function SCOBot(options) {
 			scorm.debug(settings.prefix + ": Setting Objective at " + n + " (This may be false)");
 			if (isBadValue(n)) { // First Run
 				n = scorm.getvalue(p1 + '_count');
+				if(n === 'false') {
+					scorm.debug(settings.prefix + ": LMS is return false, can not proceed, check error codes");
+					return n;
+				}
 				scorm.debug(settings.prefix + ": Objective " + data.id + " was not found.  Adding new at " + n + " " + data.description);
 				f = true;
 			}
@@ -1458,6 +1462,10 @@ function SCOBot(options) {
 	this.setCommentFromLearner = function(msg, loc, date) {
 		var p1 = "cmi.comments_from_learner.",
 			n = scorm.getvalue(p1 + "_count");
+		if(n === 'false') {
+			scorm.debug(settings.prefix + ": Sorry, LMS returned a comments count of 'false'.  Review error logs.");
+			return n;
+		}
 		if(msg.length > 0 && msg.length < 4000) {
 			scorm.debug(settings.prefix + ": Sorry, message from learner was empty or exceeded the limit.", 2);
 		}
@@ -1465,6 +1473,44 @@ function SCOBot(options) {
 		scorm.setvalue(p1 + 'comment', msg);
 		scorm.setvalue(p1 + 'location', loc);
 		return scorm.setvalue(p1 + 'timestamp', scorm.isoDateToString(date));
+	};
+	/**
+	 * Grade It
+	 * This method will set cmi.score.scaled, cmi.success_status, and cmi.completion_status.  This is for situations
+	 * where you are doing simple scoring, with NO objectives or interactions.
+	 * Prereq for this would be to have passed in scaled_passing_score and completion_threshold in to SCOBot
+	 * If none are provided it will default to 'passed' and 'completed'
+	 * Special Note: If you are using Objectives, Interactions and set the totals, you do not need to use this method.
+	 * @return {String} 'true' or 'false'
+	 */
+	this.gradeIt = function() {
+		var scoreScaled = 1,
+			scoreRaw = scorm.getvalue('cmi.score.raw'),
+			scoreMin = scorm.getvalue('cmi.score.min'),
+			scoreMax = scorm.getvalue('cmi.score.max'),
+			progressMeasure = scorm.getvalue('cmi.progress_measure');
+		// Set Score Scaled
+		if ((scoreMax - scoreMin) === 0) {
+			// Division By Zero
+			scorm.debug(settings.prefix + ": Division by Zero for scoreMax - scoreMin " + scoreMax, 2);
+			scorm.setvalue('cmi.score.scaled', scoreScaled);
+		} else {
+			scoreScaled = ((scoreRaw - scoreMin) / (scoreMax - scoreMin)).toString();
+			scorm.debug(settings.prefix + ": Score Scaled = " + scoreScaled, 3);
+			scorm.setvalue('cmi.score.scaled', trueRound(scoreScaled, 7));
+		}
+		// Set Completion Status
+		if (parseFloat(progressMeasure, 10) >= parseFloat(settings.completion_threshold, 10)) {
+			scorm.setvalue('cmi.completion_status', 'completed');
+		} else {
+			scorm.setvalue('cmi.completion_status', 'incomplete');
+		}
+		// Set Success Status
+		if (parseFloat(scoreScaled, 10) >= parseFloat(settings.scaled_passing_score, 10)) {
+			scorm.setvalue('cmi.success_status', 'passed');
+		} else {
+			scorm.setvalue('cmi.success_status', 'failed');
+		}
 	};
 	/**
 	 * Happy Ending
