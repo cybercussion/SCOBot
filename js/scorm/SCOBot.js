@@ -1448,6 +1448,25 @@ function SCOBot(options) {
 		return notStartedYet();
 	};
 	/**
+	 * Set Comment From Learner
+	 * This will set the comment, location and time the student made a comment
+	 * @param msg {String} comment
+	 * @param loc {String} location
+	 * @param date {Object} New Date object (for timestamp)
+	 * @return {String}
+	 */
+	this.setCommentFromLearner = function(msg, loc, date) {
+		var p1 = "cmi.comments_from_learner.",
+			n = scorm.getvalue(p1 + "_count");
+		if(msg.length > 0 && msg.length < 4000) {
+			scorm.debug(settings.prefix + ": Sorry, message from learner was empty or exceeded the limit.", 2);
+		}
+		p1 += n + '.';
+		scorm.setvalue(p1 + 'comment', msg);
+		scorm.setvalue(p1 + 'location', loc);
+		return scorm.setvalue(p1 + 'timestamp', scorm.isoDateToString(date));
+	};
+	/**
 	 * Happy Ending
 	 * This will auto-score the student to passed, completed, and scored
 	 * @return {String}
