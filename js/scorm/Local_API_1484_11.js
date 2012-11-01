@@ -60,7 +60,7 @@ function Local_API_1484_11(options) {
 			},
 			completion_status : "unknown",
 			completion_threshold : "0.7",
-			credit : "no_credit",
+			credit : "no-credit",
 			entry : "ab-initio",
 			exit : "",
 			interactions : {
@@ -72,10 +72,10 @@ function Local_API_1484_11(options) {
 			learner_name : "Simulated User",
 			learner_preference : {
 				_children : "audio_level,language,delivery_speed,audio_captioning",
-				audio_level : "",
+				audio_level : "1",
 				language : "",
-				delivery_speed : "",
-				audio_captioning : ""
+				delivery_speed : "1",
+				audio_captioning : "0"
 			},
 			location : "",
 			max_time_allowed : "",
