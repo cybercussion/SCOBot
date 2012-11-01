@@ -2,8 +2,8 @@
 /*jslint devel: true, browser: true, regexp: true */
 /**
  * This is a sample SCORM Startup sequence and handicap API's for ease of use.
- * General Concept: When the LMS connects, call var SB = new SCOBOT();
- * SCOBOT
+ * General Concept: When the LMS connects, call var SB = new SCOBot();
+ * SCOBot
  * This only works with the SCORM_API, but has the basis to work with other API's.
  * Several public API's will call one to many SCORM Calls and this will make every attempt
  * to do common SCORM Tasks or boil down SCORM tasks into a smaller easy to use method.
