@@ -9,18 +9,18 @@
 		<meta http-equiv="X-UA-Compatible" content="chrome=1" />
 		<link rel="apple-touch-icon" href="img/icon.png"/>
 		<link rel="apple-touch-startup-image" href="img/startup.png" />
-		<link rel="stylesheet" href="css/styles.css" />
+		<link rel="stylesheet" href="QUnit-Tests/css/styles.css" />
 		<!--[if lt IE 9]>
-		<script src="js/util/html5.js"></script>
-		<![endif]-->
+        <script src="QUnit-Tests/js/util/html5.js"></script>
+        <![endif]-->
 		<!--[if lt IE 8]>
-		<script type="text/javascript" src="js/player/util/json2.js"></script>
-		<![endif]-->
+        <script type="text/javascript" src="QUnit-Tests/js/player/util/json2.js"></script>
+        <![endif]-->
 		<!-- Developer Breakout: This will be merged, minified and packed when built -->
-		<script type="text/javascript" charset="utf-8" src="js/jquery/jquery-1.7.1.js"></script>
-		<script type="text/javascript" charset="utf-8" src="js/scorm/Local_API_1484_11.js"></script>
-		<script type="text/javascript" charset="utf-8" src="js/scorm/SCORM_API.js"></script>
-		<script type="text/javascript" charset="utf-8" src="js/scorm/SCOBot.js"></script>
+		<script type="text/javascript" charset="utf-8" src="QUnit-Tests/js/jquery/jquery-1.7.1.js"></script>
+		<script type="text/javascript" charset="utf-8" src="QUnit-Tests/js/scorm/Local_API_1484_11.js"></script>
+		<script type="text/javascript" charset="utf-8" src="QUnit-Tests/js/scorm/SCORM_API.js"></script>
+		<script type="text/javascript" charset="utf-8" src="QUnit-Tests/js/scorm/SCOBot.js"></script>
 		<script type="text/javascript" charset="utf-8">
 			/*globals SCORM_API, SCOBot */
 			// Please edit these parameters to match your deployment defaults
@@ -76,7 +76,7 @@
 					, and ramp up to full quiz, essay, interactions and objectives with the ability to suspend data.  Depending on where you fall on the spectrum, it's a good idea to take a solid look at what your needs are so you're not lofting around a lot of overhead to do a simple task.
 				</p>
 				<p>
-					There is a readme.html file located in <a href="js/scorm/readme.html">js/scorm/readme.html</a> that covers in greater detail what I'm eluding to here.  This documentation is being added as the project solidifies, but it covers much of the implementation.
+					There is a readme.html file located in <a href="QUnit-Tests/js/scorm/readme.html">js/scorm/readme.html</a> that covers in greater detail what I'm eluding to here.  This documentation is being added as the project solidifies, but it covers much of the implementation.
 				</p>
 				<p>
 					If you were looking for a single file to drop into your project, your seeking the actual "build" of this project.  This is the process of merging and packing all JavaScript files.  In order to keep things open, and editable for now, I've kept it broken out until I reach a conclusion on the best way to offer the needed edits, with the base code.
@@ -127,7 +127,7 @@
 					<b>JSDocs Commenting</b> - Comments formatted for interpretation by jsDocs for instant documentation
 				</p>
 				<p>
-					<b>Qunit Integration</b> - QUnit is a test suite that allows for Test Driven Development.  This more accurately tests existing and new functionality. <a href="qunit_SCORM_API.html">qunit_SCORM_API.html</a> and <a href="qunit_SCOBot.html">qunit_SCOBot.html</a>
+					<b>Qunit Integration</b> - QUnit is a test suite that allows for Test Driven Development.  This more accurately tests existing and new functionality. <a href="QUnit-Tests/qunit_SCORM_API.html">qunit_SCORM_API.html</a> and <a href="QUnit-Tests/qunit_SCOBot.html">qunit_SCOBot.html</a>
 				</p>
 				<p>
 					<b>Size</b> - &lt; 10KB packed (by itself).  Currently loaded with Local_API_1484_11, SCOBot, and SCORM_API is 10,276 bytes (7/5/2011)
