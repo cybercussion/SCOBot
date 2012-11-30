@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<manifest identifier="QUNIT_TEST_SUITE" version="1.0"
+		  xmlns="http://www.imsglobal.org/xsd/imscp_v1p1"
+		  xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3"
+		  xmlns:adlnav="http://www.adlnet.org/xsd/adlnav_v1p3"
+		  xmlns:adlseq="http://www.adlnet.org/xsd/adlseq_v1p3"
+		  xmlns:imsss="http://www.imsglobal.org/xsd/imsss"
+		  xmlns:lom="http://ltsc.ieee.org/xsd/LOM"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 imscp_v1p1.xsd
+                        http://www.adlnet.org/xsd/adlcp_v1p3 adlcp_v1p3.xsd
+                        http://www.adlnet.org/xsd/adlnav_v1p3 adlnav_v1p3.xsd
+                        http://www.adlnet.org/xsd/adlseq_v1p3 adlseq_v1p3.xsd
+                        http://www.imsglobal.org/xsd/imsss imsss_v1p0.xsd
+                        http://ltsc.ieee.org/xsd/LOM lom.xsd">
+	<metadata>
+		<schema>ADL SCORM</schema>
+		<schemaversion>2004 3rd Edition</schemaversion>
+	</metadata>
+	<organizations default="ORG-001">
+		<organization identifier="ORG-001" adlseq:objectivesGlobalToSystem="true">
+			<!--****** Title of Grade ******-->
+			<title>Course</title>
+			<item identifier="GradeX" isvisible="true">
+				<!--****** Title of Topic ******-->
+				<title>Grade X</title>
+				<item identifier="TopicX" isvisible="true">
+					<!--****** Title of Unit ******-->
+					<title>Topic X</title>
+					<item identifier="UnitX" isvisible="true">
+						<!--****** Title of Lesson ******-->
+						<title>Unit X</title>
+						<item identifier="LessonX" isvisible="true">
+							<title>Lesson X</title>
+							<!-- See i1 link to reference a1 below.  Also notice launch parameters (querystring format) -->
+							<item identifier="ACT-001" identifierref="RES-001" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=06">
+								<!--****** Title of SCO ******-->
+								<title>QUnit SCORM_API</title>
+								<!-- Launch Data -->
+								<adlcp:dataFromLMS><![CDATA[name=value]]></adlcp:dataFromLMS>
+								<!-- equates to cmi.completion_threshold -->
+								<adlcp:completionThreshold>0.75</adlcp:completionThreshold>
+								<imsss:sequencing>
+									<imsss:objectives>
+										<imsss:primaryObjective satisfiedByMeasure="true">
+											<!-- equates to cmi.scaled_passing_score -->
+											<imsss:minNormalizedMeasure>0.6</imsss:minNormalizedMeasure>
+										</imsss:primaryObjective>
+									</imsss:objectives>
+									<!-- Optional: Limit attempts (managed by LMS), and or attemptAbsoluteDurationLimit equates to cmi.max_time_allowed  -->
+									<!--imsss:limitConditions attemptLimit="3" attemptAbsoluteDurationLimit="" /-->
+								</imsss:sequencing>
+							</item>
+							<!-- See i2 link to reference a2 below.  Also notice launch parameters (querystring format) -->
+							<item identifier="ACT-002" identifierref="RES-002" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=09">
+								<!--****** Title of SCO ******-->
+								<title>QUnit SCOBot</title>
+								<!-- Launch Data -->
+								<adlcp:dataFromLMS><![CDATA[name=value]]></adlcp:dataFromLMS>
+								<!-- equates to cmi.completion_threshold -->
+								<adlcp:completionThreshold>0.75</adlcp:completionThreshold>
+								<imsss:sequencing>
+									<imsss:objectives>
+										<imsss:primaryObjective satisfiedByMeasure="true">
+											<!-- equates to cmi.scaled_passing_score -->
+											<imsss:minNormalizedMeasure>0.6</imsss:minNormalizedMeasure>
+										</imsss:primaryObjective>
+									</imsss:objectives>
+									<!-- Optional: Limit attempts (managed by LMS), and or attemptAbsoluteDurationLimit equates to cmi.max_time_allowed  -->
+									<!--imsss:limitConditions attemptLimit="3" attemptAbsoluteDurationLimit="" /-->
+								</imsss:sequencing>
+							</item>
+							<!-- See i3 link to reference a3 below.  Also notice launch parameters (querystring format) -->
+							<item identifier="ACT-003" identifierref="RES-003" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=06">
+								<!--****** Title of SCO ******-->
+								<title>QUnit SCOBot Production</title>
+								<!-- Launch Data -->
+								<adlcp:dataFromLMS><![CDATA[name=value]]></adlcp:dataFromLMS>
+								<!-- equates to cmi.completion_threshold -->
+								<adlcp:completionThreshold>0.75</adlcp:completionThreshold>
+								<imsss:sequencing>
+									<imsss:objectives>
+										<imsss:primaryObjective satisfiedByMeasure="true">
+											<!-- equates to cmi.scaled_passing_score -->
+											<imsss:minNormalizedMeasure>0.6</imsss:minNormalizedMeasure>
+										</imsss:primaryObjective>
+									</imsss:objectives>
+									<!-- Optional: Limit attempts (managed by LMS), and or attemptAbsoluteDurationLimit equates to cmi.max_time_allowed  -->
+									<!--imsss:limitConditions attemptLimit="3" attemptAbsoluteDurationLimit="" /-->
+								</imsss:sequencing>
+							</item>
+						</item>
+					</item>
+				</item>
+			</item>
+		</organization>
+	</organizations>
+	<resources>
+		<resource identifier="RES-001" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCORM_API.html">
+			<metadata />
+			<!--****** FILES ******-->
+			<file href="qunit_SCORM_API.html" />
+			<file href="js/scorm/Local_API_1484_11.js" />
+			<file href="js/scorm/SCORM_API.js" />
+			<file href="js/test/scorm_api.js" />
+			<dependency identifierref="common_files" />
+		</resource>
+		<resource identifier="RES-002" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCOBot.html">
+			<metadata />
+			<!--****** FILES ******-->
+			<file href="qunit_SCOBot.html" />
+			<file href="js/scorm/Local_API_1484_11.js" />
+			<file href="js/scorm/SCORM_API.js" />
+			<file href="js/scorm/SCOBot.js" />
+			<file href="js/test/scobot.js" />
+			<dependency identifierref="common_files" />
+		</resource>
+		<resource identifier="RES-003" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCOBot_prod.html">
+			<metadata />
+			<!--****** FILES ******-->
+			<file href="qunit_SCOBot_prod.html" />
+			<file href="js/scorm/scorm.bot.pack.js" />
+			<file href="js/test/scobot.js" />
+			<dependency identifierref="common_files" />
+		</resource>
+		<!-- Shared Assets (optional deployment capability) -->
+		<resource identifier="common_files" type="webcontent" adlcp:scormType="asset">
+			<file href="QUnit-SCORM_API/css/qunit.css" />
+			<file href="QUnit-SCORM_API/js//util/json2.js" />
+			<file href="QUnit-SCORM_API/js/jquery/jquery-1.8.1.js"/>
+			<file href="QUnit-SCORM_API/js/jquery/plugins/qunit.js" />
+		</resource>
+	</resources>
+</manifest>
