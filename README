@@ -9,7 +9,7 @@ Tip: This file technically shouldn't be edited.
 This is the main 'long-hand' SCORM 2004 that connects to the LMS 'API_1484_11' (2004) or 'API' (1.2).  With some additions to rollback to SCORM 1.2.  Please note, I've only taken the SCORM 1.2 rollback so far, as it was needed on another project I worked on.  There will be cases where there just isn't enough space to store some items if your going from 2004 to 1.2.  Ok, fair warning.  This supplies the base support of SCORM (Connection to the LMS, initialize, get/set value, commit, terminate).
 
 QUnit-Tests/js/scorm/SCOBot.js (Optional in a deployment)-
-Tip: This is totally customizeable to fit your needs.  Edit away.
+Tip: This is totally customizable to fit your needs.  Edit away.
 This is a boiled down series of API's that do common things we all do in a Shareable Content Object.  I often get asked questions about SCORM, and I always try to inform people that API Wrappers are commonly just 'line of sight' to the LMS.  There is mild enforcement of the specification, but most of that comes from the LMS API_1484_11.  SCOBot, is an attempt to rollup all that between the lines stuff that our content commonly has to do.  From managing ISO 8601 time, responses and response patterns, structured suspend data, scoring etc ...
 
 QUnit-Tests/js/scorm/Local_API_1484_11.js (Optional in a deployment)-
