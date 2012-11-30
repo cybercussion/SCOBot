@@ -17,7 +17,7 @@ Tip: This file can be modified if needed.  This holds the CMI Object (customizab
 This is a LMS mimic as boiled down, and will slowly be strengthened with-in reason.  Its not the most strict so don't expect it to throw every single error right now.  It keeps the entire CMI object and console logs the JSON object so you can view whats changed during local testing.  If it doesn't cost (lines of code and or file size) a huge amount to strengthen it up I'll slowly be rolling in those error handlers and validators.  SCORM is a rather large spec to enforce however, and my only concern is this might cost more than its worth.  I had considered adding local storage here however in the case of a offline SCO since it could connect to this when its ran offline.  But, this will also add more code and I'd rather that be an option later when and if it arises.
  
 So what am I looking at?
-I rebundled this project with all the files you would need to construct a Content Aggregation Model (Package you import into a LMS that supports SCORM 2004).
+I re-bundled this project with all the files you would need to construct a Content Aggregation Model (Package you import into a LMS that supports SCORM 2004).
 I hope this helps some people with that process that are manually creating content.
 
 Flavors/Approaches:
