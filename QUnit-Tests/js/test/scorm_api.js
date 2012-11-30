@@ -68,7 +68,7 @@ test("initialize", function () {
 			// First time this will be blank / null, since this is isLocal your pretty much always in the "first time" category
 			strictEqual(getvalue('cmi.launch_data'), '?name1=value1&name2=value2&name3=value3', "Requested cmi.launch_data - " + getvalue('cmi.launch_data'));
 			strictEqual(getvalue('cmi.entry'), 'ab-initio', "Requested cmi.entry - " + getvalue('cmi.entry'));
-			strictEqual(getvalue('cmi.credit'), 'no_credit', "Requested cmi.credit - " + getvalue('cmi.credit'));
+			strictEqual(getvalue('cmi.credit'), 'no-credit', "Requested cmi.credit - " + getvalue('cmi.credit'));
 			strictEqual(getvalue('cmi.location'), "", "Getting cmi.location - " + getvalue('cmi.location') + "(this should be empty)");
 			// this may need to be "false"
 			strictEqual(getvalue('cmi.completion_status'), "incomplete", "Getting cmi.completion_status - " + getvalue('cmi.completion_status'));
