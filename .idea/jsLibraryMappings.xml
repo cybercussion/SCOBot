@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="JavaScriptLibraryMappings">
-    <file url="PROJECT" libraries="{Modernizr-2.5.3, jQuery UI-1.8.17, jQuery-1.7.2}" />
-  </component>
-</project>
-
