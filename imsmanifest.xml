@@ -33,7 +33,8 @@
 						<item identifier="LessonX" isvisible="true">
 							<title>Lesson X</title>
 							<imsss:sequencing>
-								<imsss:controlMode choice="false" choiceExit="false" flow="true" forwardOnly = "true"/>
+								<!-- Enable choice if you want them to choose, forwardOnly if you don't want them to be able to go back -->
+								<imsss:controlMode choice="false" choiceExit="false" flow="true" forwardOnly = "false" />
 							</imsss:sequencing>
 							<!-- See i1 link to reference a1 below.  Also notice launch parameters (querystring format) -->
 							<item identifier="ACT-001" identifierref="RES-001" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=06">
