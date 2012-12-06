@@ -1128,6 +1128,12 @@ test("Set Suspend Data By Page ID", function () {
 
 test("Suspend SCO", function () {
 	scorm.debug(">>>>>>>>> Suspending <<<<<<<<<");
+	strictEqual(scorm.commit(), 'true', "Commiting to check navigation possibilities.");
+	canContinue = scorm.getvalue('adl.nav.request_valid.continue');
+	strictEqual(canContinue, 'true', 'Checking for adl.nav.request_valid.continue'); // Check your imss sequencing flow control!!!
+	if(canContinue === 'true' || canContinue === 'unknown') {
+		//scorm.setvalue('adl.nav.request', 'continue'); // Enable if you want it to cruise past this SCO
+	}
 	strictEqual(SB.suspend(), 'true', 'Suspending SCO');
 	scorm.debug("SetValue Calls: " + setvalue_calls + "\nGetValue Calls: " + getvalue_calls, 4);
 });
