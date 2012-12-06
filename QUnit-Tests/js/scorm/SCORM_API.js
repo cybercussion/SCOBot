@@ -2,12 +2,12 @@
 /*jslint devel: true, browser: true */
 /**
  * SCORM API
- * This is a content API, it self establishes communication with the LMS in SCORM 2004 or 1.2.
- * Switch Statement will convert some SCORM 2004 calls to SCORM 1.2, but you must understand there are limitations
+ * This is a content API, it self-establishes communication with the LMS in SCORM 2004 or 1.2.
+ * Switch statements will convert some SCORM 2004 calls to SCORM 1.2, but you must understand there are limitations
  * on data storage between versions. Example: Suspend Data 64,000 vs 4096 or Bookmark(location) 1000 vs 255.
- * Depending on your usages your content may not squeeze into a SCORM 1.2 space.  Because of this, log messages will
- * be output so you can monitor your cmi "set" value length.  Ultimately, a LMS may block your request because of this.
- * This API is meant to simply common SCORM Tasks, but also offer the ability to use it 'long hand'. Several other
+ * Depending on your use, your content may not squeeze into the SCORM 1.2 available space.  Because of this, log messages
+ * will be output so you can monitor your cmi "set" value length.  Ultimately, a LMS may block your request because of this.
+ * This API is meant to simplify common SCORM Tasks, but also offers the ability to use it 'long hand'. Several other
  * public API's are available online, some free some charge, and this is a best effort to boil it all down.
  * Documentation, samples, resources, and credits: ADL, Claude Ostyn, Pipwerks, SCORM.com
  * Goals: SCORM For Everyone else, low overhead, simple API's, containment, and transparency.
@@ -21,9 +21,9 @@
  * scorm.terminate();
  *
  * HTML Event Setup:
- * If you choose not to use SCOBot tips for onload and onunload, onbeforeunload events.  You may need to make init, exit methods to do other things,
+ * If you choose not to use SCOBot tips for onload and onunload, onbeforeunload events you may need to make init, exit methods to do other things
  * vs. directly referencing the SCORM API here.  Feel free to make those methods if you need to.  'window.top' can be used because
- * some deployments self occur within a popup in a IFRAME will not fire properly on exit, in some mozilla browsers.  Last checked, window worked with
+ * some deployments self occur within a popup in a IFRAME will not fire properly on exit, in some Mozilla browsers.  Last checked, window worked with
  * JQuery 1.7+ however.  If you have issues trapping the unload event, please try window.top.
  * $(window).bind('load', YOUR_INITIALIZATION_METHOD);
  * $(window).bind('unload', YOUR_EXIT_METHOD);
@@ -383,7 +383,7 @@ function SCORM_API(options) {
 		//if (bTruncated) alert ("Hours truncated to 9999 to fit HHHH:MM:SS.SS format")
 		return str;
 	}
-	// End SCORM Time Handlers /////////////////////////////	
+	// End SCORM Time Handlers /////////////////////////////
 	/**
 	 * Make Boolean
 	 * Turns 'yes', 'no', 'true', 'false', '0', '1' into true/false
@@ -512,7 +512,7 @@ function SCORM_API(options) {
 			lms = API.path, // lms shortcut
 			ec = 0, // error code
 			nn = null, // new number
-			ig = false;	// ignore		
+			ig = false;	// ignore
 		// Custom event Trigger getvalue
 		$(self).triggerHandler({
 			'type': "getvalue",
@@ -609,7 +609,7 @@ function SCORM_API(options) {
 		});
 		// Security Consideration?
 		// It may be worth some minor security later to validate this is being set from a authorized source.  This is lacking support old versions of IE however.
-		//debug(settings.prefix + ": The caller of this method is " + arguments.callee.caller.caller.name, 4);  //arguments.callee.caller	
+		//debug(settings.prefix + ": The caller of this method is " + arguments.callee.caller.caller.name, 4);  //arguments.callee.caller
 		if (API.isActive) {// it has initialized
 			// This is switch cased to appropriately translate SCORM 2004 to 1.2 if needed.
 			// Handy if you don't want to go thru all your content calls...
@@ -855,7 +855,7 @@ function SCORM_API(options) {
 		}
 		return s;
 	};
-	// End SCORM Public Calls /////////////	
+	// End SCORM Public Calls /////////////
 	// Start Public Utility based Support for SCORM Calls
 	/**
 	 * Get Objective By ID
@@ -863,7 +863,7 @@ function SCORM_API(options) {
 	 * Objectives do not appear to be 'journaled' as object identifiers have to be unique.
 	 * As this method is seeking information it may trigger SCORM Errors on the LMS that hint that
 	 * objects haven't been defined yet.  This is perfectly normal.
-	 * @param id {Mixed} Alpha-Numeric Identification of the Interaction you're looking for 
+	 * @param id {Mixed} Alpha-Numeric Identification of the Interaction you're looking for
 	 * @returns id {String} 'false' if nothing found.
 	 */
 	this.getObjectiveByID = function (id) {
@@ -890,7 +890,7 @@ function SCORM_API(options) {
 	 * This is fun, they make you go fish the interactions array integer by the ID.
 	 * I included this in the main SCORM API because this functionality should be stock.  You're
 	 * either going to journal these (history) or treat them like states that you update.  You must decide that.
-	 * @param id {Mixed} Alpha-Numeric Identification of the Interaction you're looking for 
+	 * @param id {Mixed} Alpha-Numeric Identification of the Interaction you're looking for
 	 * @returns id {String} 'false' if nothing found
 	 */
 	this.getInteractionByID = function (id) {
@@ -959,7 +959,7 @@ function SCORM_API(options) {
 		}
 		return 'false';
 	};
-	// End SCORM Public Utilities 
+	// End SCORM Public Utilities
 	// Internal API Public Calls //////////
 	/**
 	 * Init (Internal API)
