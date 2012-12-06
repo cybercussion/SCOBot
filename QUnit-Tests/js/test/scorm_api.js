@@ -38,7 +38,6 @@ test("scorm.debug", function () {
 // Initialize
 test("initialize", function () {
 	ok(scorm.initialize(), "initialize");
-	ok(setvalue('cmi.completion_status', "incomplete"), "Setting cmi.completion_status to incomplete");
 	version = scorm.getvalue('cmi._version');
 	if (version === "Local 1.0") {
 		isLocal = true;
