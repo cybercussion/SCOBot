@@ -2,12 +2,12 @@
 /*jslint devel: true, browser: true */
 /**
  * SCORM API
- * This is a content API, it self establishes communication with the LMS in SCORM 2004 or 1.2.
- * Switch Statement will convert some SCORM 2004 calls to SCORM 1.2, but you must understand there are limitations
+ * This is a content API, it self-establishes communication with the LMS in SCORM 2004 or 1.2.
+ * Switch statements will convert some SCORM 2004 calls to SCORM 1.2, but you must understand there are limitations
  * on data storage between versions. Example: Suspend Data 64,000 vs 4096 or Bookmark(location) 1000 vs 255.
- * Depending on your usages your content may not squeeze into a SCORM 1.2 space.  Because of this, log messages will
- * be output so you can monitor your cmi "set" value length.  Ultimately, a LMS may block your request because of this.
- * This API is meant to simply common SCORM Tasks, but also offer the ability to use it 'long hand'. Several other
+ * Depending on your use, your content may not squeeze into the SCORM 1.2 available space.  Because of this, log messages
+ * will be output so you can monitor your cmi "set" value length.  Ultimately, a LMS may block your request because of this.
+ * This API is meant to simplify common SCORM Tasks, but also offers the ability to use it 'long hand'. Several other
  * public API's are available online, some free some charge, and this is a best effort to boil it all down.
  * Documentation, samples, resources, and credits: ADL, Claude Ostyn, Pipwerks, SCORM.com
  * Goals: SCORM For Everyone else, low overhead, simple API's, containment, and transparency.
@@ -21,9 +21,9 @@
  * scorm.terminate();
  *
  * HTML Event Setup:
- * If you choose not to use SCOBot tips for onload and onunload, onbeforeunload events.  You may need to make init, exit methods to do other things,
+ * If you choose not to use SCOBot tips for onload and onunload, onbeforeunload events you may need to make init, exit methods to do other things
  * vs. directly referencing the SCORM API here.  Feel free to make those methods if you need to.  'window.top' can be used because
- * some deployments self occur within a popup in a IFRAME will not fire properly on exit, in some mozilla browsers.  Last checked, window worked with
+ * some deployments self occur within a popup in a IFRAME will not fire properly on exit, in some Mozilla browsers.  Last checked, window worked with
  * JQuery 1.7+ however.  If you have issues trapping the unload event, please try window.top.
  * $(window).bind('load', YOUR_INITIALIZATION_METHOD);
  * $(window).bind('unload', YOUR_EXIT_METHOD);
