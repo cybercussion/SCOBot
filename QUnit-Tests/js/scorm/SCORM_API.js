@@ -339,7 +339,6 @@ function SCORM_API(options) {
 	 * Centiseconds To SCORM 1.2 Duration
 	 * Borrowed from Claude Ostyn, but touched up for JSLint/JavaScript and evil "with" statement
 	 * @param n {Number} Total Seconds
-	 * @param bPrecise {Boolean} Only Set true if were dealing with months, years (highly unlikely)
 	 * @returns {String} SCORM 2004 Time PT0H0M0S Format
 	 */
 	function centisecsToSCORM12Duration(n) {
@@ -387,7 +386,7 @@ function SCORM_API(options) {
 	/**
 	 * Make Boolean
 	 * Turns 'yes', 'no', 'true', 'false', '0', '1' into true/false
-	 * @param v {String} value to turn to boolean
+	 * @param str {String} value to turn to boolean
 	 * @returns {Boolean}
 	 */
 	function makeBoolean(str) {
@@ -398,14 +397,7 @@ function SCORM_API(options) {
 			case true: // falls through
 			case false:
 				return Boolean(str);
-		}/*
-		if (str === undefined) {
-			debug(settings.prefix + " : makeBoolean was given empty string, converting to false", 2);
-			return false;
 		}
-		if (str === true || str === false) {
-			return Boolean(str);
-		}*/
 		switch (str.toLowerCase()) {
 		case "true":
 		case "yes":
@@ -464,8 +456,8 @@ function SCORM_API(options) {
 	}
 	/**
 	 * Get Last LMS Error Message
-	 * Error Message assicoated by error code
-	 * @param {Number} error code
+	 * Error Message associated by error code
+	 * @param n {Number} error code
 	 * @returns {String} error message
 	 */
 	function getLastErrorMessage(n) {
@@ -528,7 +520,7 @@ function SCORM_API(options) {
 		});
 		if (API.isActive) {// it has initialized
 			// This is switch cased to appropriately translate SCORM 2004 to 1.2 if needed.
-			// Handy if you don't want to go thru all your content calls...
+			// Handy if you don't want to go through all your content calls...
 			switch (API.version) {
 			case "1.2":
 				switch (n) {
@@ -578,7 +570,7 @@ function SCORM_API(options) {
 				v = lms.GetValue(n);
 				break;
 			default:
-				// handle non-LMS failover (will return 'false' below otherwise)?
+				// handle non-LMS fail-over (will return 'false' below otherwise)?
 				break;
 			}
 			ec = getLastErrorCode();
@@ -620,7 +612,7 @@ function SCORM_API(options) {
 		//debug(settings.prefix + ": The caller of this method is " + arguments.callee.caller.caller.name, 4);  //arguments.callee.caller
 		if (API.isActive) {// it has initialized
 			// This is switch cased to appropriately translate SCORM 2004 to 1.2 if needed.
-			// Handy if you don't want to go thru all your content calls...
+			// Handy if you don't want to go through all your content calls...
 			switch (API.version) {
 			case "1.2":
 				API.mode = API.mode === "" ? lms.LMSGetValue('cmi.core.lesson_mode') : API.mode;
