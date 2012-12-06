@@ -391,13 +391,21 @@ function SCORM_API(options) {
 	 * @returns {Boolean}
 	 */
 	function makeBoolean(str) {
+		switch (str) {
+			case undefined:
+				debug(settings.prefix + " : makeBoolean was given empty string, converting to false", 2);
+				return false;
+			case true: // falls through
+			case false:
+				return Boolean(str);
+		}/*
 		if (str === undefined) {
 			debug(settings.prefix + " : makeBoolean was given empty string, converting to false", 2);
 			return false;
 		}
 		if (str === true || str === false) {
 			return Boolean(str);
-		}
+		}*/
 		switch (str.toLowerCase()) {
 		case "true":
 		case "yes":
