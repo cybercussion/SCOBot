@@ -2,7 +2,8 @@
 QUnit.config.reorder = false;
 var scorm,
 	isLocal = false,
-	version = '';
+	version = '',
+	canContinue = '';
 // This is required by the isLocal SCORM API_1484_11
 
 // SCORM API (the long-hand scorm calls a more granular test)
@@ -356,9 +357,16 @@ test("initialize", function () {
 				// Commit
 				test("commit", function () {
 					strictEqual(scorm.commit(), 'true', "Commit data (should respond true)");
+					// Test to see if adl.nav.request_valid.continue functions
+					canContinue = scorm.getvalue('adl.nav.request_valid.continue');
+					strictEqual(canContinue, 'true', 'Checking for adl.nav.request_valid.continue');
 				});
 				// Terminate
 				test("terminate", function () {
+					if(canContinue === 'true' || canContinue === 'unknown') {
+						//scorm.setvalue('adl.nav.request', 'continue');  // Enable this if you want it to cruise thru the whole lesson
+						// Commit will be called on terminate!!
+					}
 					strictEqual(scorm.setvalue('cmi.exit', 'normal'), 'true', "Setting Exit type normal");
 					strictEqual(scorm.terminate(), 'true', "Termination (you can't do anything else after this technically)");
 
