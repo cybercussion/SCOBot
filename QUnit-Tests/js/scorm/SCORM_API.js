@@ -390,13 +390,12 @@ function SCORM_API(options) {
 	 * @returns {Boolean}
 	 */
 	function makeBoolean(str) {
-		switch (str) {
-			case undefined:
-				debug(settings.prefix + " : makeBoolean was given empty string, converting to false", 2);
-				return false;
-			case true: // falls through
-			case false:
-				return Boolean(str);
+		if (str === undefined) {
+			debug(settings.prefix + " : makeBoolean was given empty string, converting to false", 2);
+			return false;
+		}
+		if (str === true || str === false) {
+			return Boolean(str);
 		}
 		switch (str.toLowerCase()) {
 		case "true":
@@ -787,6 +786,7 @@ function SCORM_API(options) {
 					break;
 				}
 				ec = getLastErrorCode();
+				console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>' + s + '>>>>>>>>>>>>>>>>>>>>>>>>');
 				// Check for any errors previously
 				if (s && ec === 0) {
 					API.isActive = true;
