@@ -32,10 +32,20 @@
 						<title>Unit X</title>
 						<item identifier="LessonX" isvisible="true">
 							<title>Lesson X</title>
+							<imsss:sequencing>
+								<imsss:controlMode choice="false" choiceExit="false" flow="true" forwardOnly = "true"/>
+							</imsss:sequencing>
 							<!-- See i1 link to reference a1 below.  Also notice launch parameters (querystring format) -->
 							<item identifier="ACT-001" identifierref="RES-001" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=06">
 								<!--****** Title of SCO ******-->
 								<title>QUnit SCORM_API</title>
+								<!--adlnav:presentation>
+									<adlnav:navigationInterface>
+										<adlnav:hideLMSUI>continue</adlnav:hideLMSUI>
+										<adlnav:hideLMSUI>previous</adlnav:hideLMSUI>
+										<adlnav:hideLMSUI>suspendAll</adlnav:hideLMSUI>
+									</adlnav:navigationInterface>
+								</adlnav:presentation-->
 								<!-- Launch Data -->
 								<adlcp:dataFromLMS><![CDATA[name=value]]></adlcp:dataFromLMS>
 								<!-- equates to cmi.completion_threshold -->
@@ -55,6 +65,13 @@
 							<item identifier="ACT-002" identifierref="RES-002" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=09">
 								<!--****** Title of SCO ******-->
 								<title>QUnit SCOBot</title>
+								<!--adlnav:presentation>
+									<adlnav:navigationInterface>
+										<adlnav:hideLMSUI>continue</adlnav:hideLMSUI>
+										<adlnav:hideLMSUI>previous</adlnav:hideLMSUI>
+										<adlnav:hideLMSUI>suspendAll</adlnav:hideLMSUI>
+									</adlnav:navigationInterface>
+								</adlnav:presentation-->
 								<!-- Launch Data -->
 								<adlcp:dataFromLMS><![CDATA[name=value]]></adlcp:dataFromLMS>
 								<!-- equates to cmi.completion_threshold -->
@@ -74,6 +91,13 @@
 							<item identifier="ACT-003" identifierref="RES-003" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=06">
 								<!--****** Title of SCO ******-->
 								<title>QUnit SCOBot Production</title>
+								<adlnav:presentation>
+									<adlnav:navigationInterface>
+										<adlnav:hideLMSUI>continue</adlnav:hideLMSUI>
+										<adlnav:hideLMSUI>previous</adlnav:hideLMSUI>
+										<adlnav:hideLMSUI>suspendAll</adlnav:hideLMSUI>
+									</adlnav:navigationInterface>
+								</adlnav:presentation>
 								<!-- Launch Data -->
 								<adlcp:dataFromLMS><![CDATA[name=value]]></adlcp:dataFromLMS>
 								<!-- equates to cmi.completion_threshold -->
