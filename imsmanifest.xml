@@ -144,14 +144,14 @@
 			<metadata />
 			<!--****** FILES ******-->
 			<file href="qunit_SCOBot_prod.html" />
-			<file href="js/scorm/scorm.bot.pack.js" />
+			<file href="js/scorm.bot.pack.js" />
 			<file href="js/test/scobot.js" />
 			<dependency identifierref="common_files" />
 		</resource>
 		<!-- Shared Assets (optional deployment capability) -->
 		<resource identifier="common_files" type="webcontent" adlcp:scormType="asset">
 			<file href="QUnit-SCORM_API/css/qunit.css" />
-			<file href="QUnit-SCORM_API/js//util/json2.js" />
+			<file href="QUnit-SCORM_API/js/util/json2.js" />
 			<file href="QUnit-SCORM_API/js/jquery/jquery-1.8.1.js"/>
 			<file href="QUnit-SCORM_API/js/jquery/plugins/qunit.js" />
 		</resource>
