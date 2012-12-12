@@ -1157,11 +1157,13 @@ function SCOBot(options) {
 				return 'false';
 			}
 			//Time stuff will need to move after ID is added
-			if (typeof (data.timestamp) === "object") {
+			//if (typeof (data.timestamp) === "object") {
+			if ($.type(data.timestamp) === "date") {
 				timestamp = scorm.isoDateToString(data.timestamp); // 2012-02-12T00:37:29 formatted
 			}
 			data.timestamp = timestamp;
-			if (typeof (data.latency) === "object") {
+			//if (typeof (data.latency) === "object") {
+			if ($.type(data.latency) === "date") {
 				latency        = (data.latency.getTime() - orig_timestamp.getTime()) / 1000;
 				data.latency   = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
 			} else if (data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
