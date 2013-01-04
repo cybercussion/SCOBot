@@ -150,10 +150,11 @@
 		</resource>
 		<!-- Shared Assets (optional deployment capability) -->
 		<resource identifier="common_files" type="webcontent" adlcp:scormType="asset">
-			<file href="QUnit-SCORM_API/css/qunit.css" />
+			<file href="QUnit-SCORM_API/css/qunit-1.10.0.css" />
 			<file href="QUnit-SCORM_API/js/util/json2.js" />
-			<file href="QUnit-SCORM_API/js/jquery/jquery-1.8.1.js"/>
-			<file href="QUnit-SCORM_API/js/jquery/plugins/qunit.js" />
+			<file href="QUnit-SCORM_API/js/jquery/jquery-1.8.3.js"/>
+			<file href="QUnit-SCORM_API/js/jquery/jquery-1.8.3.min.js"/>
+			<file href="QUnit-SCORM_API/js/jquery/plugins/qunit-1.10.0.js" />
 		</resource>
 	</resources>
 </manifest>
