@@ -1134,6 +1134,6 @@ test("Suspend SCO", function () {
 	if(canContinue === 'true' || canContinue === 'unknown') {
 		//scorm.setvalue('adl.nav.request', 'continue'); // Enable if you want it to cruise past this SCO
 	}
-	strictEqual(SB.suspend(), 'true', 'Suspending SCO');
+	//strictEqual(SB.suspend(), 'true', 'Suspending SCO');
 	scorm.debug("SetValue Calls: " + setvalue_calls + "\nGetValue Calls: " + getvalue_calls, 4);
 });
