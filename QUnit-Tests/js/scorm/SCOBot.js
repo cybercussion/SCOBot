@@ -912,6 +912,7 @@ function SCOBot(options) {
 			if (!isBadValue(tmpCompletionThreshold) && tmpCompletionThreshold !== "-1") {
 				settings.completion_threshold = tmpCompletionThreshold;
 			}
+			// Completion Threshold is read-only so it comes from the CAM (imsmanifest.xml) or you manage it yourself.
 			tmpScaledPassingScore         = scorm.getvalue('cmi.scaled_passing_score'); // This may be empty, default otherwise
 			if (!isBadValue(tmpScaledPassingScore) && tmpScaledPassingScore !== "-1") {
 				settings.scaled_passing_score = tmpScaledPassingScore;
