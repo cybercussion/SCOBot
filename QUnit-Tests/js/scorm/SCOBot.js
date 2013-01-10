@@ -262,7 +262,7 @@ function SCOBot(options) {
 	 * This is a data filter to convert input formats into SCORM standard strings.  Please review each interaction for what it expects.
 	 * This will not enforce SCORM char limits, so please mind your logs if your doing something your not suppose to.
 	 * @param type {String} Expects true-false, choice, fill-in, long-fill-in, matching, performance, sequencing, likert, numeric, other
-	 * @param value {Mixed} May take Array or Object of arrays depending
+	 * @param value {*} May take Array or Object of arrays depending
 	 * @returns {String} formatted value for interaction type
 	 */
 	function encodeInteractionType(type, value) {
@@ -493,7 +493,7 @@ function SCOBot(options) {
 	 * This is a data filter to convert input formats from SCORM standard strings to there native JS equivalent.
 	 * @param type {String} Expects true-false, choice, fill-in, long-fill-in, matching, performance, sequencing, likert, numeric, other
 	 * @param value {String} SCORM 2004 Format for Interaction learner response, or pattern
-	 * @returns {Mixed} formatted value for interaction type
+	 * @returns {*} formatted value for interaction type
 	 */
 	function decodeInteractionType(type, value) {
 		var i = 0,
@@ -1051,7 +1051,8 @@ function SCOBot(options) {
 	 *	]
 	 * };
 	 * Calling commit will still be needed to truly save it.
-	 * @param id {Mixed}
+	 * @param id {*}
+	 * @param title {String}
 	 * @param data {Object}
 	 * @returns {Boolean}
 	 */
@@ -1079,7 +1080,7 @@ function SCOBot(options) {
 	/**
 	 * Get Suspend Data By Page ID
 	 * This will get the suspend data by id 
-	 * @param id {Mixed}
+	 * @param id {*}
 	 * @returns {Object} but false if empty.
 	 */
 	this.getSuspendDataByPageID = function (id) {
@@ -1242,7 +1243,7 @@ function SCOBot(options) {
 	 * Get Interaction
 	 * Returns the full Interaction object 
 	 * @param id {String}
-	 * @returns {Mixed} object or string 'false'
+	 * @returns {*} object or string 'false'
 	 * {
 	 *	id: '1',                             // 4000 chars
 	 *	type: 'true-false',                  // (true-false, choice, fill-in, long-fill-in, matching, performance, sequencing, likert, numeric, other)
@@ -1411,7 +1412,7 @@ function SCOBot(options) {
 	 * Get Objective
 	 * Returns the Objective object by ID
 	 * @param id {String}
-	 * @returns {Mixed} object or string 'false'
+	 * @returns {*} object or string 'false'
 	 * {
 	 *	id: '1',                            // 4000 chars
 	 *	score: {

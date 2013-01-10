@@ -109,7 +109,7 @@ function SCORM_API(options) {
 	 * No Console
 	 * Lack of support in older browsers forced this
 	 * @param msg {String} Debug Message
-	 * @param lvl {Mixed} 1=Error, 2=Warning, 3=Log, 4=Info
+	 * @param lvl {*} 1=Error, 2=Warning, 3=Log, 4=Info
 	 * @event debug fired when no console is available.  You could listen to this to put it in an alternative log.
 	 */
 	function noconsole(msg, lvl) {
@@ -863,7 +863,7 @@ function SCORM_API(options) {
 	 * Objectives do not appear to be 'journaled' as object identifiers have to be unique.
 	 * As this method is seeking information it may trigger SCORM Errors on the LMS that hint that
 	 * objects haven't been defined yet.  This is perfectly normal.
-	 * @param id {Mixed} Alpha-Numeric Identification of the Interaction you're looking for
+	 * @param id {*} Alpha-Numeric Identification of the Interaction you're looking for
 	 * @returns id {String} 'false' if nothing found.
 	 */
 	this.getObjectiveByID = function (id) {
@@ -890,7 +890,7 @@ function SCORM_API(options) {
 	 * This is fun, they make you go fish the interactions array integer by the ID.
 	 * I included this in the main SCORM API because this functionality should be stock.  You're
 	 * either going to journal these (history) or treat them like states that you update.  You must decide that.
-	 * @param id {Mixed} Alpha-Numeric Identification of the Interaction you're looking for
+	 * @param id {*} Alpha-Numeric Identification of the Interaction you're looking for
 	 * @returns id {String} 'false' if nothing found
 	 */
 	this.getInteractionByID = function (id) {
@@ -1034,7 +1034,7 @@ function SCORM_API(options) {
 	 * Get (Internal API)
 	 * This locally gets values local to this API
 	 * @param n {String} name
-	 * @returns value {Mixed}
+	 * @returns value {*}
 	 */
 	this.get = function (n) {
 		//debug(settings.prefix + ": get " + n, 3);
