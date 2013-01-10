@@ -153,7 +153,7 @@ function SCOBot(options) {
 	/**
 	 * Verify cmi score scaled
 	 * Validates if success_status is passed, and exit_type is normal.  Checks that score.max is 1.
-	 * May need to tighten this up later, its mostly for SCO's that default to finish and expect them to be complete.
+	 * May need to tighten this up later, its mostly for SCO's that default to normal and expect them to be complete.
 	 */
 	function verifyScoreScaled() {
 		var success = scorm.getvalue('cmi.success_status');
