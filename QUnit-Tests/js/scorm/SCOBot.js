@@ -112,7 +112,7 @@ function SCOBot(options) {
 			$(self).triggerHandler({
 				'type': "unload"
 			});
-			if (scorm.get('exit_type') === "normal") {
+			if (scorm.get('exit_type') === "finish") {
 				self.finish();
 			} else {
 				self.suspend();
@@ -157,7 +157,7 @@ function SCOBot(options) {
 	 */
 	function verifyScoreScaled() {
 		var success = scorm.getvalue('cmi.success_status');
-		if (success === 'passed' && scorm.get('exit_type') === "normal") {
+		if (success === 'passed' && scorm.get('exit_type') === "finish") {
 			if (scorm.getvalue('cmi.score.scaled') === 'false') {
 				if (scorm.getvalue('cmi.score.max') === '1') {
 					scorm.setvalue('cmi.score.scaled', '1');
