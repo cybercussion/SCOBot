@@ -55,10 +55,10 @@ function SCOBot(options) {
 			launch_data: {},
 			interaction_mode: "state", // or journaled
 			launch_data_type: "querystring", // or json
-			scorm_edition: "3rd", // or 4th - this is a issue with "editions" of SCORM 2004 that differ 
-			success_status: "unknown",
+			scorm_edition: "3rd", // or 4th - this is a issue with "editions" of SCORM 2004 that differ
+			success_status: "unknown", // used as local status * see SCORM_API for override
 			location: "",
-			completion_status: "",
+			completion_status: "", // used as local status * see SCORM_API for override
 			suspend_data: {pages: []},
 			mode: "",
 			completion_threshold: 0,
