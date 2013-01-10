@@ -69,7 +69,7 @@ function SCORM_API(options) {
 			isActive : false,
 			throw_alerts : false,
 			prefix : "SCORM_API",
-			exit_type : "suspend", // suspend, normal, "" (undetermined)
+			exit_type : "suspend", // suspend, finish, or "" (undetermined)
 			success_status : "unknown", // passed, failed, unknown
 			use_standalone : true,
 			standalone: false,
