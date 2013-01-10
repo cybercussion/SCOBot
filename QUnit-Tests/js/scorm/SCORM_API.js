@@ -13,7 +13,7 @@
  * Goals: SCORM For Everyone else, low overhead, simple API's, containment, and transparency.
  *
  * Typical CMI Usage:
- * var scorm = new SCORM_API({debug: true, exit_type: 'finish'}),
+ * var scorm = new SCORM_API({debug: true, exit_type: 'suspend'}),
  *     lmsconnected = scorm.initialize();
  * scorm.getvalue('cmi.location');
  * scorm.setvalue('cmi.location', '4');
@@ -69,11 +69,11 @@ function SCORM_API(options) {
 			isActive : false,
 			throw_alerts : false,
 			prefix : "SCORM_API",
-			exit_type : "suspend",
-			success_status : "unknown",
+			exit_type : "suspend", // suspend, normal, "" (undetermined)
+			success_status : "unknown", // passed, failed, unknown
 			use_standalone : true,
 			standalone: false,
-			completion_status : "unknown",
+			completion_status : "unknown", // completed, incomplete, unknown
 			time_type: "GMT"
 		},
 		// Settings merged with defaults and extended options

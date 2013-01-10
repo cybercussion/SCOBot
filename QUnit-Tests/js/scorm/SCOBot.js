@@ -112,7 +112,7 @@ function SCOBot(options) {
 			$(self).triggerHandler({
 				'type': "unload"
 			});
-			if (scorm.get('exit_type') === "finish") {
+			if (scorm.get('exit_type') === "normal") {
 				self.finish();
 			} else {
 				self.suspend();
@@ -152,12 +152,12 @@ function SCOBot(options) {
 	}
 	/**
 	 * Verify cmi score scaled
-	 * Validates if success_status is passed, and exit_type is finish.  Checks that score.max is 1.
+	 * Validates if success_status is passed, and exit_type is normal.  Checks that score.max is 1.
 	 * May need to tighten this up later, its mostly for SCO's that default to finish and expect them to be complete.
 	 */
 	function verifyScoreScaled() {
 		var success = scorm.getvalue('cmi.success_status');
-		if (success === 'passed' && scorm.get('exit_type') === "finish") {
+		if (success === 'passed' && scorm.get('exit_type') === "normal") {
 			if (scorm.getvalue('cmi.score.scaled') === 'false') {
 				if (scorm.getvalue('cmi.score.max') === '1') {
 					scorm.setvalue('cmi.score.scaled', '1');
