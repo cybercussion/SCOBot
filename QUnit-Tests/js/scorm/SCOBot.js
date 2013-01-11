@@ -21,7 +21,7 @@
  */
  /*!
  * SCOBot
- * Copyright (c) 2011-2012 Mark Statkus <mark@cybercussion.com>
+ * Copyright (c) 2011-2013 Mark Statkus <mark@cybercussion.com>
  * The MIT License
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -47,9 +47,9 @@ function SCOBot(options) {
 	"use strict";
 	/** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
 	var defaults = {
-			version: "1.0.2",
+			version: "1.1",
 			createDate: "04/07/2011 09:33AM",
-			modifiedDate: "10/23/2012 3:00PM",
+			modifiedDate: "01/10/2013 5:09PM",
 			prefix: "SCOBot",
 			// SCORM buffers and settings
 			launch_data: {},
