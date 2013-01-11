@@ -37,7 +37,8 @@ You could just use the SCORM_API.js and get down the road.  But, what I've found
 
 This requires you to have a base understanding of SCORM or be open to trying to learn it.  There are several online resources from ADL on this subject which cover the specification in detail.  I'm not even going to make a feeble attempt as it took them over 200 pages to describe the standard.  I couldn't even begin to do it justice in this little README.
 
-## QUnit:
+## QUnit Launchables:
+If your testing a LMS, feel free to edit the imsmanifest.xml to fit your needs.  Change the tests to match your launch parameters or launch data.  These tests are not meant to remain static.  Make it fit your needs.
 * **qunit_SCORM_API.html** - This will run a series of 90+ tests against SCORM which include some local debug, gets and sets as well as classic Initialize, GetValue, SetValue, Commit and Terminate.  Even some illegal calls.  This whole package is great to run on a LMS to view if the LMS is compliant with SCORM.
 The test for this is found at 'js/test/scorm_api.js'.
 
