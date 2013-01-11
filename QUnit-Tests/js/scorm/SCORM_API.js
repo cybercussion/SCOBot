@@ -62,18 +62,18 @@ function SCORM_API(options) {
 	"use strict";
 	// Please edit run time options or override them when you instantiate this object.
 	var defaults = {
-			version : "1.0",
-			createDate : "04/05/2011 08:56AM",
-			modifiedDate : "03/02/2012 17:00AM",
-			debug : false,
-			isActive : false,
-			throw_alerts : false,
-			prefix : "SCORM_API",
-			exit_type : "suspend", // suspend, finish, or "" (undetermined)
-			success_status : "unknown", // passed, failed, unknown
-			use_standalone : true,
+			version: "1.1",
+			createDate: "04/05/2011 08:56AM",
+			modifiedDate: "01/10/2013 5:28PM",
+			debug: false,
+			isActive: false,
+			throw_alerts: false,
+			prefix: "SCORM_API",
+			exit_type: "suspend", // suspend, finish, or "" (undetermined)
+			success_status: "unknown", // passed, failed, unknown
+			use_standalone: true,
 			standalone: false,
-			completion_status : "unknown", // completed, incomplete, unknown
+			completion_status: "unknown", // completed, incomplete, unknown
 			time_type: "GMT"
 		},
 		// Settings merged with defaults and extended options
@@ -215,9 +215,8 @@ function SCORM_API(options) {
 			nY = 0,
 			nM = 0,
 			nD = 0,
-			nH = 0,
-			nMin = 0,
-			nS = 0;
+			nH,
+			nMin;
 		// Next set of operations uses whole seconds
 		//with (Math) { //agrumentavely considered harmful
 		nCs = Math.round(nCs);
@@ -292,14 +291,14 @@ function SCORM_API(options) {
 	/**
 	 * ISO 8601 String to Date
 	 * Not extremely clear yet if this is needed at a SCO level.  If not I'll remove it later.
-	 * @param str {Date String} ISO8601
+	 * @param str {String} ISO8601
 	 * @return {Object} Date Object or false
 	 */
 	function isoStringToDate(str) {
 		var MM = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
 			d,
 			uoffset,
-			offset,
+			offset = 0,
 			mil = 0,
 			dd;
 		switch (settings.time_type) {
@@ -358,10 +357,10 @@ function SCORM_API(options) {
 		nS = Math.floor(nCs / 100);
 		nCs = nCs - nS * 100;
 		//}
-		if (nH > 9999) {
+		/*if (nH > 9999) {
 			nH = 9999;
 			bTruncated = true;
-		}
+		}*/
 		str = "0000" + nH + ":";
 		str = str.substr(str.length - 5, 5);
 		if (nM < 10) {
@@ -595,7 +594,7 @@ function SCORM_API(options) {
 	 * @returns {String}
 	 */
 	this.setvalue = function (n, v) {
-		var s = false, // success
+		var s = 'false', // success
 			lms = API.path, // lms shortcut
 			ec = 0, // error code
 			nn = null, // new number
@@ -730,10 +729,10 @@ function SCORM_API(options) {
 	 * @returns {String} 'true' or 'false'
 	 */
 	this.commit = function () {
-		var s            = false,
+		var s            = 'false',
 			lms          = API.path,
 			ec           = 0,
-			session_secs = 0,
+			session_secs,
 			saveDate     = new Date();
 		session_secs     = (saveDate.getTime() - settings.startDate.getTime()) / 1000;
 		if (API.isActive) {// it has initialized
@@ -764,7 +763,7 @@ function SCORM_API(options) {
 	/**
 	 * Initialize  (SCORM Call)
 	 * Initializes the SCO
-	 * @returns {Boolean}
+	 * @returns {String} 'true' or 'false'
 	 */
 	this.initialize = function () {
 		debug(settings.prefix + ": Initialize Called. \n\tversion: " + settings.version + "\n\tModified: " + settings.modifiedDate, 3);
@@ -864,7 +863,7 @@ function SCORM_API(options) {
 	 * As this method is seeking information it may trigger SCORM Errors on the LMS that hint that
 	 * objects haven't been defined yet.  This is perfectly normal.
 	 * @param id {*} Alpha-Numeric Identification of the Interaction you're looking for
-	 * @returns id {String} 'false' if nothing found.
+	 * @returns {String} 'false' if nothing found or id
 	 */
 	this.getObjectiveByID = function (id) {
 		var count = self.getvalue("cmi.objectives._count"), // obtain total objectives
@@ -891,7 +890,7 @@ function SCORM_API(options) {
 	 * I included this in the main SCORM API because this functionality should be stock.  You're
 	 * either going to journal these (history) or treat them like states that you update.  You must decide that.
 	 * @param id {*} Alpha-Numeric Identification of the Interaction you're looking for
-	 * @returns id {String} 'false' if nothing found
+	 * @returns {String} 'false' if nothing found or id
 	 */
 	this.getInteractionByID = function (id) {
 		var count = self.getvalue("cmi.interactions._count"), // obtain total objectives
@@ -976,7 +975,7 @@ function SCORM_API(options) {
 		}
 		if (API.path) {
 			API.connection = true;
-			return 'true';
+			return true;
 		}
 		debug(settings.prefix + ": I was unable to locate an API for communication", 2);
 		if (settings.use_standalone) {
@@ -1034,7 +1033,7 @@ function SCORM_API(options) {
 	 * Get (Internal API)
 	 * This locally gets values local to this API
 	 * @param n {String} name
-	 * @returns value {*}
+	 * @returns {*} value or {Boolean} false
 	 */
 	this.get = function (n) {
 		//debug(settings.prefix + ": get " + n, 3);
