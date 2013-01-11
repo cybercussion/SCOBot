@@ -3,6 +3,14 @@
 I've added Wiki documentation now, so you can read more about the API support in detail.
 Here: https://github.com/cybercussion/SCORM_API/wiki - Please refer to this for much more detailed information.
 
+## Goals:
+* **Save** you time trying to support the SCORM Standard.  Yes, its Initialize, Get Value, Set Value, Commit, and Terminate on the surface, but it goes way beyond that.
+* **Educate** - I'm learning, you're learning, we are all learning
+* **Modernize** - No one likes 500 global variable constants coupled with endless other issues associated with un-managed code.
+* **Transparency** - Know why something isn't working, and have logging to back it up.
+* **Test** - Drove the whole project by test cases against the specification.
+
+## About the Project:
 I've kept this project split up into 3 logical portions, leaving room for anyone to add or subtract from the complete package. The main focal point would be 'QUnit-Tests/js/scorm/', as the surrounding files are simply supporting files like JQuery, QUnit, and further README files.  I've also added all the files that go into a Content Aggregation Model.  This is a package used to export your content to a learning management server.
 The portions of this project is split into the following sections:
 
@@ -20,7 +28,7 @@ This is a LMS mimic as boiled down, and will slowly be strengthened with-in reas
 
 * Also have now added a minified, or packed version of all 3 of these files in a 29KB easy to use single file for those not doing there own builds.  See the **scorm.bot.pack.js** which is only the 3 above files merged, minified and packed.
 
-## So what am I looking at?
+## So what are you looking at?
 I re-bundled this project with all the files you would need to construct a Content Aggregation Model (Package you import into a LMS that supports SCORM 2004).
 I hope this helps some people with that process that are manually creating content.  The imsmanifest.xml files within have some example structures and parameters that will hopefully aid you in defining your course, lesson or topics.
 
