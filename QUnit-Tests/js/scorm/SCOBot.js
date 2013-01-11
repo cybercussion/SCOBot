@@ -237,6 +237,7 @@ function SCOBot(options) {
 	 * Find Response Type (May not use this)
 	 * This is designed to check for {case_matters: true/false}, {order_matters: true/false} or {lang: x}
 	 * @param type {String} order_matters, case_matters, lang
+	 * @param str {String}
 	 * @returns {Number}
 	 */
 	function findResponseType(type, str) {
@@ -263,7 +264,7 @@ function SCOBot(options) {
 	 * This will not enforce SCORM char limits, so please mind your logs if your doing something your not suppose to.
 	 * @param type {String} Expects true-false, choice, fill-in, long-fill-in, matching, performance, sequencing, likert, numeric, other
 	 * @param value {*} May take Array or Object of arrays depending
-	 * @returns {String} formatted value for interaction type
+	 * @returns {*} formatted value for interaction type or Boolean false
 	 */
 	function encodeInteractionType(type, value) {
 		var str = '',
@@ -666,7 +667,7 @@ function SCOBot(options) {
 	/**
 	 * Set Suspend Data
 	 * This will set existing suspend data managed by escaping the values
-	 * @returns {Boolean} true (success) false (fail)
+	 * @returns {String} true (success) false (fail)
 	 */
 	function setSuspendData() {
 		var result;
@@ -687,7 +688,7 @@ function SCOBot(options) {
 	 * cmi.success_status, 
 	 * cmi.completion_status,
 	 * cmi.progress_measure
-	 * @returns {Object} or false
+	 * @returns {*} object or false string
 	 * {
 	 *	score_scaled      = '0',
 	 *	success_status    = 'failed',
@@ -697,19 +698,17 @@ function SCOBot(options) {
 	 */
 	function checkProgress() {
 		if (isStarted) {
-			var response                 = {},
-				scoreRaw                 = 0,
+			var scoreRaw                 = 0,
 				tmpRaw                   = 0,
 				scoreMax                 = 0,
 				scoreMin                 = 0,
 				scoreScaled              = 1,
-				progressMeasure          = 0,
-				completionStatus         = '',
+				progressMeasure,
 				totalObjectivesCompleted = 0,
-				totalKnownObjectives     = parseInt(scorm.getvalue('cmi.objectives._count'), 10),
-				totalKnownInteractions   = parseInt(scorm.getvalue('cmi.interactions._count'), 10),
+				//totalKnownObjectives     = parseInt(scorm.getvalue('cmi.objectives._count'), 10),
+				//totalKnownInteractions   = parseInt(scorm.getvalue('cmi.interactions._count'), 10),
 				i                        = 0,
-				count                    = 0;
+				count;
 			if (settings.totalInteractions === 0 || settings.totalObjectives === 0) {
 				// This is a non-starter, if the SCO Player doesn't set these we are flying blind
 				scorm.debug(settings.prefix + ": Sorry, I cannot calculate Progress as the totalInteractions and or Objectives are zero", 2);
@@ -752,13 +751,13 @@ function SCOBot(options) {
 			progressMeasure = (totalObjectivesCompleted / settings.totalObjectives).toString();
 			scorm.setvalue('cmi.progress_measure', trueRound(progressMeasure, 7));
 			// Set Completion Status
-			if (parseFloat(progressMeasure, 10) >= parseFloat(settings.completion_threshold, 10)) {
+			if (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) {
 				scorm.setvalue('cmi.completion_status', 'completed');
 			} else {
 				scorm.setvalue('cmi.completion_status', 'incomplete');
 			}
 			// Set Success Status
-			if (parseFloat(scoreScaled, 10) >= parseFloat(settings.scaled_passing_score, 10)) {
+			if (parseFloat(scoreScaled) >= parseFloat(settings.scaled_passing_score)) {
 				scorm.setvalue('cmi.success_status', 'passed');
 			} else {
 				scorm.setvalue('cmi.success_status', 'failed');
@@ -776,7 +775,7 @@ function SCOBot(options) {
 	 * Get Comments From LMS
 	 * Checks to see if there are any comments from the LMS, and will
 	 * return a complete object back for use with a display.
-	 * @return {Object} or 'false'
+	 * @return {*} object or 'false'
 	 */
 	function getCommentsFromLMS() {
 		if (isStarted) {
@@ -784,7 +783,7 @@ function SCOBot(options) {
 				count    = scorm.getvalue(p1 + '_count'),
 				response = [],
 				obj      = {},
-				i        = 0;
+				i;
 			if (!isBadValue(count)) {
 				return 'false';
 			}
@@ -1054,7 +1053,7 @@ function SCOBot(options) {
 	 * @param id {*}
 	 * @param title {String}
 	 * @param data {Object}
-	 * @returns {Boolean}
+	 * @returns {String}
 	 */
 	this.setSuspendDataByPageID = function (id, title, data) {
 		if (isStarted) {
@@ -1081,7 +1080,7 @@ function SCOBot(options) {
 	 * Get Suspend Data By Page ID
 	 * This will get the suspend data by id 
 	 * @param id {*}
-	 * @returns {Object} but false if empty.
+	 * @returns {*} object, but false if empty.
 	 */
 	this.getSuspendDataByPageID = function (id) {
 		if (isStarted) {
@@ -1143,11 +1142,10 @@ function SCOBot(options) {
 				j,       // Reserved for correct responses loop
 				p,       // Reserved for the count within interactions.n.ncorrect_responses.p loop
 				p1 = 'cmi.interactions.', // Reduction of retyping
-				p2 = '',                  // Reduction of retyping
+				p2,                  // Reduction of retyping
 				orig_timestamp = data.timestamp || scorm.isoStringToDate(scorm.getvalue(p1 + scorm.getInteractionByID(data.id) + '.timestamp')),
 				timestamp, // Reserved for converting the Timestamp
 				latency, // Reserved for doing the Timestamp to latency conversion (May not exist)
-				namespace, // Reserved for holding the cmi.interaction.n. name space to stop having to re-type it
 				result;  // Result of calling values against the SCORM API
 			if (!$.isPlainObject(data)) {
 				scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof (data) + " instead.", 1);
@@ -1269,10 +1267,10 @@ function SCOBot(options) {
 	 */
 	this.getInteraction = function (id) {
 		if (isStarted) {
-			var n = 'false', // Interaction count
+			var n, // Interaction count
 				p1 = 'cmi.interactions.', // Reduction of typing
-				m = 0, // objectives count
-				p = 0, // correct_responses count
+				m, // objectives count
+				p, // correct_responses count
 				i = 0, // loop count
 				obj = {}; // Response object
 			n = scorm.getInteractionByID(id);
@@ -1353,7 +1351,6 @@ function SCOBot(options) {
 		if (isStarted) {
 			var p1 = 'cmi.objectives.',
 				n = scorm.getObjectiveByID(data.id),
-				i = 0,
 				result = 'false',
 				f = false;
 			scorm.debug(settings.prefix + ": Setting Objective at " + n + " (This may be false)");
@@ -1432,8 +1429,7 @@ function SCOBot(options) {
 	this.getObjective = function (id) {
 		if (isStarted) {
 			var n = scorm.getObjectiveByID(id),
-				p1 = 'cmi.objectives.',
-				obj = {};
+				p1 = 'cmi.objectives.';
 			if (n === 'false') {
 				return n;
 			}
@@ -1504,13 +1500,13 @@ function SCOBot(options) {
 			scorm.setvalue('cmi.score.scaled', trueRound(scoreScaled, 7));
 		}
 		// Set Completion Status
-		if (parseFloat(progressMeasure, 10) >= parseFloat(settings.completion_threshold, 10)) {
+		if (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) {
 			scorm.setvalue('cmi.completion_status', 'completed');
 		} else {
 			scorm.setvalue('cmi.completion_status', 'incomplete');
 		}
 		// Set Success Status
-		if (parseFloat(scoreScaled, 10) >= parseFloat(settings.scaled_passing_score, 10)) {
+		if (parseFloat(scoreScaled) >= parseFloat(settings.scaled_passing_score)) {
 			scorm.setvalue('cmi.success_status', 'passed');
 		} else {
 			scorm.setvalue('cmi.success_status', 'failed');
@@ -1602,6 +1598,7 @@ function SCOBot(options) {
 	 * This locally sets values local to this API
 	 * @param n {String} name
 	 * @param v (String,Number,Object,Array,Boolean} value
+	 * @return {Boolean}
 	 */
 	this.set = function (n, v) {
 		// May need to maintain read-only perms here, case them out as needed.
@@ -1616,7 +1613,7 @@ function SCOBot(options) {
 			settings[n] = v;
 			break;
 		}
-		return (isError === 0);
+		return (isError === false);
 	};
 	/**
 	 * Get 
