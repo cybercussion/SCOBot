@@ -219,8 +219,7 @@ function SCOBot(options) {
 	 * @returns {Number} Milliseconds
 	 */
 	function currentTime() {
-		var d = new Date();
-		return d.getTime() + (Date.remoteOffset || 0);
+		return (new Date().getTime());
 	}
 	/**
 	 * True Round
