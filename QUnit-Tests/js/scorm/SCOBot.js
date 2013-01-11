@@ -1619,7 +1619,7 @@ function SCOBot(options) {
 	 * Get 
 	 * This locally gets values local to this API
 	 * @param n {String} name
-	 * @returns value
+	 * @returns {*} value or {Boolean} false
 	 */
 	this.get = function (n) {
 		if (settings[n] === undefined) {
