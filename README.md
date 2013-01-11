@@ -29,10 +29,12 @@ You could just use the SCORM_API.js and get down the road.  But, what I've found
 This requires you to have a base understanding of SCORM or be open to trying to learn it.  There are several online resources from ADL on this subject which cover the specification in detail.  I'm not even going to make a feeble attempt as it took them over 200 pages to describe the standard.  I couldn't even begin to do it justice in this little README.
 
 ## QUnit:
-*qunit_SCORM_API.html - This will run a series of 90+ tests against SCORM which include some local debug, gets and sets as well as classic Initialize, GetValue, SetValue, Commit and Terminate.  Even some illegal calls.  This whole package is great to run on a LMS to view if the LMS is compliant with SCORM.
+* qunit_SCORM_API.html - This will run a series of 90+ tests against SCORM which include some local debug, gets and sets as well as classic Initialize, GetValue, SetValue, Commit and Terminate.  Even some illegal calls.  This whole package is great to run on a LMS to view if the LMS is compliant with SCORM.
 The test for this is found at 'js/test/scorm_api.js'.
 
-*qunit_SCOBot.html - This will run thru a series of rolled up common functionality that pelts the SCORM_API with all the calls, stressing out the Interactions, Objectives, Suspend Data functionality.  This will continue to grow, as I expand the tests to include proper and improper data formats.
+* qunit_SCOBot.html - This will run thru a series of rolled up common functionality that pelts the SCORM_API with all the calls, stressing out the Interactions, Objectives, Suspend Data functionality.  This will continue to grow, as I expand the tests to include proper and improper data formats.
+
+* qunit_SCOBot_prod.html - This is the same as the one above, but using the minified/packed JavaScript (single file) scorm.bot.pack.js @ 29KB.
 
 ### Further Reading:
 There are additional HTML based 'read me' files I've written up over the months I worked on this.  I based much the work on the fact that it's been many many years since SCORM 2004, and JavaScript has come quite a ways since those days.  Getting this into JSLint, QUnit and some more structured code made good solid sense to me.  Since this is on peoples radar in such a broad audience its extremely difficult to speak in API terms to someone that wants to just record some information, and has no idea where in the spec to put it.  I understand when building e-learning content you are often faced with teams of people that don't fully grasp or aren't working in the realm of SCORM.  Terms won't always line up, and the sequence doesn't always match up.  You may run out of space within a few areas due to character limits.  These things cause architectual directional changes and can create problems when your close to deploying.  So I'd highly recommend getting more reading online in if you're new to this.
