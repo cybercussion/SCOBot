@@ -1,5 +1,5 @@
 
-# SCORM_API for Content w/ SCOBot and Local LMS Mimic for standalone
+# Shareable Content Object: SCORM API
 I've added Wiki documentation now, so you can read more about the API support in detail.
 Here: https://github.com/cybercussion/SCORM_API/wiki - Please refer to this for much more detailed information.
 
