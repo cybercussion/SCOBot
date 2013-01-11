@@ -8,7 +8,7 @@ Here: https://github.com/cybercussion/SCORM_API/wiki - Please refer to this for 
 * **Educate** - I'm learning, you're learning, we are all learning
 * **Modernize** - No one likes 500 global variable constants coupled with endless other issues associated with un-managed code.
 * **Transparency** - Know why something isn't working, and have logging to back it up.
-* **Test** - Drove the whole project by test cases against the specification.
+* **Test** - Drove the whole project with unit tests against the specification.  Scenarios, make having a complete test impossible.  Which is why there is always room for more testing.
 
 ## About the Project:
 I've kept this project split up into 3 logical portions, leaving room for anyone to add or subtract from the complete package. The main focal point would be 'QUnit-Tests/js/scorm/', as the surrounding files are simply supporting files like JQuery, QUnit, and further README files.  I've also added all the files that go into a Content Aggregation Model.  This is a package used to export your content to a learning management server.
