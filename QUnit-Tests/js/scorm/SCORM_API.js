@@ -193,23 +193,23 @@ function SCORM_API(options) {
 	 * @returns {String} SCORM 2004 Time PT0H0M0S Format
 	 */
 	function centisecsToISODuration(n, bPrecise) {
-		// Note: SCORM and IEEE 1484.11.1 require centisec precision
-		// Parameters:
-		// n = number of centiseconds
-		// bPrecise = optional parameter; if true, duration will
-		// be expressed without using year and/or month fields.
-		// If bPrecise is not true, and the duration is long,
-		// months are calculated by approximation based on average number
-		// of days over 4 years (365*4+1), not counting the extra days
-		// for leap years. If a reference date was available,
-		// the calculation could be more precise, but becomes complex,
-		// since the exact result depends on where the reference date
-		// falls within the period (e.g. beginning, end or ???)
-		// 1 year ~ (365*4+1)/4*60*60*24*100 = 3155760000 centiseconds
-		// 1 month ~ (365*4+1)/48*60*60*24*100 = 262980000 centiseconds
-		// 1 day = 8640000 centiseconds
-		// 1 hour = 360000 centiseconds
-		// 1 minute = 6000 centiseconds
+		/* Note: SCORM and IEEE 1484.11.1 require centisec precision
+		   Parameters:
+		   n = number of centiseconds
+		   bPrecise = optional parameter; if true, duration will
+		   be expressed without using year and/or month fields.
+		   If bPrecise is not true, and the duration is long,
+		   months are calculated by approximation based on average number
+		   of days over 4 years (365*4+1), not counting the extra days
+		   for leap years. If a reference date was available,
+		   the calculation could be more precise, but becomes complex,
+		   since the exact result depends on where the reference date
+		   falls within the period (e.g. beginning, end or ???)
+		   1 year ~ (365*4+1)/4*60*60*24*100 = 3155760000 centiseconds
+		   1 month ~ (365*4+1)/48*60*60*24*100 = 262980000 centiseconds
+		   1 day = 8640000 centiseconds
+		   1 hour = 360000 centiseconds
+		   1 minute = 6000 centiseconds */
 		var str = "P",
 			nCs = Math.max(n, 0),
 			nY = 0,
@@ -218,7 +218,7 @@ function SCORM_API(options) {
 			nH,
 			nMin;
 		// Next set of operations uses whole seconds
-		//with (Math) { //agrumentavely considered harmful
+		//with (Math) { //argumentatively considered harmful
 		nCs = Math.round(nCs);
 		if (bPrecise === true) {
 			nD = Math.floor(nCs / 8640000);
@@ -342,7 +342,7 @@ function SCORM_API(options) {
 	 */
 	function centisecsToSCORM12Duration(n) {
 		// Format is [HH]HH:MM:SS[.SS]
-		var bTruncated = false,
+		var //bTruncated = false,
 			str,
 			nH,
 			nCs,
