@@ -1,7 +1,8 @@
 
-# SCORM_API
-Hi,
-I've added Wiki documentation now, so you can read more about the API support in detail. Here: https://github.com/cybercussion/SCORM_API/wiki
+# SCORM_API for Content w/ SCOBot and Local LMS Mimic for standalone
+I've added Wiki documentation now, so you can read more about the API support in detail.
+Here: https://github.com/cybercussion/SCORM_API/wiki - Please refer to this for much more detailed information.
+
 I've kept this project split up into 3 logical portions, leaving room for anyone to add or subtract from the complete package. The main focal point would be 'QUnit-Tests/js/scorm/', as the surrounding files are simply supporting files like JQuery, QUnit, and further README files.  I've also added all the files that go into a Content Aggregation Model.  This is a package used to export your content to a learning management server.
 The portions of this project is split into the following sections:
 
