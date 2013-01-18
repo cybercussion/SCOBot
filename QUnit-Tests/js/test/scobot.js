@@ -30,9 +30,9 @@ $(scorm).on("getvalue", function (e) {
 // Much of SCOBOT is a bit auto-pilot so several SCORM calls may be made on one API reference.
 module("SCOBot");
 // Debug
-test("scorm.debug", function () {
+test("SB.debug", function () {
 	"use strict";
-	var sub_method = scorm.debug;
+	var sub_method = SB.debug;
 	ok(sub_method("Error Message", 1), "Valid error message");
 	ok(sub_method("Warning Message", 2), "Valid warning message");
 	ok(sub_method("General Message", 3), "Valid general message");
@@ -69,8 +69,8 @@ test("Set Totals", function () {
 		scoreMax:          '16.083'
 	}), 'true', 'Setting SCO totals');
 	// Based on Entry we may be able to tell if we've been ran before.
-	scorm.debug(">>>>>>>>> TOTALS SET <<<<<<<<<");
-	version = scorm.getvalue('cmi._version');
+	SB.debug(">>>>>>>>> TOTALS SET <<<<<<<<<");
+	version = SB.getvalue('cmi._version');
 	if (version === "Local 1.0") {
 		local = true;
 	} else {
@@ -98,18 +98,18 @@ test("Bookmarking", function () {
 });
 
 test("Max Time Allowed", function() {
-	var max_time_allowed = scorm.getvalue('cmi.max_time_allowed');
+	var max_time_allowed = SB.getvalue('cmi.max_time_allowed');
 	strictEqual(max_time_allowed, '', "Checking max time allowed ('')");
 	// Note, if you update the CAM to pass imsss:attemptAbsoluteDurationLimit please update this test!
 });
 
 test("Comments from LMS", function () {
-	strictEqual(scorm.getvalue('cmi.comments_from_lms._count'), '0', "Getting Comments from LMS count '0'");
+	strictEqual(SB.getvalue('cmi.comments_from_lms._count'), '0', "Getting Comments from LMS count '0'");
 	// UPDATE YOUR TESTS HERE IF YOU INTEND TO CHECK FOR COMMENTS
 });
 
 test("Check Comments from Learner", function () {
-	var learner_comment_count = scorm.getvalue('cmi.comments_from_learner._count');
+	var learner_comment_count = SB.getvalue('cmi.comments_from_learner._count');
 	if (SB.getEntry() !== "resume") {
 		// Verify previous comments
 		strictEqual(learner_comment_count, '0', "Getting Comments from Learner count '0'");
@@ -126,8 +126,8 @@ test("Set Comment from Learner", function() {
 
 test("Objectives", function () {
 	if (SB.getEntry() !== "resume") {
-		scorm.debug(">>>>>>>>> Setting Objective(s) <<<<<<<<<");
-		scorm.debug("Get objective count before the fun begins.... " + scorm.getvalue('cmi.objectives._count'));
+		SB.debug(">>>>>>>>> Setting Objective(s) <<<<<<<<<");
+		SB.debug("Get objective count before the fun begins.... " + SB.getvalue('cmi.objectives._count'));
 		// For True False
 		strictEqual(SB.setObjective({
 			id:                '1_1', // {String}
@@ -268,8 +268,8 @@ test("Objectives", function () {
 			progress_measure:  '0',
 			description:       'They will answer a numeric interaction'
 		}), 'true', "Setting Objective Numeric 8_1 unscored");
-		scorm.debug(">>>>>>>>> End Setting Objective(s) <<<<<<<<<");
-		scorm.debug(">>>>>>>>> Verify Objective(s) <<<<<<<<<");
+		SB.debug(">>>>>>>>> End Setting Objective(s) <<<<<<<<<");
+		SB.debug(">>>>>>>>> Verify Objective(s) <<<<<<<<<");
 		// Verify These 
 		var objective = SB.getObjective('1_1');
 		strictEqual(objective.id, "1_1", "Verify Objective id is 1_1");
@@ -382,10 +382,10 @@ test("Objectives", function () {
 		strictEqual(objective.description, "They will answer a numeric interaction", "Verify Objective description is They will answer a numeric interaction");
 
 		strictEqual(SB.getInteraction('999_9'), 'false', "Getting bogus objective, should be false");
-		scorm.debug(">>>>>>>>> End Verify Objective(s) <<<<<<<<<");
+		SB.debug(">>>>>>>>> End Verify Objective(s) <<<<<<<<<");
 	} else {
 		// Some scores were set, verify they are still there (LMS Only)
-		scorm.debug(">>>>>>>>> Verify Objective(s) <<<<<<<<<");
+		SB.debug(">>>>>>>>> Verify Objective(s) <<<<<<<<<");
 		var objective = SB.getObjective('1_1');
 		strictEqual(objective.id, "1_1", "Verify Objective id is 1_1");
 		strictEqual(objective.score.scaled, "1", "Verify Objective score.scaled is 1");
@@ -497,7 +497,7 @@ test("Objectives", function () {
 		strictEqual(objective.description, "They will answer a numeric interaction", "Verify Objective description is They will answer a numeric interaction");
 
 		strictEqual(SB.getInteraction('999_9'), 'false', "Getting bogus objective, should be false");
-		scorm.debug(">>>>>>>>> End Verify Objective(s) <<<<<<<<<");
+		SB.debug(">>>>>>>>> End Verify Objective(s) <<<<<<<<<");
 	}
 });
 
@@ -512,7 +512,7 @@ test("Interactions", function () {
 	endTime.setMinutes(startTime.getMinutes() + 5); // Add 5 minutes for latency, result would be PT5M
 
 	if (SB.getEntry() !== 'resume') {
-		scorm.debug(">>>>>>>>> Setting Interaction(s) <<<<<<<<<");
+		SB.debug(">>>>>>>>> Setting Interaction(s) <<<<<<<<<");
 		// True False Interaction
 		strictEqual(SB.setInteraction({
 			id:                intID, // {String}
@@ -540,12 +540,12 @@ test("Interactions", function () {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.type'), 'true-false', 'Verifying cmi.interactions.' + n + '.type is true-false');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '1_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 1_1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.learner_response'), 'true', 'Verifying cmi.interactions.' + n + '.learner_response is true');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.type'), 'true-false', 'Verifying cmi.interactions.' + n + '.type is true-false');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '1_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 1_1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), 'true', 'Verifying cmi.interactions.' + n + '.learner_response is true');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End True False Interaction
 
 		// Multiple Choice Interaction
@@ -578,12 +578,12 @@ test("Interactions", function () {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.type'), "choice", 'Verifying cmi.interactions.' + n + '.type is choice');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '2_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 2_1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.learner_response'), 'a[,]c', 'Verifying cmi.interactions.' + n + '.learner_response is a[,]c');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.result'), 'incorrect', 'Verifying cmi.interactions.' + n + '.result is incorrect');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.type'), "choice", 'Verifying cmi.interactions.' + n + '.type is choice');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '2_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 2_1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), 'a[,]c', 'Verifying cmi.interactions.' + n + '.learner_response is a[,]c');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'incorrect', 'Verifying cmi.interactions.' + n + '.result is incorrect');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End Multiple Choice Interaction
 
 		// Fill In Interaction
@@ -624,12 +624,12 @@ test("Interactions", function () {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.type'), 'fill-in', 'Verifying cmi.interactions.' + n + '.type is fill-in');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '3_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 3_1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.learner_response'), '{lang=en}car[,]automobile', 'Verifying cmi.interactions.' + n + '.learner_response is {lang=en}car[,]automobile');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.type'), 'fill-in', 'Verifying cmi.interactions.' + n + '.type is fill-in');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '3_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 3_1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), '{lang=en}car[,]automobile', 'Verifying cmi.interactions.' + n + '.learner_response is {lang=en}car[,]automobile');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End Fill In Interaction
 
 		// Sequencing Interaction
@@ -662,12 +662,12 @@ test("Interactions", function () {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.type'), 'sequencing', 'Verifying cmi.interactions.' + n + '.type is sequencing');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '4_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 4_1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.learner_response'), 'a[,]c[,]b', 'Verifying cmi.interactions.' + n + '.learner_response is a[,]c[,]b');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.result'), 'incorrect', 'Verifying cmi.interactions.' + n + '.result is incorrect');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.type'), 'sequencing', 'Verifying cmi.interactions.' + n + '.type is sequencing');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '4_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 4_1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), 'a[,]c[,]b', 'Verifying cmi.interactions.' + n + '.learner_response is a[,]c[,]b');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'incorrect', 'Verifying cmi.interactions.' + n + '.result is incorrect');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End Sequencing Interaction
 
 		// Long Fill In Interaction
@@ -707,12 +707,12 @@ test("Interactions", function () {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.type'), 'long-fill-in', 'Verifying cmi.interactions.' + n + '.type is long-fill-in');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '5_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 5_1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.learner_response'), "{lang=en}There was one once, but it's been a long day.", "Verifying cmi.interactions." + n + ".learner_response is {lang=en}There was one once, but it's been a long day.");
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.type'), 'long-fill-in', 'Verifying cmi.interactions.' + n + '.type is long-fill-in');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '5_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 5_1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), "{lang=en}There was one once, but it's been a long day.", "Verifying cmi.interactions." + n + ".learner_response is {lang=en}There was one once, but it's been a long day.");
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End Long Fill In Choice Interaction
 
 		// Matching Interaction
@@ -757,12 +757,12 @@ test("Interactions", function () {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.type'), 'matching', 'Verifying cmi.interactions.' + n + '.type is matching');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '6_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 6_1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.learner_response'), 'tile_1[.]target_2[,]tile_2[.]target_1[,]tile_3[.]target_3', 'Verifying cmi.interactions.' + n + '.learner_response is tile_1[.]target_2[,]tile_2[.]target_1[,]tile_3[.]target_3');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.type'), 'matching', 'Verifying cmi.interactions.' + n + '.type is matching');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '6_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 6_1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), 'tile_1[.]target_2[,]tile_2[.]target_1[,]tile_3[.]target_3', 'Verifying cmi.interactions.' + n + '.learner_response is tile_1[.]target_2[,]tile_2[.]target_1[,]tile_3[.]target_3');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End Matching Interaction
 
 		// LikeRT Interaction
@@ -805,12 +805,12 @@ test("Interactions", function () {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.type'), 'likert', 'Verifying cmi.interactions.' + n + '.type is likert');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '7_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 7_1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.learner_response'), 'strongly_agree', 'Verifying cmi.interactions.' + n + '.learner_response is strongly_agree');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.type'), 'likert', 'Verifying cmi.interactions.' + n + '.type is likert');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '7_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 7_1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), 'strongly_agree', 'Verifying cmi.interactions.' + n + '.learner_response is strongly_agree');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End LikeRT Interaction
 
 		// Other Interaction
@@ -853,12 +853,12 @@ test("Interactions", function () {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.type'), 'other', 'Verifying cmi.interactions.' + n + '.type is other');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '8_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 8_1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.learner_response'), 'Anything we want.', 'Verifying cmi.interactions.' + n + '.learner_response is Anything we want.');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.type'), 'other', 'Verifying cmi.interactions.' + n + '.type is other');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '8_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 8_1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), 'Anything we want.', 'Verifying cmi.interactions.' + n + '.learner_response is Anything we want.');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End Other Interaction
 
 		// Performance Interaction
@@ -906,12 +906,12 @@ test("Interactions", function () {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.type'), 'performance', 'Verifying cmi.interactions.' + n + '.type is performance');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '9_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 9_1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.learner_response'), 'step_1[.]answer_2[,]step_2[.]answer_1[,]step_3[.]answer_3', 'Verifying cmi.interactions.' + n + '.learner_response is step_1[.]step_answer_2[,]step_2[.]answer_1[,]step_3[.]answer_3');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.type'), 'performance', 'Verifying cmi.interactions.' + n + '.type is performance');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '9_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 9_1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), 'step_1[.]answer_2[,]step_2[.]answer_1[,]step_3[.]answer_3', 'Verifying cmi.interactions.' + n + '.learner_response is step_1[.]step_answer_2[,]step_2[.]answer_1[,]step_3[.]answer_3');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End Performance Interaction
 
 		// Numeric Interaction
@@ -940,7 +940,7 @@ test("Interactions", function () {
 			latency:           endTime, // {Object} date end (optional)
 			description:       "Just fill in some random decimal that looks like 10.5." // {String} question commonly
 		}), 'true', "Setting numeric Interaction 6");
-		//scorm.debug("I AM CHECKIN A SMALL SUBSET WITH A NEW LATENCY +++++++++++++++++++++++++++++++++", 4);
+		//SB.debug("I AM CHECKIN A SMALL SUBSET WITH A NEW LATENCY +++++++++++++++++++++++++++++++++", 4);
 		/*strictEqual(SB.setInteraction({
 		 id: intID,                                                    // {String}
 		 latency: endTime,                                             // {Object} date end (optional)
@@ -950,18 +950,18 @@ test("Interactions", function () {
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
 		m = scorm.getInteractionObjectiveByID(n, objID);
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.type'), 'numeric', 'Verifying cmi.interactions.' + n + '.type is numeric');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '10_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 9_1');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.learner_response'), '10.5', 'Verifying cmi.interactions.' + n + '.learner_response is 10.5');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
-		strictEqual(scorm.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.type'), 'numeric', 'Verifying cmi.interactions.' + n + '.type is numeric');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '10_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 9_1');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), '10.5', 'Verifying cmi.interactions.' + n + '.learner_response is 10.5');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End Performance Interaction
-		scorm.debug(">>>>>>>>> End Setting Interaction(s) <<<<<<<<<");
+		SB.debug(">>>>>>>>> End Setting Interaction(s) <<<<<<<<<");
 	}
-	scorm.debug('>>>>>> Verify Interaction Block <<<<<<<');
+	SB.debug('>>>>>> Verify Interaction Block <<<<<<<');
 	var interaction = SB.getInteraction('1'); // True False
-	scorm.debug(interaction);
+	SB.debug(interaction);
 	strictEqual(interaction.id, '1', 'Verify Interaction ID 1');
 	strictEqual(interaction.type, 'true-false', 'Verify Interaction Type true-false');
 	strictEqual(interaction.objectives[0].id, '1_1', 'Verify Interaction Objectives 1_1');
@@ -972,12 +972,12 @@ test("Interactions", function () {
 	strictEqual(interaction.description, 'This is the question?', 'Verify Interaction description "This is the question?"');
 
 	interaction = SB.getInteraction('2'); // Choice
-	scorm.debug(interaction);
+	SB.debug(interaction);
 	strictEqual(interaction.id, '2', 'Verify Interaction ID 2');
 	strictEqual(interaction.type, 'choice', 'Verify Interaction Type choice');
 	strictEqual(interaction.objectives[0].id, '2_1', 'Verify Interaction Objectives 2_1');
-	scorm.debug("Response pattern");
-	scorm.debug(interaction.correct_responses[0].pattern);
+	SB.debug("Response pattern");
+	SB.debug(interaction.correct_responses[0].pattern);
 	deepEqual(interaction.correct_responses[0].pattern, ["a", "b"], 'Verify Interaction Correct Responses [a,b]');
 	strictEqual(interaction.weighting, '1', 'Verify Interaction weighting 1');
 	deepEqual(interaction.learner_response, ["a", "c"], 'Verify Interaction learner response [a,c]');
@@ -986,7 +986,7 @@ test("Interactions", function () {
 
 	// TODO Write rest of tests...
 
-	scorm.debug('>>>>>>>>> End Interaction Verification <<<<<<<<<<');
+	SB.debug('>>>>>>>>> End Interaction Verification <<<<<<<<<<');
 });
 
 /*test("Get Interaction By ID", function() {
@@ -1016,7 +1016,7 @@ test("Interactions", function () {
 test("Update Objective By ID", function () {
 
 	if (SB.getEntry() !== "resume") {
-		scorm.debug(">>>>>>>>> Updating Objective(s) <<<<<<<<<");
+		SB.debug(">>>>>>>>> Updating Objective(s) <<<<<<<<<");
 		// For True False
 		strictEqual(SB.setObjective({
 			id:                '1_1', // {String}
@@ -1083,7 +1083,7 @@ test("Update Objective By ID", function () {
 			completion_status: 'completed', // {String} completed, incomplete, not attempted
 			progress_measure:  '1'                                       // {String}
 		}), 'true', "Setting Objective True False 1_1 unscored");
-		scorm.debug(">>>>>>>>> End Updating Objective(s) <<<<<<<<<");
+		SB.debug(">>>>>>>>> End Updating Objective(s) <<<<<<<<<");
 	} else {
 		// Do something else?  With no tests this will cause a assertion error in QUnit.
 		// Doing any updating to these objectives means needing to manage resumes and verifying.
@@ -1127,13 +1127,13 @@ test("Set Suspend Data By Page ID", function () {
 });
 
 test("Suspend SCO", function () {
-	scorm.debug(">>>>>>>>> Suspending <<<<<<<<<");
-	strictEqual(scorm.commit(), 'true', "Commiting to check navigation possibilities.");
-	canContinue = scorm.getvalue('adl.nav.request_valid.continue');
+	SB.debug(">>>>>>>>> Suspending <<<<<<<<<");
+	strictEqual(scorm.commit(), 'true', "Committing to check navigation possibilities.");
+	canContinue = SB.getvalue('adl.nav.request_valid.continue');
 	strictEqual(canContinue, 'true', 'Checking for adl.nav.request_valid.continue'); // Check your imss sequencing flow control!!!
 	if(canContinue === 'true' || canContinue === 'unknown') {
-		//scorm.setvalue('adl.nav.request', 'continue'); // Enable if you want it to cruise past this SCO
+		//SB.setvalue('adl.nav.request', 'continue'); // Enable if you want it to cruise past this SCO
 	}
 	//strictEqual(SB.suspend(), 'true', 'Suspending SCO');
-	scorm.debug("SetValue Calls: " + setvalue_calls + "\nGetValue Calls: " + getvalue_calls, 4);
+	SB.debug("SetValue Calls: " + setvalue_calls + "\nGetValue Calls: " + getvalue_calls, 4);
 });
