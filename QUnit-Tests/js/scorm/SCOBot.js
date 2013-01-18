@@ -967,6 +967,24 @@ function SCOBot(options) {
 		return notStartedYet();
 	};
 	/**
+	 * Debug
+	 * Relay so you don't have to say scorm vs SB
+	 * @type {*} *see SCORM_API debug
+	 */
+	this.debug = scorm.debug;
+	/**
+	 * Get Value
+	 * Relay so you can keep talking to SCOBot for one-to-one SCORM calls.
+	 * @type {*|Function} *see SCORM_API getvalue
+	 */
+	this.getvalue = scorm.getvalue;
+	/**
+	 * Set Value
+	 * Relay so you can keep talking to SCObot for one-to-one SCORM calls.
+	 * @type {*|Function} *see SCORM_API setvalue
+	 */
+	this.setvalue = scorm.setvalue;
+	/**
 	 * Get Mode
 	 * This will return the current SCO Mode we are in (normal, browse, review)
 	 * @returns {String} normal, browse, review
