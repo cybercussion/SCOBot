@@ -750,17 +750,11 @@ function SCOBot(options) {
 			progressMeasure = (totalObjectivesCompleted / settings.totalObjectives).toString();
 			scorm.setvalue('cmi.progress_measure', trueRound(progressMeasure, 7));
 			// Set Completion Status
-			if (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) {
-				scorm.setvalue('cmi.completion_status', 'completed');
-			} else {
-				scorm.setvalue('cmi.completion_status', 'incomplete');
-			}
+			settings.completion_status = (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) ? 'completed' : 'incomplete';
+			scorm.setvalue('cmi.completion_status', settings.completion_status);
 			// Set Success Status
-			if (parseFloat(scoreScaled) >= parseFloat(settings.scaled_passing_score)) {
-				scorm.setvalue('cmi.success_status', 'passed');
-			} else {
-				scorm.setvalue('cmi.success_status', 'failed');
-			}
+			settings.success_status = (parseFloat(scoreScaled) >= parseFloat(settings.scaled_passing_score)) ? 'passed' : 'failed';
+			scorm.setvalue('cmi.success_status', settings.success_status);
 			return {
 				score_scaled: scorm.getvalue('cmi.score.scaled'),
 				success_status: scorm.getvalue('cmi.success_status'),
@@ -1517,17 +1511,11 @@ function SCOBot(options) {
 			scorm.setvalue('cmi.score.scaled', trueRound(scoreScaled, 7));
 		}
 		// Set Completion Status
-		if (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) {
-			scorm.setvalue('cmi.completion_status', 'completed');
-		} else {
-			scorm.setvalue('cmi.completion_status', 'incomplete');
-		}
+		settings.completion_status = (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) ? 'completed' : 'incomplete';
+		scorm.setvalue('cmi.completion_status', settings.completion_status);
 		// Set Success Status
-		if (parseFloat(scoreScaled) >= parseFloat(settings.scaled_passing_score)) {
-			scorm.setvalue('cmi.success_status', 'passed');
-		} else {
-			scorm.setvalue('cmi.success_status', 'failed');
-		}
+		settings.success_status = (parseFloat(scoreScaled) >= parseFloat(settings.scaled_passing_score)) ? 'passed' : 'failed';
+		scorm.setvalue('cmi.success_status', settings.success_status);
 		return 'true';
 	};
 	/**
