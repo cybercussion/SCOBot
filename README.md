@@ -3,6 +3,8 @@
 I've added Wiki documentation now, so you can read more about the API support in detail.
 Here: https://github.com/cybercussion/SCORM_API/wiki - Please refer to this for much more detailed information.
 
+You may be looking for the LMS Runtime API_1484_11.  This project does not currently expose that, but does have a LMS Mimic or Local API_1484_11 used when no LMS is present. More on that below...
+
 ## Goals:
 * **Save** you time trying to support the SCORM Standard.  Yes, its Initialize, Get Value, Set Value, Commit, and Terminate on the surface, but it goes way beyond that.
 * **Educate** - I'm learning, you're learning, we are all learning
@@ -23,7 +25,7 @@ Tip: This is totally customizable to fit your needs.  Edit away.
 This is a boiled down series of API's that do common things we all do in a Shareable Content Object.  I often get asked questions about SCORM, and I always try to inform people that API Wrappers are commonly just 'line of sight' to the LMS.  There is mild enforcement of the specification, but most of that comes from the LMS API_1484_11.  SCOBot, is an attempt to rollup all that between the lines stuff that our content commonly has to do.  From managing ISO 8601 time, responses and response patterns, structured suspend data, scoring etc ...
 
 * **QUnit-Tests/js/scorm/Local_API_1484_11.js** (Optional in a deployment)-
-Tip: This file can be modified if needed.  This holds the CMI Object (customizable) and lightly enforces the specification.
+Tip: This file can be modified if needed.  This holds the CMI Object (customizable), and lightly enforces the specification.
 This is a LMS mimic as boiled down, and will slowly be strengthened with-in reason.  Its not the most strict so don't expect it to throw every single error right now.  It keeps the entire CMI object and console logs the JSON object so you can view whats changed during local testing.  If it doesn't cost (lines of code and or file size) a huge amount to strengthen it up I'll slowly be rolling in those error handlers and validators.  SCORM is a rather large spec to enforce however, and my only concern is this might cost more than its worth.  I had considered adding local storage here however in the case of a offline SCO since it could connect to this when its ran offline.  But, this will also add more code and I'd rather that be an option later when and if it arises.
 
 * Also have now added a minified, or packed version of all 3 of these files in a 29KB easy to use single file for those not doing there own builds.  See the **scorm.bot.pack.js** which is only the 3 above files merged, minified and packed.
