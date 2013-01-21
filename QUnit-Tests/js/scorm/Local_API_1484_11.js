@@ -252,7 +252,7 @@ function Local_API_1484_11(options) {
 			r = getData(key.substr(4, key.length), cmi);
 			//scorm.debug(settings.prefix + ": cmiGetValue got " + r, 4);
 			// Filter
-			if (r === undefined || r === null) {
+			if (r === '' || r === null) {
 				settings.errorCode = 401;
 				settings.diagnostic = "Sorry, there was a undefined response from " + key;
 				r = "false";
@@ -264,20 +264,23 @@ function Local_API_1484_11(options) {
 	}
 	/**
 	 * Is Read Only?
-	 * I've placed several of the read-only items in a delimited string.  This is used to compare 
+	 * I've placed several of the read-only items in a delimited string.  This is used to compare
 	 * the key, to known read-only values to keep you from changing something your not supposed to.
 	 * @param key {String} like cmi.location
 	 * @returns {Boolean} true or false
 	 */
 	function isReadOnly(key) {
 		// See note above about read-only
-		var tiers = key.split("."),
+		var tiers = key.split('.'),
 			v = tiers[tiers.length - 1]; // last value
-		if (tiers[0] === "adl" && tiers[4] === "id") {
+		if (tiers[0] === 'adl' && tiers[4] === 'id') {
 			return true;
 		}
-		if (tiers[1] === "comments_from_lms") {// entirely read only
+		if (tiers[1] === 'comments_from_lms') {// entirely read only
 			return true;
+		}
+		if (tiers[1] === 'comments_from_learner') { // Condition where comment in this case is allowed.
+			return false;
 		}
 		return read_only.indexOf('|' + v + '|') >= 0;
 	}
