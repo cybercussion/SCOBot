@@ -1478,7 +1478,7 @@ function SCOBot(options) {
 			return n;
 		}
 		if(msg.length > 0 && msg.length < 4000) {
-			scorm.debug(settings.prefix + ": Sorry, message from learner was empty or exceeded the limit.", 2);
+			scorm.debug(settings.prefix + ": Sorry, message from learner was empty or exceeded the limit. Length:" + msg.length, 2);
 		}
 		p1 += n + '.';
 		scorm.setvalue(p1 + 'comment', msg);
