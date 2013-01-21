@@ -224,7 +224,7 @@ function Local_API_1484_11(options) {
 		} else {
 			v = ka.shift();
 			if (obj[v]) {
-				return getData(ka.join("."), obj[v]);
+				return getData(ka.join("."), obj[v]) + ''; // just in case its undefined
 			}
 			throwUnimplemented(key);
 			return 'false';
@@ -252,7 +252,7 @@ function Local_API_1484_11(options) {
 			r = getData(key.substr(4, key.length), cmi);
 			//scorm.debug(settings.prefix + ": cmiGetValue got " + r, 4);
 			// Filter
-			if (r === '' || r === null) {
+			if (r === 'undefined') {
 				settings.errorCode = 401;
 				settings.diagnostic = "Sorry, there was a undefined response from " + key;
 				r = "false";
@@ -370,7 +370,6 @@ function Local_API_1484_11(options) {
 			tiers = k.toLowerCase().split(".");
 			switch (tiers[0]) {
 			case "cmi":
-				//scorm.debug(settings.prefix + ": CMI Getting " + k, 4);
 				r = cmiGetValue(k);
 				break;
 			case "ssp":
