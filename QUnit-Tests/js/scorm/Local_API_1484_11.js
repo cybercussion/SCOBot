@@ -308,7 +308,7 @@ function Local_API_1484_11(options) {
 	}
 	/** 
 	 * Get Object Length
-	 * @param {Object}
+	 * @param obj {Object}
 	 * returns {Number}
 	 */
 	function getObjLength(obj) {
@@ -332,7 +332,7 @@ function Local_API_1484_11(options) {
 	// Public	
 	/**
 	 * isRunning, Returns true if initialized is 1 and terminated is 0
-	 * @returns true or false
+	 * @returns {Boolean} true or false
 	 */
 	this.isRunning = function () {
 		return settings.initialized === 1 && settings.terminated === 0;
@@ -340,7 +340,7 @@ function Local_API_1484_11(options) {
 	/*jslint nomen: true */
 	/**
 	 * Initialize Session (SCORM) only once!
-	 * @returns "true" or "false" depending on if its been initialized prior
+	 * @returns {String} "true" or "false" depending on if its been initialized prior
 	 */
 	this.Initialize = function () {
 		scorm.debug(settings.prefix + ":  Initializing...", 3);
@@ -353,7 +353,7 @@ function Local_API_1484_11(options) {
 	/**
 	 * GetValue (SCORM)
 	 * @param key {String}
-	 * @returns "true" or "false" depending on if its been initialized prior
+	 * @returns {String} "true" or "false" depending on if its been initialized prior
 	 */
 	this.GetValue = function (key) {
 		//scorm.debug(settings.prefix + ":  Running: " + this.isRunning() + " GetValue: " + key + "...", 4);
@@ -389,7 +389,7 @@ function Local_API_1484_11(options) {
 	 * SetValue (SCORM)
 	 * @param key {String}
 	 * @param value {String}
-	 * @returns "true" or "" depending on if its been initialized prior
+	 * @returns {String} "true" or "" depending on if its been initialized prior
 	 */
 	this.SetValue = function (key, value) {
 		scorm.debug(settings.prefix + ": SetValue: " + key + " = " + value, 4);
@@ -447,7 +447,7 @@ function Local_API_1484_11(options) {
 						// This one is tricky because if a id is added at tier[3] this means the objective count needs to increase for this interaction.
 						// Interactions array values may not exist yet, which is why its important to build these out ahead of time.
 						// this should work (Subtract _count, and _children)
-						if (parseInt(tiers[2], 10) === "NaN") {
+						if (isNaN(parseInt(tiers[2], 10))) {
 							return 'false';
 						}
 						// Interactions uses objectives and correct_repsponses that need to be constructed.
@@ -506,7 +506,7 @@ function Local_API_1484_11(options) {
 						// END ID CHeck
 						cmi.objectives._count = (getObjLength(cmi.objectives) - 2).toString(); // Why -2?  _count and _children
 						// ditto
-						if (parseInt(tiers[2], 10) === "NaN") {
+						if (isNaN(parseInt(tiers[2], 10))) {
 							return 'false';
 						}
 						break;
@@ -537,7 +537,7 @@ function Local_API_1484_11(options) {
 	/**
 	 * Commit (SCORM)
 	 * Typically empty, I'm unaware of anyone ever passing anything.
-	 * @returns "true" or "false"
+	 * @returns {String} "true" or "false"
 	 */
 	this.Commit = function () {
 		scorm.debug(settings.prefix + ": Commit CMI Object:", 4);
@@ -548,6 +548,7 @@ function Local_API_1484_11(options) {
 	};
 	/**
 	 * Terminate
+	 * @returns {String}
 	 */
 	this.Terminate = function () {
 		// Could do things here like a LMS
@@ -571,7 +572,7 @@ function Local_API_1484_11(options) {
 	};
 	/**
 	 * GetLastError (SCORM) - Returns the error number from the last error
-	 * @returns number
+	 * @returns {Number}
 	 */
 	this.GetLastError = function () {
 		return settings.errorCode;
