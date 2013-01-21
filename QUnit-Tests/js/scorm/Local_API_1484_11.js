@@ -78,7 +78,7 @@ function Local_API_1484_11(options) {
 				audio_captioning : "0"
 			},
 			location : "",
-			max_time_allowed : "",
+			max_time_allowed : "false",
 			mode : "normal",
 			objectives : {
 				_children : "id,score,success_status,completion_status,description",
