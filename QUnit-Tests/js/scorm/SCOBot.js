@@ -1585,7 +1585,7 @@ function SCOBot(options) {
 		if (isStarted) {
 			setSuspendData();
 			scorm.debug(settings.prefix + ": I am timing out...", 3);
-			scorm.setvalue('cmi.exit', 'timeout');
+			scorm.setvalue('cmi.exit', 'time-out');
 			updateStatus();
 			// This is completed per this call.
 			isStarted = false;
