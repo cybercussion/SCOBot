@@ -70,7 +70,6 @@ function SCOBot(options) {
 		// Settings merged with defaults and extended options
 		settings     = $.extend(defaults, options),
 		lmsconnected = false,
-		isExit       = false,
 		isError      = false,
 		isStarted    = false,
 		badValues    = '|null|undefined|false|| |',
@@ -106,8 +105,8 @@ function SCOBot(options) {
 	 * @returns {Boolean} true or false if successfully exited 
 	 */
 	function exitSCO() {
-		if (!isExit) {
-			isExit = true;
+		if (isStarted) {
+			isStarted = false;
 			// Custom Event Trigger load
 			$(self).triggerHandler({
 				'type': "unload"
@@ -119,7 +118,7 @@ function SCOBot(options) {
 			}
 			scorm.debug(settings.prefix + ": SCO is done unloading.", 4);
 		}
-		return isExit;
+		return true;
 	}
 	/**
 	 * Trigger Warning (internal to this API)
