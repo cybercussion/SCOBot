@@ -1075,6 +1075,7 @@ function SCOBot(options) {
 					settings.suspend_data.pages[i].data = data; // overwrite existing
 					scorm.debug(settings.prefix + ": Suspend Data Set", 4);
 					scorm.debug(settings.suspend_data, 4);
+					setSuspendData();
 					return 'true';
 				}
 			}
