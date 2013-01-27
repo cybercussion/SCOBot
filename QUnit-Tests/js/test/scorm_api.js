@@ -373,6 +373,7 @@ test("initialize", function () {
 					// Make some Illegal SCORM Calls after Termination should successfully fail ;)
 					test("Illegal calls after Termination", function () {
 						var setvalue = scorm.setvalue;
+						scorm.debug("QUnit making illegal API calls, don't be alarmed.");
 						strictEqual(setvalue('cmi.location', '5'), 'false', "Setting cmi.location after termination (not allowed)");
 						strictEqual(setvalue('cmi.suspend_data', '{\"something\":\"value\"}'), 'false', "Setting cmi.suspend_data after termination (not allowed)");
 						//scorm.debug("Total Set Calls: " + setvalue_calls, 4); // END

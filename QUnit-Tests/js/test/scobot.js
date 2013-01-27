@@ -1127,6 +1127,7 @@ test("Set Suspend Data By Page ID", function () {
 });
 
 test("Suspend SCO", function () {
+	SB.setSuspendData
 	SB.debug(">>>>>>>>> Suspending <<<<<<<<<");
 	strictEqual(scorm.commit(), 'true', "Committing to check navigation possibilities.");
 	canContinue = SB.getvalue('adl.nav.request_valid.continue');
