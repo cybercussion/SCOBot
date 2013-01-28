@@ -1075,16 +1075,16 @@ function SCOBot(options) {
 					settings.suspend_data.pages[i].data = data; // overwrite existing
 					scorm.debug(settings.prefix + ": Suspend Data Set", 4);
 					scorm.debug(settings.suspend_data, 4);
-					setSuspendData();
-					return 'true';
+					return setSuspendData();
+					//return 'true';
 				}
 			}
 			// new page push
 			settings.suspend_data.pages.push({'id': id, 'title': title, 'data': data});
 			scorm.debug(settings.prefix + ": Suspend Data set:", 4);
 			scorm.debug(settings.suspend_data, 4);
-			setSuspendData();
-			return 'true';
+			return setSuspendData();
+			//return 'true';
 		}
 		return notStartedYet();
 	};
