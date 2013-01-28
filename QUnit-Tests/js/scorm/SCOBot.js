@@ -1551,7 +1551,6 @@ function SCOBot(options) {
 	 */
 	this.suspend = function () {
 		if (isStarted) {
-			setSuspendData();
 			scorm.debug(settings.prefix + ": I am suspending...", 3);
 			scorm.setvalue('cmi.exit', 'suspend');
 			updateStatus();
@@ -1567,7 +1566,6 @@ function SCOBot(options) {
 	 */
 	this.finish = function () {
 		if (isStarted) {
-			setSuspendData();
 			scorm.debug(settings.prefix + ": I am finishing...", 3);
 			scorm.setvalue('cmi.exit', 'normal');
 			updateStatus();
@@ -1584,7 +1582,6 @@ function SCOBot(options) {
 	 */
 	this.timeout = function () {
 		if (isStarted) {
-			setSuspendData();
 			scorm.debug(settings.prefix + ": I am timing out...", 3);
 			scorm.setvalue('cmi.exit', 'time-out');
 			updateStatus();
