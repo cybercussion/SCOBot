@@ -297,6 +297,10 @@ function SCOBot(options) {
 			// Force unload method to wrap player up and Terminate
 			// switch default exit type to time-out
 			exitSCO();
+		} else {
+			$(self).triggerHandler({
+				'type': "continue"
+			});
 		}
 	}
 	/**
