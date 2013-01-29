@@ -124,7 +124,7 @@ function SCOBot(options) {
 					self.timeout();
 					break;
 				default:
-					debug(settings.prefix + ": unknown exit type", 2);
+					scorm.debug(settings.prefix + ": unknown exit type", 2);
 					break;
 			}
 			scorm.debug(settings.prefix + ": SCO is done unloading.", 4);

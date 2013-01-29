@@ -1044,7 +1044,7 @@ function SCORM_API(options) {
 			debug(settings.prefix + ": If you included Local_API_1484_11 I'll mimic the LMS.  If not, all SCORM calls will fail.", 4);
 			settings.standalone = true;
 			API.version = "2004";
-			// May or maynot be provided (standalone) if not, this is null (DOA)
+			// May or may not be provided (standalone) if not, this is null (DOA)
 			API.path = typeof (Local_API_1484_11) === 'function' ? new Local_API_1484_11() : null;
 			return true;
 		}
