@@ -264,6 +264,67 @@ function SCORM_API(options) {
 		return str;
 	}
 	/**
+	 * ISO Duration to Centisecond
+	 * @param str
+	 * @return {Number}
+	 */
+	function ISODurationToCentisec(str)	{
+		// Only gross syntax check is performed here
+		// Months calculated by approximation based on average number
+		// of days over 4 years (365*4+1), not counting the extra days
+		// in leap years. If a reference date was available,
+		// the calculation could be more precise, but becomes complex,
+		// since the exact result depends on where the reference date
+		// falls within the period (e.g. beginning, end or ???)
+		// 1 year ~ (365*4+1)/4*60*60*24*100 = 3155760000 centiseconds
+		// 1 month ~ (365*4+1)/48*60*60*24*100 = 262980000 centiseconds
+		// 1 day = 8640000 centiseconds
+		// 1 hour = 360000 centiseconds
+		// 1 minute = 6000 centiseconds
+		var aV = new Array(0,0,0,0,0,0),
+			bErr = !!((str.indexOf("P") !== 0)),
+			bTFound = false,
+			aT = new Array("Y","M","D","H","M","S"),
+			p=0,
+			i=0;
+		if (!bErr) {
+			str = str.substr(1); //get past the P
+			for (i = 0 ; i < aT.length; i++) {
+				if (str.indexOf("T") == 0) {
+					str = str.substr(1);
+					i = Math.max(i,3);
+					bTFound = true;
+				}
+				p = str.indexOf(aT[i]);
+				if (p > -1)	{
+					if ((i == 1) && (str.indexOf("T") > -1) && (str.indexOf("T") < p)) {
+						continue;
+					}
+					if (aT[i] == "S") {
+						aV[i] = parseFloat(str.substr(0,p))
+					} else {
+						aV[i] = parseInt(str.substr(0,p))
+					}
+					if (isNaN(aV[i])) {
+						bErr = true;
+						break;
+					} else if ((i > 2) && (!bTFound)) {
+						bErr = true;
+						break;
+					}
+					str = str.substr(p+1);
+				}
+			}
+			bErr = !!(((!bErr) && (str.length != 0)));
+		}
+		if (bErr) {
+			return 0;
+		}
+		return aV[0]*3155760000 + aV[1]*262980000
+			+ aV[2]*8640000 + aV[3]*360000 + aV[4]*6000
+			+ Math.round(aV[5]*100)
+	}
+	/**
 	 * Pad Time
 	 * Pads time with proper formatting (double digits)
 	 */
@@ -1049,6 +1110,7 @@ function SCORM_API(options) {
 	 */
 	this.centisecsToSCORM12Duration = centisecsToSCORM12Duration;
 	this.centisecsToISODuration = centisecsToISODuration;
+	this.ISODurationToCentisec = ISODurationToCentisec;
 	this.isoDateToStringUTC = isoDateToStringUTC;
 	this.isoDateToString = isoDateToString;
 	this.isoStringToDate = isoStringToDate;

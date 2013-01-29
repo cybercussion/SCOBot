@@ -78,7 +78,7 @@ function Local_API_1484_11(options) {
 				audio_captioning : "0"
 			},
 			location : "",
-			max_time_allowed : "",
+			max_time_allowed : "", // PT26.4S for 26.4 Seconds
 			mode : "normal",
 			objectives : {
 				_children : "id,score,success_status,completion_status,description",
@@ -96,7 +96,7 @@ function Local_API_1484_11(options) {
 			session_time : "PT0H0M0S",
 			success_status : "unknown",
 			suspend_data : "",
-			time_limit_action : "",
+			time_limit_action : "", // exit, no message or continue, message etc ...
 			total_time : "PT0H0M0S"
 		},
 		cmi = {},

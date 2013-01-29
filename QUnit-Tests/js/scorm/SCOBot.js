@@ -47,14 +47,15 @@ function SCOBot(options) {
 	"use strict";
 	/** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
 	var defaults = {
-			version: "1.2.1",
+			version: "1.3",
 			createDate: "04/07/2011 09:33AM",
-			modifiedDate: "01/28/2013 4:36PM",
+			modifiedDate: "01/28/2013 9:50PM",
 			prefix: "SCOBot",
 			// SCORM buffers and settings
 			launch_data: {},
 			interaction_mode: "state", // or journaled
 			launch_data_type: "querystring", // or json
+			initiate_timer: true,
 			scorm_edition: "3rd", // or 4th - this is a issue with "editions" of SCORM 2004 that differ
 			success_status: "unknown", // used as local status * see SCORM_API for override
 			location: "",
@@ -63,6 +64,7 @@ function SCOBot(options) {
 			mode: "",
 			completion_threshold: 0,
 			scaled_passing_score: 0.7,
+			max_time_allowed: '',
 			totalInteractions: 0,
 			totalObjectives: 0,
 			startTime: 0
@@ -111,10 +113,19 @@ function SCOBot(options) {
 			$(self).triggerHandler({
 				'type': "unload"
 			});
-			if (scorm.get('exit_type') === "finish") {
-				self.finish();
-			} else {
-				self.suspend();
+			switch(scorm.get('exit_type')) {
+				case "finish":
+					self.finish();
+					break;
+				case "suspend":
+					self.suspend();
+					break;
+				case "timeout":
+					self.timeout();
+					break;
+				default:
+					debug(settings.prefix + ": unknown exit type", 2);
+					break;
 			}
 			scorm.debug(settings.prefix + ": SCO is done unloading.", 4);
 			isStarted = false;
@@ -188,6 +199,7 @@ function SCOBot(options) {
 	 * This is a great common way to do this so regardless of time zone you can reflect the 
 	 * time this time stamp was referring to.
 	 * Acceptable Format GMT 2012-02-28T15:00:00.0-8:00, UTC 2012-02-28T15:00:00.0-8:00Z, Plain 2012-02-28T15:00:00
+	 * @param v {String} ISO 8601 timestamp
 	 * @returns {Boolean} true or false
 	 */
 	function isISO8601(v) {
@@ -204,6 +216,16 @@ function SCOBot(options) {
 			break;
 		}
 		return iso8601Exp.test(v);
+	}
+	/**
+	 * is ISO 8601 Duration
+	 * This is a PT0H0M0S format
+	 * @param v {String}
+	 * @return {Boolean}
+	 */
+	function isISO8601Duration(v) {
+		var iso8601Dur = /^(?:P)([^T]*)(?:T)?(.*)?$/;
+		return iso8601Dur.test(v);
 	}
 	/**
 	 * Not Started Yet
@@ -256,6 +278,26 @@ function SCOBot(options) {
 			break;
 		}
 		return reg.exec(str);
+	}
+	/**
+	 * Times Up
+	 */
+	function timesUp() {
+		scorm.debug("Times Up!");
+		var time_action = scorm.getvalue('cmi.time_limit_action').split(','),
+			message = !!((time_action[1] === "message"));
+		if(message) {
+			$(self).triggerHandler({
+				'type': "message",
+				'text': "Time Limit Exceeded"
+			});
+		}
+		scorm.set('exit_type', "timeout");
+		if (time_action[0] === "exit") {
+			// Force unload method to wrap player up and Terminate
+			// switch default exit type to time-out
+			exitSCO();
+		}
 	}
 	/**
 	 * Set Value By Interaction Type
@@ -921,6 +963,16 @@ function SCOBot(options) {
 					'data': settings.comments_from_lms
 				});
 			}
+			// Check if there is a max_time_allowed
+			settings.max_time_allowed = scorm.getvalue('cmi.max_time_allowed');
+			if(isISO8601Duration(settings.max_time_allowed)) {
+				if(settings.initiate_timer) {
+					scorm.debug(settings.prefix + " This SCO has a set time, I am starting the timer for " + settings.max_time_allowed + "...");
+					self.startTimer();
+				}
+			} else {
+				scorm.debug(settings.prefix + "This is not ISO8601 time duration. " + settings.max_time_allowed);
+			}
 		} else {
 			scorm.debug(settings.prefix + ": You already called start!  I don't see much point in doing this more than once.", 2);
 			return false;
@@ -959,6 +1011,14 @@ function SCOBot(options) {
 			return 'true';
 		}
 		return notStartedYet();
+	};
+	/**
+	 * Start Timer
+	 * This will begin the timer based on the time provided by max_time_allowed.  This depends on the time_limit_action.
+	 */
+	this.startTimer = function() {
+		var time = scorm.ISODurationToCentisec(settings.max_time_allowed) * 10;
+		setTimeout(timesUp, time);
 	};
 	/**
 	 * Debug
@@ -1286,10 +1346,10 @@ function SCOBot(options) {
 				p, // correct_responses count
 				i = 0, // loop count
 				obj = {}, // Response object
-				ts,
-				ly,
-				timestamp,
-				latency;
+				ts, // temp
+				ly, // temp
+				timestamp, // for converting to date object
+				latency; // for converting to date object
 			n = scorm.getInteractionByID(id);
 			if (n === 'false') {
 				return n;
