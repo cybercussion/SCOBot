@@ -47,9 +47,9 @@ function SCOBot(options) {
 	"use strict";
 	/** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
 	var defaults = {
-			version: "1.2",
+			version: "1.2.1",
 			createDate: "04/07/2011 09:33AM",
-			modifiedDate: "01/27/2013 2:56PM",
+			modifiedDate: "01/28/2013 4:36PM",
 			prefix: "SCOBot",
 			// SCORM buffers and settings
 			launch_data: {},
