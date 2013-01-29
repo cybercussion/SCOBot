@@ -105,8 +105,8 @@ function SCOBot(options) {
 	 * @returns {Boolean} true or false if successfully exited 
 	 */
 	function exitSCO() {
+		scorm.debug("SCO is being asked, *cough* forced to exit ...", 3);
 		if (isStarted) {
-			isStarted = false;
 			// Custom Event Trigger load
 			$(self).triggerHandler({
 				'type': "unload"
@@ -117,6 +117,7 @@ function SCOBot(options) {
 				self.suspend();
 			}
 			scorm.debug(settings.prefix + ": SCO is done unloading.", 4);
+			isStarted = false;
 		}
 		return true;
 	}
