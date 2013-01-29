@@ -1285,7 +1285,11 @@ function SCOBot(options) {
 				m, // objectives count
 				p, // correct_responses count
 				i = 0, // loop count
-				obj = {}; // Response object
+				obj = {}, // Response object
+				ts,
+				ly,
+				timestamp,
+				latency;
 			n = scorm.getInteractionByID(id);
 			if (n === 'false') {
 				return n;
@@ -1295,6 +1299,12 @@ function SCOBot(options) {
 			obj.id                = id;
 			obj.type              = scorm.getvalue(p1 + 'type');
 			m                     = scorm.getvalue(p1 + 'objectives._count');
+			// Fix the time stamps up ...
+			ts = scorm.getvalue(p1 + 'timestamp');
+			ly = scorm.getvalue(p1 + 'latency');
+			timestamp = (isISO8601(ts)) ? scorm.isoStringToDate(ts) : ts;
+			latency = (isISO8601(ly)) ? scorm.isoStringToDate(ly) : ly;
+			// End
 			obj.objectives        = [];
 			if (m !== 'false') {
 				//m -= 1; // Subtract one since the _count is the next avail slot
@@ -1304,12 +1314,11 @@ function SCOBot(options) {
 					});
 				}
 			}
-			obj.timestamp         = scorm.getvalue(p1 + 'timestamp'); // TODO need to convert to date object?
+			obj.timestamp         = timestamp;
 			p                     = scorm.getvalue(p1 + 'correct_responses._count');
 			obj.correct_responses = [];
 			if (p !== 'false') {
 				// Loop thru and grab the patterns
-				//p -= 1; // Subtract one since the count is the next available slot and it will result in a error.
 				for (i = 0; i < p; i += 1) {
 					obj.correct_responses.push({
 						pattern: decodeInteractionType(obj.type, scorm.getvalue(p1 + 'correct_responses.' + i + '.pattern'))
@@ -1319,24 +1328,9 @@ function SCOBot(options) {
 			obj.weighting         = scorm.getvalue(p1 + 'weighting');
 			obj.learner_response  = decodeInteractionType(obj.type, scorm.getvalue(p1 + 'learner_response'));
 			obj.result            = scorm.getvalue(p1 + 'result');
-			obj.latency           = scorm.getvalue(p1 + 'latency'); // TODO need to convert to date object?
+			obj.latency           = latency;
 			obj.description       = scorm.getvalue(p1 + 'description');
 			return obj;
-			/*
-			 Could return in this format
-			 return {
-				id: '',
-				type: '',
-				objectives: [],
-				timestamp: {},
-				correct_responses: [],
-				weighting: '',
-				learner_response: '',
-				result: '',
-				latency: '',
-				description: ''
-			 };
-			 */
 		}
 		return notStartedYet();
 	};
