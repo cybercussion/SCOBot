@@ -62,9 +62,9 @@ function SCORM_API(options) {
 	"use strict";
 	// Please edit run time options or override them when you instantiate this object.
 	var defaults = {
-			version: "1.1",
+			version: "1.3",
 			createDate: "04/05/2011 08:56AM",
-			modifiedDate: "01/10/2013 5:28PM",
+			modifiedDate: "01/28/2013 9:53PM",
 			debug: false,
 			isActive: false,
 			throw_alerts: false,
