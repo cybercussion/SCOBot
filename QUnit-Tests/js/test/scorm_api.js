@@ -126,8 +126,8 @@ test("initialize", function () {
 			scorm.debug(">>>>>>>>>>>> start set value test <<<<<<<<<<<<<<<<<<<", 4);
 			strictEqual(setvalue('cmi.mode', 'browse'), 'false', "Setting cmi.mode (not allowed, will throw error 404)"); // This is not allowed validate
 			ok(setvalue('cmi.location', '4'), "Setting cmi.location to 4");
-			ok(setvalue('cmi.completion_status', "incomplete"), "Setting cmi.completion_status to incomplete");
 			strictEqual(setvalue('cmi.completion_status', "total failure"), 'false', "Setting cmi.completion_status to total failure (not allowed, will throw error 406)");	// This is not allowed validate
+			ok(setvalue('cmi.completion_status', "incomplete"), "Setting cmi.completion_status to incomplete");
 			ok(setvalue('cmi.success_status', "passed"), "Setting cmi.success_status to passed");
 			ok(setvalue('cmi.score.min', '0'), "Setting cmi.score.min to 0");
 			ok(setvalue('cmi.score.max', '1'), "Setting cmi.score.max to 1");
