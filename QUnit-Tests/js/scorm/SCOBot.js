@@ -74,7 +74,7 @@ function SCOBot(options) {
 		lmsconnected = false,
 		isError      = false,
 		isStarted    = false,
-		badValues    = '|null|undefined|false|| |',
+		badValues    = '|null|undefined|false|NaN|| |',
 		error        = scorm.get('error'), // no sense retyping this
 		self         = this; // Hook
 	// End Constructor ////////
@@ -1303,7 +1303,7 @@ function SCOBot(options) {
 					result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
 				}
 			} else {
-				scorm.debug(settings.prefix + "Something went wrong with Correct Responses, it wasn't an Array.", 1);
+				scorm.debug(settings.prefix + ": Something went wrong with Correct Responses, it wasn't an Array.", 1);
 			}
 			if (!isBadValue(data.weighting)) { result = scorm.setvalue(p1 + 'weighting', data.weighting); }
 			if (!isBadValue(data.learner_response)) { result = scorm.setvalue(p1 + 'learner_response', encodeInteractionType(data.type, data.learner_response)); } // will need to format by interaction type
@@ -1423,7 +1423,10 @@ function SCOBot(options) {
 			var p1 = 'cmi.objectives.',
 				n = scorm.getObjectiveByID(data.id),
 				result = 'false',
-				f = false;
+				f = false,
+				def1 = ": Passed no or bad ",
+				def2 = " ignored.",
+				sv = scorm.setvalue;
 			scorm.debug(settings.prefix + ": Setting Objective at " + n + " (This may be false)");
 			if (isBadValue(n)) { // First Run
 				n = scorm.getvalue(p1 + '_count');
@@ -1437,42 +1440,26 @@ function SCOBot(options) {
 			p1 += n + '.';
 			if (f) {
 				if (!isBadValue(data.id)) {
-					scorm.setvalue(p1 + 'id', data.id.toString());
+					sv(p1 + 'id', data.id.toString());
 				} else { // Show stopper
 					scorm.debug(settings.prefix + ": You did not pass an objective ID!!", 1);
 					return 'false';
 				}
 			}
 			if ($.isPlainObject(data.score)) {
-				if (!isBadValue(data.score.scaled)) {
-					result = scorm.setvalue(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString());
-				}
-				if (!isBadValue(data.score.raw)) {
-					result = scorm.setvalue(p1 + 'score.raw', trueRound(data.score.raw, 7).toString());
-				}
-				if (!isBadValue(data.score.min)) {
-					result = scorm.setvalue(p1 + 'score.min', trueRound(data.score.min, 7).toString());
-				}
-				if (!isBadValue(data.score.max)) {
-					result = scorm.setvalue(p1 + 'score.max', trueRound(data.score.max, 7).toString());
-				}
+				result = !isBadValue(data.score.scaled) ? sv(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.scaled: " + data.score.scaled + def2,3);
+				result = !isBadValue(data.score.raw) ? sv(p1 + 'score.raw', trueRound(data.score.raw, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.raw: " + data.score.raw + def2,3);
+				result = !isBadValue(data.score.min) ? sv(p1 + 'score.min', trueRound(data.score.min, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.min: " + data.score.min + def2,3);
+				result = !isBadValue(data.score.max) ? sv(p1 + 'score.max', trueRound(data.score.max, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.max: " + data.score.max + def2,3);
 			} else {
 				scorm.debug(settings.prefix + ": Did not receive a score object.  May or may not be an issue.", 4);
 			}
-			if (!isBadValue(data.success_status)) {
-				result = scorm.setvalue(p1 + 'success_status', data.success_status);
-			}
-			if (!isBadValue(data.completion_status)) {
-				result = scorm.setvalue(p1 + 'completion_status', data.completion_status);
-			}
-			if (!isBadValue(data.progress_measure)) {
-				result = scorm.setvalue(p1 + 'progress_measure', trueRound(data.progress_measure, 7));
-			}
-			if (!isBadValue(data.description)) {
-				result = scorm.setvalue(p1 + 'description', data.description);
-			}
+			result = !isBadValue(data.success_status) ? sv(p1 + 'success_status', data.success_status) : scorm.debug(settings.prefix + def1 + p1 + "success_status: " + data.success_status + def2,3);
+			result = !isBadValue(data.completion_status) ? sv(p1 + 'completion_status', data.completion_status) : scorm.debug(settings.prefix + def1 + p1 + "completion_status: " + data.completion_status + def2,3);
+			result = !isBadValue(data.progress_measure) ? sv(p1 + 'progress_measure', data.progress_measure) : scorm.debug(settings.prefix + def1 + p1 + "progress_measure: " + data.progress_measure + def2,3);
+			result = !isBadValue(data.description) ? sv(p1 + 'description', data.description) : scorm.debug(settings.prefix + def1 + p1 + "description: " + data.description + def2,3);
 			scorm.debug(settings.prefix + ": Progress\n" + JSON.stringify(checkProgress(), null, " "), 4);
-			return result;
+			return result.toString();
 		}
 		return notStartedYet();
 	};
@@ -1531,19 +1518,22 @@ function SCOBot(options) {
 	 * @return {String}
 	 */
 	this.setCommentFromLearner = function(msg, loc, date) {
-		var p1 = "cmi.comments_from_learner.",
-			n = scorm.getvalue(p1 + "_count");
-		if(n === 'false') {
-			scorm.debug(settings.prefix + ": Sorry, LMS returned a comments count of 'false'.  Review error logs.");
-			return n;
+		if (isStarted) {
+			var p1 = "cmi.comments_from_learner.",
+				n = scorm.getvalue(p1 + "_count");
+			if(n === 'false') {
+				scorm.debug(settings.prefix + ": Sorry, LMS returned a comments count of 'false'.  Review error logs.");
+				return n;
+			}
+			if(msg.length > 0 && msg.length < 4000) {
+				scorm.debug(settings.prefix + ": Sorry, message from learner was empty or exceeded the limit. Length:" + msg.length, 2);
+			}
+			p1 += n + '.';
+			scorm.setvalue(p1 + 'comment', msg);
+			scorm.setvalue(p1 + 'location', loc);
+			return scorm.setvalue(p1 + 'timestamp', scorm.isoDateToString(date));
 		}
-		if(msg.length > 0 && msg.length < 4000) {
-			scorm.debug(settings.prefix + ": Sorry, message from learner was empty or exceeded the limit. Length:" + msg.length, 2);
-		}
-		p1 += n + '.';
-		scorm.setvalue(p1 + 'comment', msg);
-		scorm.setvalue(p1 + 'location', loc);
-		return scorm.setvalue(p1 + 'timestamp', scorm.isoDateToString(date));
+		return notStartedYet();
 	};
 	/**
 	 * Grade It
@@ -1700,6 +1690,7 @@ function SCOBot(options) {
 	$(window).bind('load', initSCO);
 	//$(window).bind('beforeunload', exitSCO); // You want to confirm exit?
 	$(window).bind('unload', exitSCO);
+	//$(window.top).bind('unload', exitSCO); // for those ugly situations
 	// Listen for SCORM API Exception
 	$(scorm).on('exception', function (e) {
 		triggerException(e.error);

@@ -852,6 +852,7 @@ function SCORM_API(options) {
 					API.isActive = true;
 					API.data.completion_status = self.getvalue('cmi.completion_status');
 					settings.startDate = new Date();
+					//self.setvalue('cmi.exit', settings.exit_type); // Consider setting exit type sooner by default?
 					// Need to set Start Date
 					debug(settings.prefix + ": SCO is initialized.", 3);
 					switch (API.data.completion_status) {
@@ -1028,11 +1029,20 @@ function SCORM_API(options) {
 	 */
 	this.init = function () {
 		// Search for LMS API
-		if (window.parent && window.parent !== window) {
-			findAPI(window.parent);
+		var win;
+		try {
+			win = window.parent;
+			if (win && win !== window) {
+				findAPI(window.parent);
+			}
+		} catch(e) {
+
 		}
-		if (!API.path && window.top.opener) {
-			findAPI(window.top.opener);
+		if (!API.path) {
+			try {
+				win = window.top.opener;
+				findAPI(win);
+			} catch (e) {}
 		}
 		if (API.path) {
 			API.connection = true;
