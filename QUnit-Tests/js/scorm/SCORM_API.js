@@ -1035,14 +1035,12 @@ function SCORM_API(options) {
 			if (win && win !== window) {
 				findAPI(window.parent);
 			}
-		} catch(e) {
-
-		}
+		} catch(e) {/* Cross Domain issue */}
 		if (!API.path) {
 			try {
 				win = window.top.opener;
 				findAPI(win);
-			} catch (e) {}
+			} catch (e) {/* Cross domain issue */}
 		}
 		if (API.path) {
 			API.connection = true;
