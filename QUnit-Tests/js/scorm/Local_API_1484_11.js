@@ -37,68 +37,68 @@ function Local_API_1484_11(options) {
 	// Constructor
 	"use strict";
 	var defaults = {
-			version : "1.0",
-			moddate : "02/23/2012 10:00AM",
+			version : "2.0",
+			moddate : "02/08/2013 10:00AM",
 			createdate : "07/17/2010 08:15AM",
 			prefix: "Local_API_1484_11",
 			errorCode : 0,
 			diagnostic : '',
 			initialized : 0,
-			terminated : 0
+			terminated : 0,
+			CMI: {
+				_version : "Local 1.0",
+				comments_from_learner : {
+					_children : "comment,location,timestamp",
+					_count : "0"
+				},
+				comments_from_lms : {
+					_children : "comment,location,timestamp",
+					_count : "0"
+				},
+				completion_status : "unknown",
+				completion_threshold : "0.7",
+				credit : "no-credit",
+				entry : "ab-initio",
+				exit : "",
+				interactions : {
+					_children : "id,type,objectives,timestamp,correct_responses,weighting,learner_response,result,latency,description",
+					_count : "0"
+				},
+				launch_data : "?name1=value1&name2=value2&name3=value3", // {\"name1\": \"value1\", \"name2\": \"value2\", \"name3\": \"value3\"} or ?name1=value1&name2=value2&name3=value3
+				learner_id : "100",
+				learner_name : "Simulated User",
+				learner_preference : {
+					_children : "audio_level,language,delivery_speed,audio_captioning",
+					audio_level : "1",
+					language : "",
+					delivery_speed : "1",
+					audio_captioning : "0"
+				},
+				location : "",
+				max_time_allowed : "", // PT26.4S for 26.4 Seconds
+				mode : "normal",
+				objectives : {
+					_children : "id,score,success_status,completion_status,description",
+					_count : "0"
+				},
+				progress_measure : "",
+				scaled_passing_score : "0.7",
+				score : {
+					_children : "scaled,raw,min,max",
+					scaled : "",
+					raw : "",
+					min : "",
+					max : ""
+				},
+				session_time : "PT0H0M0S",
+				success_status : "unknown",
+				suspend_data : "",
+				time_limit_action : "", // exit, no message or continue, message etc ...
+				total_time : "PT0H0M0S"
+			}
 		},
 		// Settings merged with defaults and extended options */
 		settings = $.extend(defaults, options),
-		CMI = {
-			_version : "Local 1.0",
-			comments_from_learner : {
-				_children : "comment,location,timestamp",
-				_count : "0"
-			},
-			comments_from_lms : {
-				_children : "comment,location,timestamp",
-				_count : "0"
-			},
-			completion_status : "unknown",
-			completion_threshold : "0.7",
-			credit : "no-credit",
-			entry : "ab-initio",
-			exit : "",
-			interactions : {
-				_children : "id,type,objectives,timestamp,correct_responses,weighting,learner_response,result,latency,description",
-				_count : "0"
-			},
-			launch_data : "?name1=value1&name2=value2&name3=value3", // {\"name1\": \"value1\", \"name2\": \"value2\", \"name3\": \"value3\"} or ?name1=value1&name2=value2&name3=value3
-			learner_id : "100",
-			learner_name : "Simulated User",
-			learner_preference : {
-				_children : "audio_level,language,delivery_speed,audio_captioning",
-				audio_level : "1",
-				language : "",
-				delivery_speed : "1",
-				audio_captioning : "0"
-			},
-			location : "",
-			max_time_allowed : "", // PT26.4S for 26.4 Seconds
-			mode : "normal",
-			objectives : {
-				_children : "id,score,success_status,completion_status,description",
-				_count : "0"
-			},
-			progress_measure : "",
-			scaled_passing_score : "0.7",
-			score : {
-				_children : "scaled,raw,min,max",
-				scaled : "",
-				raw : "",
-				min : "",
-				max : ""
-			},
-			session_time : "PT0H0M0S",
-			success_status : "unknown",
-			suspend_data : "",
-			time_limit_action : "", // exit, no message or continue, message etc ...
-			total_time : "PT0H0M0S"
-		},
 		cmi = {},
 		/**
 		 * Completion Status's that are allowed
@@ -344,7 +344,11 @@ function Local_API_1484_11(options) {
 	 */
 	this.Initialize = function () {
 		scorm.debug(settings.prefix + ":  Initializing...", 3);
-		cmi = CMI;
+		if (settings.cmi !== null) {
+			cmi = settings.cmi;
+		} else {
+			cmi = settings.CMI;
+		}
 		// Clean CMI Object
 		settings.initialized = 1;
 		settings.terminated = 0;
@@ -450,37 +454,84 @@ function Local_API_1484_11(options) {
 							return 'false';
 						}
 						// Interactions uses objectives and correct_repsponses that need to be constructed.
-						if (cmi.interactions[tiers[2]] === undefined) {
-							cmi.interactions[tiers[2]] = {};
+						// Legal build of interaction array item
+						if (!$.isPlainObject(cmi.interactions[tiers[2]])) {
+							if (tiers[3] === "id") {
+								cmi.interactions[tiers[2]] = {};
+								setData(k.substr(4, k.length), v, cmi);
+								cmi.interactions._count = (getObjLength(cmi.interactions) - 2).toString(); // Why -2?  _count and _children
+								if (cmi.interactions[tiers[2]].objectives === undefined) {
+									// Setup Objectives for the first time
+									scorm.debug(settings.prefix + ": Constructing objectives object for new interaction", 4);
+									cmi.interactions[tiers[2]].objectives = {};
+									cmi.interactions[tiers[2]].objectives._count = "-1";
+									cmi.interactions[tiers[2]].objectives._children = "id,score,success_status,completion_status,description";
+								}
+								// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
+								if (cmi.interactions[tiers[2]].correct_responses === undefined) {
+									// Setup Objectives for the first time
+									scorm.debug(settings.prefix + ": Constructing correct responses object for new interaction", 4);
+									cmi.interactions[tiers[2]].correct_responses = {};
+									cmi.interactions[tiers[2]].correct_responses._count = "-1";
+									//cmi.interactions[tiers[2]].correct_responses._children = "pattern"; // scorm spec didn't include _children for pattern.
+								}
+								return 'true';
+							} else {
+								// Can't add inteaction without id first.
+								scorm.debug("Can't add interaction without ID first!", 3);
+								return 'false';
+								// Todo throw error code
+							}
+						} else {
+							// Manage Objectives
+							if (tiers[3] === 'objectives') { // cmi.interactions.n.objectives
+								// Validate
+								if (cmi.interactions[tiers[2]].objectives._children.indexOf(tiers[5]) === -1) {
+									return throwVocabError(key, v);
+								}
+								// Objectives require a unique ID
+								if (tiers[5] === "id") {
+									count = parseInt(cmi.interactions[tiers[2]].objectives._count, 10);
+									for (z = 0; z < count; z += 1) {
+										if (cmi.interactions[tiers[2]].objectives[z].id === v) {
+											return throwGeneralSetError(key, v, z);
+											//settings.errorCode = "351";
+											//settings.diagnostic = "The objectives.id element must be unique.  The value '" + v + "' has already been set in objective #" + z;
+										}
+									}
+								}
+								setData(k.substr(4, k.length), v, cmi);
+								cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 2).toString(); // Why -2?  _count and _children
+								return 'true';
+							}
+							// Manage Correct Responses
+							if (tiers[3] === 'correct_responses') {
+								// Todo Validate Correct response patterns
+								setData(k.substr(4, k.length), v, cmi);
+								cmi.interactions[tiers[2]].correct_responses._count = (getObjLength(cmi.interactions[tiers[2]].correct_responses) - 1).toString(); // Why -1?  _count
+							}
+							setData(k.substr(4, k.length), v, cmi);
+							cmi.interactions._count = (getObjLength(cmi.interactions) - 2).toString(); // Why -2?  _count and _children
+							return 'true';
 						}
-						if (cmi.interactions[tiers[2]].objectives === undefined) {
-							// Setup Objectives for the first time
-							scorm.debug(settings.prefix + ": Constructing objectives object for new interaction", 4);
-							cmi.interactions[tiers[2]].objectives = {};
-							cmi.interactions[tiers[2]].objectives._count = "-1";
-							cmi.interactions[tiers[2]].objectives._children = "id,score,success_status,completion_status,description";
-						}
-						// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
-						if (cmi.interactions[tiers[2]].correct_responses === undefined) {
-							// Setup Objectives for the first time
-							scorm.debug(settings.prefix + ": Constructing correct responses object for new interaction", 4);
-							cmi.interactions[tiers[2]].correct_responses = {};
-							cmi.interactions[tiers[2]].correct_responses._count = "-1";
-							//cmi.interactions[tiers[2]].correct_responses._children = "pattern"; // scorm spec didn't include _children for pattern.
-						}
+
 						if (tiers[3] === 'objectives') {
 							// Validate
 							if (cmi.interactions[tiers[2]].objectives._children.indexOf(tiers[5]) === -1) {
 								return throwVocabError(key, v);
 							}
-							cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 1).toString(); // Why -1?  _count and _children
+							setData(k.substr(4, k.length), v, cmi);
+							cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 2).toString(); // Why -1?  _count and _children
+							return 'true';
 						}
 						if (tiers[3] === 'correct_responses') {
 							scorm.debug("Setting correct responses count to " + (getObjLength(cmi.interactions[tiers[2]].correct_responses)).toString());
+							setData(k.substr(4, k.length), v, cmi);
 							cmi.interactions[tiers[2]].correct_responses._count = (getObjLength(cmi.interactions[tiers[2]].correct_responses)).toString();
+							return 'true';
 						}
 						break;
-					case "objectives":
+						case "objectives":
 						// Objectives require a unique ID, which to me contradicts journaling
 						if (tiers[3] === "id") {
 							count = parseInt(cmi.objectives._count, 10);
@@ -503,7 +554,9 @@ function Local_API_1484_11(options) {
 							}
 						}
 						// END ID CHeck
+						setData(k.substr(4, k.length), v, cmi);
 						cmi.objectives._count = (getObjLength(cmi.objectives) - 2).toString(); // Why -2?  _count and _children
+						return 'true';
 						// ditto
 						if (isNaN(parseInt(tiers[2], 10))) {
 							return 'false';
@@ -542,7 +595,10 @@ function Local_API_1484_11(options) {
 		scorm.debug(settings.prefix + ": Commit CMI Object:", 4);
 		scorm.debug(cmi);
 		scorm.debug(settings.prefix + ": Suspend Data Usage " + suspendDataUsageStatistic());
-		// trace object as its committed
+		$(self).triggerHandler({
+			type: "StoreData",
+			runtimedata: cmi
+		});
 		return 'true';
 	};
 	/**
@@ -551,6 +607,7 @@ function Local_API_1484_11(options) {
 	 */
 	this.Terminate = function () {
 		// Could do things here like a LMS
+		self.commit();
 		settings.terminated = 1;
 		settings.initialized = 0;
 		return 'true';
