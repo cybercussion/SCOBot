@@ -439,6 +439,15 @@ function Local_API_1484_11(options) {
 						settings.errorCode = "404";
 						settings.diagnostic = "The cmi.comments_from_lms element is entirely read only.";
 						return 'false';
+					case "comments_from_learner":
+						// Validate
+						if (cmi.comments_from_learner._children.indexOf(tiers[3]) === -1) {
+							return throwVocabError(key, v);
+						}
+						setData(k.substr(4, k.length), v, cmi);
+						cmi.comments_from_learner._count = (getObjLength(cmi.comments_from_learner) - 2).toString(); // Why -1?  _count and _children
+						return 'true';
+						break;
 					case "interactions":
 						// Validate
 						if (cmi.interactions._children.indexOf(tiers[3]) === -1) {
@@ -460,7 +469,7 @@ function Local_API_1484_11(options) {
 								cmi.interactions[tiers[2]] = {};
 								setData(k.substr(4, k.length), v, cmi);
 								cmi.interactions._count = (getObjLength(cmi.interactions) - 2).toString(); // Why -2?  _count and _children
-								if (cmi.interactions[tiers[2]].objectives === undefined) {
+								if (!$.isPlainObject(cmi.interactions[tiers[2]].objectives)) {
 									// Setup Objectives for the first time
 									scorm.debug(settings.prefix + ": Constructing objectives object for new interaction", 4);
 									cmi.interactions[tiers[2]].objectives = {};
@@ -468,7 +477,7 @@ function Local_API_1484_11(options) {
 									cmi.interactions[tiers[2]].objectives._children = "id,score,success_status,completion_status,description";
 								}
 								// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
-								if (cmi.interactions[tiers[2]].correct_responses === undefined) {
+								if (!$.isPlainObject(cmi.interactions[tiers[2]].correct_responses)) {
 									// Setup Objectives for the first time
 									scorm.debug(settings.prefix + ": Constructing correct responses object for new interaction", 4);
 									cmi.interactions[tiers[2]].correct_responses = {};
@@ -512,22 +521,6 @@ function Local_API_1484_11(options) {
 							}
 							setData(k.substr(4, k.length), v, cmi);
 							cmi.interactions._count = (getObjLength(cmi.interactions) - 2).toString(); // Why -2?  _count and _children
-							return 'true';
-						}
-
-						if (tiers[3] === 'objectives') {
-							// Validate
-							if (cmi.interactions[tiers[2]].objectives._children.indexOf(tiers[5]) === -1) {
-								return throwVocabError(key, v);
-							}
-							setData(k.substr(4, k.length), v, cmi);
-							cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 2).toString(); // Why -1?  _count and _children
-							return 'true';
-						}
-						if (tiers[3] === 'correct_responses') {
-							scorm.debug("Setting correct responses count to " + (getObjLength(cmi.interactions[tiers[2]].correct_responses)).toString());
-							setData(k.substr(4, k.length), v, cmi);
-							cmi.interactions[tiers[2]].correct_responses._count = (getObjLength(cmi.interactions[tiers[2]].correct_responses)).toString();
 							return 'true';
 						}
 						break;
