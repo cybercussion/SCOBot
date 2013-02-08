@@ -74,7 +74,8 @@ function SCORM_API(options) {
 			use_standalone: true,
 			standalone: false,
 			completion_status: "unknown", // completed, incomplete, unknown
-			time_type: "GMT"
+			time_type: "GMT",
+			cmi: null
 		},
 		// Settings merged with defaults and extended options
 		settings = $.extend(defaults, options),
@@ -1053,7 +1054,13 @@ function SCORM_API(options) {
 			settings.standalone = true;
 			API.version = "2004";
 			// May or may not be provided (standalone) if not, this is null (DOA)
-			API.path = typeof (Local_API_1484_11) === 'function' ? new Local_API_1484_11() : null;
+			API.path = typeof (Local_API_1484_11) === 'function' ? new Local_API_1484_11({cmi: settings.cmi}) : null;
+			$(API.path).on('StoreData', function(e) {
+				$(self).triggerHandler({
+					type: 'StoreData',
+					runtimedata: e.runtimedata
+				});
+			});
 			return true;
 		}
 		return false;

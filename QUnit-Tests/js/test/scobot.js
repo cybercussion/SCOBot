@@ -26,6 +26,16 @@ $(scorm).on("getvalue", function (e) {
 	getvalue_calls += 1;
 	return false;
 });
+$(scorm).on("Commit", function(e) {
+	"use strict";
+	SB.debug("LMS commit was made", 3);
+	SB.debug(e.runtimedata);
+});
+$(scorm).on("Terminate", function(e) {
+	"use strict";
+	SB.debug("LMS terminate was made", 3);
+	SB.debug(e.runtimedata);
+});
 
 // Much of SCOBOT is a bit auto-pilot so several SCORM calls may be made on one API reference.
 module("SCOBot");
