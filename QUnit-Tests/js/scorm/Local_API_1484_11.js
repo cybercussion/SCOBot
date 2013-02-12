@@ -600,7 +600,7 @@ function Local_API_1484_11(options) {
 	 */
 	this.Terminate = function () {
 		// Could do things here like a LMS
-		self.commit();
+		self.Commit();
 		settings.terminated = 1;
 		settings.initialized = 0;
 		return 'true';
