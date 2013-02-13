@@ -321,6 +321,11 @@ function Local_API_1484_11(options) {
 		}
 		return length;
 	}
+	function checkExitType() {
+		if (cmi.exit === "suspend") {
+			cmi.entry = "resume";
+		}
+	}
 	/**
 	 * Update Suspend Data Usage Statistics
 	 * Will update settings.suspend_date_usage with current % level
@@ -346,6 +351,7 @@ function Local_API_1484_11(options) {
 		scorm.debug(settings.prefix + ":  Initializing...", 3);
 		if (settings.cmi !== null) {
 			cmi = settings.cmi;
+			checkExitType();
 		} else {
 			cmi = settings.CMI;
 		}
