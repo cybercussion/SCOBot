@@ -1075,6 +1075,14 @@ function SCORM_API(options) {
 		return error[n];
 	};
 	/**
+	 * Is LMS Connected
+	 * Will tell you if LMS is truly connected or not.  You may be running locally.
+	 * @return {Boolean}
+	 */
+	this.isLMSConnected = function() {
+		return API.connection;
+	};
+	/**
 	 * Set (Internal API)
 	 * This locally sets values local to this API
 	 * @param n {String} name
