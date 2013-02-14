@@ -781,7 +781,7 @@ function SCOBot(options) {
 				}
 			}
 			// Set Score Raw
-			scorm.debug(settings.prefix + "Setting score " + scorm.setvalue('cmi.score.raw', scoreRaw.toString()));
+			scorm.debug(settings.prefix + " Setting score " + scorm.setvalue('cmi.score.raw', scoreRaw.toString()));
 			// Set Score Scaled
 			if ((settings.scoreMax - settings.scoreMin) === 0) {
 				// Division By Zero
@@ -1442,7 +1442,12 @@ function SCOBot(options) {
 				if (!isBadValue(data.id)) {
 					sv(p1 + 'id', data.id.toString());
 				} else { // Show stopper
-					scorm.debug(settings.prefix + ": You did not pass an objective ID!!", 1);
+					scorm.debug(settings.prefix + ": You did not pass an objective ID!!  What I did get below:", 1);
+					for (var key in data) {
+						if (data.hasOwnProperty(key)) {
+							scorm.debug("key: " + key + "\n value: " + data[key]);
+						}
+					}
 					return 'false';
 				}
 			}
