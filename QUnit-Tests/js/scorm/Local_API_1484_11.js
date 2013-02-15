@@ -512,10 +512,6 @@ function Local_API_1484_11(options) {
 						} else {
 							// Manage Objectives
 							if (tiers[3] === 'objectives') { // cmi.interactions.n.objectives
-								// Validate
-								if (cmi.interactions[tiers[2]].objectives._children.indexOf(tiers[5]) === -1) {
-									return throwVocabError(key, v);
-								}
 								// Objectives require a unique ID
 								if (tiers[5] === "id") {
 									count = parseInt(cmi.interactions[tiers[2]].objectives._count, 10);
@@ -526,6 +522,8 @@ function Local_API_1484_11(options) {
 											//settings.diagnostic = "The objectives.id element must be unique.  The value '" + v + "' has already been set in objective #" + z;
 										}
 									}
+								} else {
+									return throwVocabError(key, v);
 								}
 								setData(k.substr(4, k.length), v, cmi);
 								cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 1).toString(); // Why -1?  _count
@@ -549,7 +547,7 @@ function Local_API_1484_11(options) {
 							for (z = 0; z < count; z += 1) {
 								if (cmi.objectives[z].id === v) {
 									settings.errorCode = "351";
-									settings.diagnostic = "The objectives.id elmeent must be unique.  The value '" + v + "' has already been set in objective #" + z;
+									settings.diagnostic = "The objectives.id element must be unique.  The value '" + v + "' has already been set in objective #" + z;
 									return 'false';
 								}
 							}
@@ -560,7 +558,7 @@ function Local_API_1484_11(options) {
 							arr = parseInt(tiers[2], 10);
 							if (cmi.objectives[arr] === undefined) {
 								settings.errorCode = "408";
-								settings.diagnostic = "The objectives.id element must be setbefore other elements can be set";
+								settings.diagnostic = "The objectives.id element must be set before other elements can be set";
 								return 'false';
 							}
 						}
