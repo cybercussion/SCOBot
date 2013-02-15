@@ -1231,6 +1231,11 @@ function SCOBot(options) {
 			if (isBadValue(data.id)) {
 				// This is a show stopper, try to give them some bread crumb to locate the problem.
 				scorm.debug(settings.prefix + ": Developer, your passing a interaction without a ID\nSee question:\n" + data.description, 1);
+				for (var key in data) {
+					if (data.hasOwnProperty(key)) {
+						scorm.debug("key: " + key + "\n value: " + data[key]);
+					}
+				}
 				return 'false';
 			}
 			//Time stuff will need to move after ID is added
