@@ -20,11 +20,9 @@ var scorm = new SCORM_API({
 	character_str = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ˜‌‍‎‏–—―‗‘’‚‛“”„†‡•…‰′″‹›‼‾⁄₣₤₧₪₫€℅ℓ№™Ω℮⅓⅔⅛⅜⅝⅞←↑→↓∂√∞∩∫≠≡■□▲△▼○●♀♂♪";
 $(scorm).on("setvalue", function (e) {
 	setvalue_calls += 1;
-	return false;
 });
 $(scorm).on("getvalue", function (e) {
 	getvalue_calls += 1;
-	return false;
 });
 $(scorm).on("StoreData", function(e) {
 	"use strict";
@@ -76,10 +74,13 @@ test("Set Totals", function () {
 	// Based on Entry we may be able to tell if we've been ran before.
 	SB.debug(">>>>>>>>> TOTALS SET <<<<<<<<<");
 	version = SB.getvalue('cmi._version');
-	if (version === "Local 1.0") {
-		local = true;
+	local = version === "Local 1.0";
+});
+test("LMS Connected", function() {
+	if (local) {
+		strictEqual(scorm.isLMSConnected(), false, 'Local enabled, should not find a LMS.');
 	} else {
-		local = false;
+		strictEqual(scorm.isLMSConnected(), true, 'Local disabled, should find a LMS.');
 	}
 });
 // SB.start is fired onload, nothing to really test here.  We could verify settings however.
@@ -119,7 +120,9 @@ test("Check Comments from Learner", function () {
 		// Verify previous comments
 		strictEqual(learner_comment_count, '0', "Getting Comments from Learner count '0'");
 	} else {
-		strictEqual(learner_comment_count, '1', "Getting Comments from Learner count '1'");
+		scorm.debug(SB.getSuspendDataByPageID(3));
+		var bookmarkCount = SB.getSuspendDataByPageID(3).fromLearner; // pull last suspended count to compare
+		strictEqual(learner_comment_count, bookmarkCount, "Getting Comments from Learner count " + bookmarkCount); // this is getting set each visit aka resume attempt.
 	}
 });
 
@@ -127,15 +130,21 @@ test("Set Comment from Learner", function() {
 	var commentTime = new Date();
 	strictEqual(SB.setCommentFromLearner("This is a comment from learner", "QUnit Test", commentTime), 'true', "Setting comment from learner.");
 	// Expand later if you like, but please update the expected count above.
+	// Increment the stored counter so on resume after several comments it can be evaluated for correctness.
+	SB.setSuspendDataByPageID(3, 'countTracker', {
+		fromLearner: SB.getvalue('cmi.comments_from_learner._count')
+	});
 });
 
 test("Objectives", function () {
+	var objective;
 	if (SB.getEntry() !== "resume") {
 		SB.debug(">>>>>>>>> Setting Objective(s) <<<<<<<<<");
-		SB.debug("Get objective count before the fun begins.... " + SB.getvalue('cmi.objectives._count'));
+		//SB.debug("Get objective count before the fun begins.... " + SB.getvalue('cmi.objectives._count'));
+		strictEqual(SB.getvalue('cmi.objectives._count'), '0', "Getting objective._count, should be '0'");
 		// For True False
 		strictEqual(SB.setObjective({
-			id:                '1_1', // {String}
+			id:       '1_1', // {String}
 			score:             {                                                     // {Object}
 				scaled: '0', // {String}
 				raw:    '0', // {String}
@@ -273,10 +282,11 @@ test("Objectives", function () {
 			progress_measure:  '0',
 			description:       'They will answer a numeric interaction'
 		}), 'true', "Setting Objective Numeric 8_1 unscored");
+		strictEqual(SB.getvalue('cmi.objectives._count'), '10', "Getting objective._count, should be '10'");
 		SB.debug(">>>>>>>>> End Setting Objective(s) <<<<<<<<<");
 		SB.debug(">>>>>>>>> Verify Objective(s) <<<<<<<<<");
 		// Verify These 
-		var objective = SB.getObjective('1_1');
+		objective = SB.getObjective('1_1');
 		strictEqual(objective.id, "1_1", "Verify Objective id is 1_1");
 		strictEqual(objective.score.scaled, "0", "Verify Objective score.scaled is 0");
 		strictEqual(objective.score.raw, "0", "Verify Objective score raw is '0'");
@@ -391,7 +401,8 @@ test("Objectives", function () {
 	} else {
 		// Some scores were set, verify they are still there (LMS Only)
 		SB.debug(">>>>>>>>> Verify Objective(s) <<<<<<<<<");
-		var objective = SB.getObjective('1_1');
+		strictEqual(SB.getvalue('cmi.objectives._count'), '10', "Getting objective._count, should be '10'");
+		objective = SB.getObjective('1_1');
 		strictEqual(objective.id, "1_1", "Verify Objective id is 1_1");
 		strictEqual(objective.score.scaled, "1", "Verify Objective score.scaled is 1");
 		strictEqual(objective.score.raw, "1.5", "Verify Objective score raw is 1.5");
@@ -517,6 +528,7 @@ test("Interactions", function () {
 	endTime.setMinutes(startTime.getMinutes() + 5); // Add 5 minutes for latency, result would be PT5M
 
 	if (SB.getEntry() !== 'resume') {
+		strictEqual(SB.getvalue('cmi.interactions._count'), '0', "Getting interactions._count, should be '0'");
 		SB.debug(">>>>>>>>> Setting Interaction(s) <<<<<<<<<");
 		// True False Interaction
 		strictEqual(SB.setInteraction({
@@ -962,6 +974,7 @@ test("Interactions", function () {
 		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
 		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End Performance Interaction
+		strictEqual(SB.getvalue('cmi.interactions._count'), '9', "Getting interactions._count, should be '9'");
 		SB.debug(">>>>>>>>> End Setting Interaction(s) <<<<<<<<<");
 	}
 	SB.debug('>>>>>> Verify Interaction Block <<<<<<<');
@@ -1093,6 +1106,7 @@ test("Update Objective By ID", function () {
 		// Do something else?  With no tests this will cause a assertion error in QUnit.
 		// Doing any updating to these objectives means needing to manage resumes and verifying.
 		// This is a little too complicated now to test for how many times this was attempted.
+		strictEqual(SB.getvalue('cmi.objectives._count'), '10', "Getting objectives._count, should be '10'");
 	}
 
 });
@@ -1132,7 +1146,6 @@ test("Set Suspend Data By Page ID", function () {
 });
 
 test("Suspend SCO", function () {
-	SB.setSuspendData
 	SB.debug(">>>>>>>>> Suspending <<<<<<<<<");
 	strictEqual(scorm.commit(), 'true', "Committing to check navigation possibilities.");
 	canContinue = SB.getvalue('adl.nav.request_valid.continue');
