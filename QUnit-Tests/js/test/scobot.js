@@ -974,7 +974,7 @@ test("Interactions", function () {
 		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
 		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End Performance Interaction
-		strictEqual(SB.getvalue('cmi.interactions._count'), '9', "Getting interactions._count, should be '9'");
+		strictEqual(SB.getvalue('cmi.interactions._count'), '10', "Getting interactions._count, should be '10'");
 		SB.debug(">>>>>>>>> End Setting Interaction(s) <<<<<<<<<");
 	}
 	SB.debug('>>>>>> Verify Interaction Block <<<<<<<');
