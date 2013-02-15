@@ -37,8 +37,8 @@ function Local_API_1484_11(options) {
 	// Constructor
 	"use strict";
 	var defaults = {
-			version : "2.0",
-			moddate : "02/08/2013 10:00AM",
+			version : "2.1",
+			moddate : "02/15/2013 12:10AM",
 			createdate : "07/17/2010 08:15AM",
 			prefix: "Local_API_1484_11",
 			errorCode : 0,
