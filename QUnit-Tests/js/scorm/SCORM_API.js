@@ -282,10 +282,10 @@ function SCORM_API(options) {
 		// 1 day = 8640000 centiseconds
 		// 1 hour = 360000 centiseconds
 		// 1 minute = 6000 centiseconds
-		var aV = new Array(0,0,0,0,0,0),
+		var aV = [0,0,0,0,0,0],
 			bErr = !!((str.indexOf("P") !== 0)),
 			bTFound = false,
-			aT = new Array("Y","M","D","H","M","S"),
+			aT = ["Y","M","D","H","M","S"],
 			p=0,
 			i=0;
 		if (!bErr) {
