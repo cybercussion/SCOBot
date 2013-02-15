@@ -173,6 +173,20 @@ function Local_API_1484_11(options) {
 		return 'false';
 	}
 	/**
+	 * Throw General Set Error
+	 * This sets the errorCode and Diagnostic for the key and value attempted.
+	 * Note, messages differ too much for this to be genericized.  I think the SCORM Error, Message and Diagnostic needs to be bundled better.
+	 * @param k {String} key
+	 * @param v {String} value
+	 * @param o {String} optional
+	 * @returns {String} 'false'
+	 */
+	function throwGeneralSetError(k, v, o) {
+		settings.errorCode = "351";
+		settings.diagnostic = "The " + k + " element must be unique.  The value '" + v + "' has already been set in #" + o;
+		return 'false';
+	}
+	/**
 	 * Set Data (Private)
 	 * This covers setting key's values against a object even when there are numbers as objects
 	 * It will chase thru the Object dot syntax to locate the key you request.  This worked out
@@ -480,7 +494,6 @@ function Local_API_1484_11(options) {
 									scorm.debug(settings.prefix + ": Constructing objectives object for new interaction", 4);
 									cmi.interactions[tiers[2]].objectives = {};
 									cmi.interactions[tiers[2]].objectives._count = "-1";
-									cmi.interactions[tiers[2]].objectives._children = "id,score,success_status,completion_status,description";
 								}
 								// Wait, before you go trying set a count on a undefined object, lets make sure it exists...
 								if (!$.isPlainObject(cmi.interactions[tiers[2]].correct_responses)) {
@@ -488,7 +501,6 @@ function Local_API_1484_11(options) {
 									scorm.debug(settings.prefix + ": Constructing correct responses object for new interaction", 4);
 									cmi.interactions[tiers[2]].correct_responses = {};
 									cmi.interactions[tiers[2]].correct_responses._count = "-1";
-									//cmi.interactions[tiers[2]].correct_responses._children = "pattern"; // scorm spec didn't include _children for pattern.
 								}
 								return 'true';
 							} else {
@@ -516,7 +528,7 @@ function Local_API_1484_11(options) {
 									}
 								}
 								setData(k.substr(4, k.length), v, cmi);
-								cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 2).toString(); // Why -2?  _count and _children
+								cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 1).toString(); // Why -1?  _count
 								return 'true';
 							}
 							// Manage Correct Responses
