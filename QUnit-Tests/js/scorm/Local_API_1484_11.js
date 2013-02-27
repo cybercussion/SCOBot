@@ -573,7 +573,7 @@ function Local_API_1484_11(options) {
 						break;
 					}
 					break;
-					// More reenforcement to come ...
+					// More reinforcement to come ...
 				}
 				// Rip off 'cmi.' before we add this to the model
 				setData(k.substr(4, k.length), v, cmi);
