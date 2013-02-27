@@ -340,6 +340,20 @@ function SCOBot(options) {
 		case 'sequencing':
 			// a[,]b
 			if ($.isArray(value)) {
+				var index = 0;
+				// Quck validation it doesn't exceed array length 36
+				if (value.length > 36 ) {
+					scorm.debug(settings.prefix + ": Developer, you're passing a sum of values that exceeds SCORM's limit of 36 for this pattern.", 2);
+				}
+				// Quick validation of short_identifier_types
+				for (index in value) {
+					if (value.hasOwnProperty(index)) {
+						if(value[index].length > 10) {
+							scorm.debug(settings.prefix + ": Developer, you're passing values that exceed SCORM's limit of 10 characters.  Yours have " + value[index].length + ". I will truncate this as not to lose data.", 2);
+							value[index] = value[index].substring(0,10);
+						}
+					}
+				}
 				str = value.join("[,]");
 				value = str;
 			} else {
