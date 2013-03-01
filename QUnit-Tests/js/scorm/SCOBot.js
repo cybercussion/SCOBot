@@ -56,6 +56,7 @@ function SCOBot(options) {
 			interaction_mode: "state", // or journaled
 			launch_data_type: "querystring", // or json
 			initiate_timer: true,
+			scorm_strict: true,
 			scorm_edition: "3rd", // or 4th - this is a issue with "editions" of SCORM 2004 that differ
 			success_status: "unknown", // used as local status * see SCORM_API for override
 			location: "",
@@ -342,13 +343,14 @@ function SCOBot(options) {
 			if ($.isArray(value)) {
 				var index = 0;
 				// Quck validation it doesn't exceed array length 36
-				if (value.length > 36 ) {
+				if (value.length > 36 && settings.scorm_strict) {
 					scorm.debug(settings.prefix + ": Developer, you're passing a sum of values that exceeds SCORM's limit of 36 for this pattern.", 2);
+					value = value.slice(0,36);
 				}
 				// Quick validation of short_identifier_types
 				for (index in value) {
 					if (value.hasOwnProperty(index)) {
-						if(value[index].length > 10) {
+						if(value[index].length > 10 && settings.scorm_strict) {
 							scorm.debug(settings.prefix + ": Developer, you're passing values that exceed SCORM's limit of 10 characters.  Yours have " + value[index].length + ". I will truncate this as not to lose data.", 2);
 							value[index] = value[index].substring(0,10);
 						}
@@ -1237,7 +1239,9 @@ function SCOBot(options) {
 				orig_timestamp = data.timestamp || scorm.isoStringToDate(scorm.getvalue(p1 + scorm.getInteractionByID(data.id) + '.timestamp')),
 				timestamp, // Reserved for converting the Timestamp
 				latency, // Reserved for doing the Timestamp to latency conversion (May not exist)
-				result;  // Result of calling values against the SCORM API
+				result,  // Result of calling values against the SCORM API
+				cr,
+				cr_hash = ''; // Correct Response limit is 5.  If you pass duplicates I'm going to stop it from happening.
 			if (!$.isPlainObject(data)) {
 				scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof (data) + " instead.", 1);
 				return 'false';
@@ -1319,7 +1323,11 @@ function SCOBot(options) {
 						p = scorm.getvalue(p1 + p2) === '-1' ? 0 : scorm.getvalue(p1 + p2);
 						scorm.debug(settings.prefix + ": p is now " + p, 4);
 					}
-					result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
+					if ( p === "match") {
+						scorm.debug(settings.prefix + ": Developer, I've already added this correct response type '" + data.correct_responses[j].pattern + "'", 2);
+					} else {
+						result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
+					}
 				}
 			} else {
 				scorm.debug(settings.prefix + ": Something went wrong with Correct Responses, it wasn't an Array.", 1);
