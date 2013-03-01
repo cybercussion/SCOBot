@@ -1016,7 +1016,7 @@ function SCORM_API(options) {
 			//scorm.debug(settings.prefix + ": Interaction Correct Responses Pattern Check for " + i + " : " + p + " vs " + pattern, 4);
 			if (pattern === p) {
 				scorm.debug(settings.prefix + ": Interaction Correct Responses By Pattern Returning " + i);
-				return i;
+				return "match";
 			}
 		}
 		return 'false';
