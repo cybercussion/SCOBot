@@ -56,7 +56,7 @@ function SCOBot(options) {
 			interaction_mode: "state", // or journaled
 			launch_data_type: "querystring", // or json
 			initiate_timer: true,
-			scorm_strict: true,
+			scorm_strict: true,  // You can override this.  Will enforce SPM of SCORM Spec
 			scorm_edition: "3rd", // or 4th - this is a issue with "editions" of SCORM 2004 that differ
 			success_status: "unknown", // used as local status * see SCORM_API for override
 			location: "",
