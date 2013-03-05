@@ -314,8 +314,10 @@ function SCOBot(options) {
 	 */
 	function encodeInteractionType(type, value) {
 		var str = '',
+			str2 = '',
 			i = 0,
-			arr = [];
+			arr = [],
+			arr2 = [];
 		switch (type) {
 		/*
 		 * True / False
@@ -485,7 +487,13 @@ function SCOBot(options) {
 				if ($.isArray(value.answers)) {
 					for (i = 0; i < value.answers.length; i += 1) {
 						if ($.isArray(value.answers[i])) {
-							arr.push(value.answers[i].join("[.]")); // this isn't working
+							// Need to check if answer is object
+							if ($.isPlainObject(value.answers[i][1])) {
+									arr2 = [trueRound(value.answers[i][1].min, 7), trueRound(value.answers[i][1].max, 7)];
+									str2 = arr2.join("[:]");
+									value.answers[i][1] = str2;
+							}
+							arr.push(value.answers[i].join("[.]"));
 						} else {
 							scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance correct response.  I got " + typeof (value.answers[i]) + " instead on " + i, 1);
 							scorm.debug(value, 1);
@@ -522,15 +530,19 @@ function SCOBot(options) {
 		 */
 		case 'numeric':
 			if (typeof (value) === "number") {
-				value = value.toString();
+				str = value.toString();
+			} else if ($.isPlainObject(value)) {
+				arr = [trueRound(value.min, 7), trueRound(value.max, 7)];
+				str = arr.join("[:]");
 			} else {
 				// Verify number to save some time.
 				str = parseFloat(value);
 				if (str === "NaN") {
 					scorm.debug(settings.prefix + ": Developer, your not passing a number for a numeric interaction.  I got " + value + " instead", 1);
 				}
+				str += ''; // String
 			}
-			return value;
+			return str;
 		/*
 		 * LikeRT
 		 * No real hands on here, expects a {String}

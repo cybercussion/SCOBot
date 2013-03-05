@@ -899,7 +899,7 @@ test("Interactions", function () {
 						order_matters: false, // {Boolean} (optional)
 						answers:       [
 							// {Array}
-							["step_1", "answer_2"],
+							["step_1", {min: 5, max: 6}],
 							// {Array} of {String}s step identifier (optional)
 							["step_2", "answer_1"],
 							["step_3", "answer_3"]
@@ -910,7 +910,7 @@ test("Interactions", function () {
 			weighting:         '1', // {String}
 			learner_response:  [
 				// {Array}
-				["step_1", "answer_2"],
+				["step_1", "5.24"],
 				// {Array} of {String}s step identifier (optional)
 				["step_2", "answer_1"],
 				["step_3", "answer_3"]
@@ -918,7 +918,7 @@ test("Interactions", function () {
 			result:            'correct', // {String} correct, incorrect, neutral
 			latency:           endTime, // {Object} date end (optional)
 			description:       "Arrange the pairs into an order of completion." // {String} question commonly
-		}), 'true', "Setting matching Interaction 6");
+		}), 'true', "Setting matching Interaction 9");
 
 		// Verify Data was set properly, I'm using long-hand scorm calls for this
 		n = scorm.getInteractionByID(intID);
@@ -926,7 +926,8 @@ test("Interactions", function () {
 		strictEqual(SB.getvalue('cmi.interactions.' + n + '.type'), 'performance', 'Verifying cmi.interactions.' + n + '.type is performance');
 		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives._count'), '1', 'Verifying cmi.interactions.' + n + '.objectives._count count is 1');
 		strictEqual(SB.getvalue('cmi.interactions.' + n + '.objectives.' + m + '.id'), '9_1', 'Verifying cmi.interactions.' + n + '.objectives.' + m + '.id id is 9_1');
-		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), 'step_1[.]answer_2[,]step_2[.]answer_1[,]step_3[.]answer_3', 'Verifying cmi.interactions.' + n + '.learner_response is step_1[.]step_answer_2[,]step_2[.]answer_1[,]step_3[.]answer_3');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.correct_responses.0.pattern'), '{order_matters=false}step_1[.]5[:]6[,]step_2[.]answer_1[,]step_3[.]answer_3', 'Verifying cmi.interactions.' + n + '.correct_response.pattern.0 is {order_matters=false}step_1[.]5[:]6[,]step_2[.]answer_1[,]step_3[.]answer_3');
+		strictEqual(SB.getvalue('cmi.interactions.' + n + '.learner_response'), 'step_1[.]5.24[,]step_2[.]answer_1[,]step_3[.]answer_3', 'Verifying cmi.interactions.' + n + '.learner_response is step_1[.]step_answer_2[,]step_2[.]answer_1[,]step_3[.]answer_3');
 		strictEqual(SB.getvalue('cmi.interactions.' + n + '.result'), 'correct', 'Verifying cmi.interactions.' + n + '.result is correct');
 		strictEqual(SB.getvalue('cmi.interactions.' + n + '.latency'), 'PT5M', 'Verifying cmi.interactions.' + n + '.latency is PT5M');
 		// End Performance Interaction
@@ -948,7 +949,10 @@ test("Interactions", function () {
 			correct_responses: [
 				// {Array}
 				{                                                         // {Object}
-					pattern: "10.5"                                       // {String}
+					pattern: {                                            // {Object}
+						min: 9.123456789,
+						max: 11
+					}
 				}
 			],
 			weighting:         '1', // {String}
@@ -956,7 +960,7 @@ test("Interactions", function () {
 			result:            'correct', // {String} correct, incorrect, neutral
 			latency:           endTime, // {Object} date end (optional)
 			description:       "Just fill in some random decimal that looks like 10.5." // {String} question commonly
-		}), 'true', "Setting numeric Interaction 6");
+		}), 'true', "Setting numeric Interaction 10");
 		//SB.debug("I AM CHECKIN A SMALL SUBSET WITH A NEW LATENCY +++++++++++++++++++++++++++++++++", 4);
 		/*strictEqual(SB.setInteraction({
 		 id: intID,                                                    // {String}
@@ -1148,10 +1152,12 @@ test("Set Suspend Data By Page ID", function () {
 test("Suspend SCO", function () {
 	SB.debug(">>>>>>>>> Suspending <<<<<<<<<");
 	strictEqual(scorm.commit(), 'true', "Committing to check navigation possibilities.");
-	canContinue = SB.getvalue('adl.nav.request_valid.continue');
-	strictEqual(canContinue, 'true', 'Checking for adl.nav.request_valid.continue'); // Check your imss sequencing flow control!!!
-	if(canContinue === 'true' || canContinue === 'unknown') {
-		//SB.setvalue('adl.nav.request', 'continue'); // Enable if you want it to cruise past this SCO
+	if(!local) {
+		canContinue = SB.getvalue('adl.nav.request_valid.continue');
+		strictEqual(canContinue, 'true', 'Checking for adl.nav.request_valid.continue'); // Check your imss sequencing flow control!!!
+		if(canContinue === 'true' || canContinue === 'unknown') {
+			//SB.setvalue('adl.nav.request', 'continue'); // Enable if you want it to cruise past this SCO
+		}
 	}
 	//strictEqual(SB.suspend(), 'true', 'Suspending SCO');
 	SB.debug("SetValue Calls: " + setvalue_calls + "\nGetValue Calls: " + getvalue_calls, 4);
