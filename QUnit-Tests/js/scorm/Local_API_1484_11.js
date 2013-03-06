@@ -37,8 +37,8 @@ function Local_API_1484_11(options) {
 	// Constructor
 	"use strict";
 	var defaults = {
-			version : "2.1",
-			moddate : "02/15/2013 12:10AM",
+			version : "2.2",
+			moddate : "03/05/2013 5:10PM",
 			createdate : "07/17/2010 08:15AM",
 			prefix: "Local_API_1484_11",
 			errorCode : 0,
@@ -238,7 +238,7 @@ function Local_API_1484_11(options) {
 		} else {
 			v = ka.shift();
 			if (obj[v]) {
-				return getData(ka.join("."), obj[v]) + ''; // just in case its undefined
+				return String(getData(ka.join("."), obj[v])); // just in case its undefined
 			}
 			throwUnimplemented(key);
 			return 'false';
@@ -467,7 +467,6 @@ function Local_API_1484_11(options) {
 						setData(k.substr(4, k.length), v, cmi);
 						cmi.comments_from_learner._count = (getObjLength(cmi.comments_from_learner) - 2).toString(); // Why -1?  _count and _children
 						return 'true';
-						break;
 					case "interactions":
 						// Validate
 						if (cmi.interactions._children.indexOf(tiers[3]) === -1) {
@@ -503,44 +502,41 @@ function Local_API_1484_11(options) {
 									cmi.interactions[tiers[2]].correct_responses._count = "-1";
 								}
 								return 'true';
-							} else {
-								// Can't add inteaction without id first.
-								scorm.debug("Can't add interaction without ID first!", 3);
-								return 'false';
-								// Todo throw error code
 							}
-						} else {
-							// Manage Objectives
-							if (tiers[3] === 'objectives') { // cmi.interactions.n.objectives
-								// Objectives require a unique ID
-								if (tiers[5] === "id") {
-									count = parseInt(cmi.interactions[tiers[2]].objectives._count, 10);
-									for (z = 0; z < count; z += 1) {
-										if (cmi.interactions[tiers[2]].objectives[z].id === v) {
-											return throwGeneralSetError(key, v, z);
-											//settings.errorCode = "351";
-											//settings.diagnostic = "The objectives.id element must be unique.  The value '" + v + "' has already been set in objective #" + z;
-										}
+							scorm.debug("Can't add interaction without ID first!", 3);
+							return 'false';
+							// Todo throw error code
+						}
+						// Manage Objectives
+						if (tiers[3] === 'objectives') { // cmi.interactions.n.objectives
+							// Objectives require a unique ID
+							if (tiers[5] === "id") {
+								count = parseInt(cmi.interactions[tiers[2]].objectives._count, 10);
+								for (z = 0; z < count; z += 1) {
+									if (cmi.interactions[tiers[2]].objectives[z].id === v) {
+										return throwGeneralSetError(key, v, z);
+										//settings.errorCode = "351";
+										//settings.diagnostic = "The objectives.id element must be unique.  The value '" + v + "' has already been set in objective #" + z;
 									}
-								} else {
-									return throwVocabError(key, v);
 								}
-								setData(k.substr(4, k.length), v, cmi);
-								cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 1).toString(); // Why -1?  _count
-								return 'true';
-							}
-							// Manage Correct Responses
-							if (tiers[3] === 'correct_responses') {
-								// Todo Validate Correct response patterns
-								setData(k.substr(4, k.length), v, cmi);
-								cmi.interactions[tiers[2]].correct_responses._count = (getObjLength(cmi.interactions[tiers[2]].correct_responses) - 1).toString(); // Why -1?  _count
+							} else {
+								return throwVocabError(key, v);
 							}
 							setData(k.substr(4, k.length), v, cmi);
-							cmi.interactions._count = (getObjLength(cmi.interactions) - 2).toString(); // Why -2?  _count and _children
+							cmi.interactions[tiers[2]].objectives._count = (getObjLength(cmi.interactions[tiers[2]].objectives) - 1).toString(); // Why -1?  _count
 							return 'true';
 						}
-						break;
-						case "objectives":
+						// Manage Correct Responses
+						if (tiers[3] === 'correct_responses') {
+							// Todo Validate Correct response patterns
+							setData(k.substr(4, k.length), v, cmi);
+							cmi.interactions[tiers[2]].correct_responses._count = (getObjLength(cmi.interactions[tiers[2]].correct_responses) - 1).toString(); // Why -1?  _count
+						}
+						setData(k.substr(4, k.length), v, cmi);
+						cmi.interactions._count = (getObjLength(cmi.interactions) - 2).toString(); // Why -2?  _count and _children
+						return 'true';
+						//break;
+					case "objectives":
 						// Objectives require a unique ID, which to me contradicts journaling
 						if (tiers[3] === "id") {
 							count = parseInt(cmi.objectives._count, 10);
@@ -563,14 +559,13 @@ function Local_API_1484_11(options) {
 							}
 						}
 						// END ID CHeck
+						if (isNaN(parseInt(tiers[2], 10))) {
+							return 'false';
+							// todo throw error code
+						}
 						setData(k.substr(4, k.length), v, cmi);
 						cmi.objectives._count = (getObjLength(cmi.objectives) - 2).toString(); // Why -2?  _count and _children
 						return 'true';
-						// ditto
-						if (isNaN(parseInt(tiers[2], 10))) {
-							return 'false';
-						}
-						break;
 					}
 					break;
 					// More reinforcement to come ...
