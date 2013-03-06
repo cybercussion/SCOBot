@@ -5,8 +5,8 @@
  * General Concept: When the LMS connects, call var SB = new SCOBot();
  * SCOBot
  * This only works with the SCORM_API, but has the basis to work with other API's.
- * Several public API's will call one to many SCORM Calls and this will make every attempt
- * to do common SCORM Tasks or boil down SCORM tasks into a smaller easy to use method.
+ * Several public API's will call one to many SCORM Calls and this will make every attempt to
+ * do common SCORM Tasks or boil down SCORM tasks into a smaller easy to use method.
  * Mode: {get} Browse, Review, Normal
  * Bookmark: {get/set} SCO Progress
  * Suspend Data: {get/set} Suspend Data Object
@@ -47,9 +47,9 @@ function SCOBot(options) {
 	"use strict";
 	/** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
 	var defaults = {
-			version: "1.3",
+			version: "2.0",
 			createDate: "04/07/2011 09:33AM",
-			modifiedDate: "01/28/2013 9:50PM",
+			modifiedDate: "03/05/2013 5:10PM",
 			prefix: "SCOBot",
 			// SCORM buffers and settings
 			launch_data: {},
@@ -114,19 +114,19 @@ function SCOBot(options) {
 			$(self).triggerHandler({
 				'type': "unload"
 			});
-			switch(scorm.get('exit_type')) {
-				case "finish":
-					self.finish();
-					break;
-				case "suspend":
-					self.suspend();
-					break;
-				case "timeout":
-					self.timeout();
-					break;
-				default:
-					scorm.debug(settings.prefix + ": unknown exit type", 2);
-					break;
+			switch (scorm.get('exit_type')) {
+			case "finish":
+				self.finish();
+				break;
+			case "suspend":
+				self.suspend();
+				break;
+			case "timeout":
+				self.timeout();
+				break;
+			default:
+				scorm.debug(settings.prefix + ": unknown exit type", 2);
+				break;
 			}
 			scorm.debug(settings.prefix + ": SCO is done unloading.", 4);
 			isStarted = false;
@@ -287,7 +287,7 @@ function SCOBot(options) {
 		scorm.debug("Times Up!");
 		var time_action = scorm.getvalue('cmi.time_limit_action').split(','),
 			message = !!((time_action[1] === "message"));
-		if(message) {
+		if (message) {
 			$(self).triggerHandler({
 				'type': "message",
 				'text': "Time Limit Exceeded"
@@ -317,7 +317,8 @@ function SCOBot(options) {
 			str2 = '',
 			i = 0,
 			arr = [],
-			arr2 = [];
+			arr2 = [],
+			index;
 		switch (type) {
 		/*
 		 * True / False
@@ -343,18 +344,18 @@ function SCOBot(options) {
 		case 'sequencing':
 			// a[,]b
 			if ($.isArray(value)) {
-				var index = 0;
+				index = 0;
 				// Quck validation it doesn't exceed array length 36
 				if (value.length > 36 && settings.scorm_strict) {
 					scorm.debug(settings.prefix + ": Developer, you're passing a sum of values that exceeds SCORM's limit of 36 for this pattern.", 2);
-					value = value.slice(0,36);
+					value = value.slice(0, 36);
 				}
 				// Quick validation of short_identifier_types
 				for (index in value) {
 					if (value.hasOwnProperty(index)) {
-						if(value[index].length > 10 && settings.scorm_strict) {
+						if (value[index].length > 10 && settings.scorm_strict) {
 							scorm.debug(settings.prefix + ": Developer, you're passing values that exceed SCORM's limit of 10 characters.  Yours have " + value[index].length + ". I will truncate this as not to lose data.", 2);
-							value[index] = value[index].substring(0,10);
+							value[index] = value[index].substring(0, 10);
 						}
 					}
 				}
@@ -489,9 +490,9 @@ function SCOBot(options) {
 						if ($.isArray(value.answers[i])) {
 							// Need to check if answer is object
 							if ($.isPlainObject(value.answers[i][1])) {
-									arr2 = [trueRound(value.answers[i][1].min, 7), trueRound(value.answers[i][1].max, 7)];
-									str2 = arr2.join("[:]");
-									value.answers[i][1] = str2;
+								arr2 = [trueRound(value.answers[i][1].min, 7), trueRound(value.answers[i][1].max, 7)];
+								str2 = arr2.join("[:]");
+								value.answers[i][1] = str2;
 							}
 							arr.push(value.answers[i].join("[.]"));
 						} else {
@@ -997,8 +998,8 @@ function SCOBot(options) {
 			}
 			// Check if there is a max_time_allowed
 			settings.max_time_allowed = scorm.getvalue('cmi.max_time_allowed');
-			if(isISO8601Duration(settings.max_time_allowed)) {
-				if(settings.initiate_timer) {
+			if (isISO8601Duration(settings.max_time_allowed)) {
+				if (settings.initiate_timer) {
 					scorm.debug(settings.prefix + " This SCO has a set time, I am starting the timer for " + settings.max_time_allowed + "...");
 					self.startTimer();
 				}
@@ -1048,7 +1049,7 @@ function SCOBot(options) {
 	 * Start Timer
 	 * This will begin the timer based on the time provided by max_time_allowed.  This depends on the time_limit_action.
 	 */
-	this.startTimer = function() {
+	this.startTimer = function () {
 		var time = scorm.ISODurationToCentisec(settings.max_time_allowed) * 10;
 		setTimeout(timesUp, time);
 	};
@@ -1252,8 +1253,9 @@ function SCOBot(options) {
 				timestamp, // Reserved for converting the Timestamp
 				latency, // Reserved for doing the Timestamp to latency conversion (May not exist)
 				result,  // Result of calling values against the SCORM API
-				cr,
-				cr_hash = ''; // Correct Response limit is 5.  If you pass duplicates I'm going to stop it from happening.
+				//cr,
+				//cr_hash = '', // Correct Response limit is 5.  If you pass duplicates I'm going to stop it from happening.
+				key;
 			if (!$.isPlainObject(data)) {
 				scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof (data) + " instead.", 1);
 				return 'false';
@@ -1261,7 +1263,7 @@ function SCOBot(options) {
 			if (isBadValue(data.id)) {
 				// This is a show stopper, try to give them some bread crumb to locate the problem.
 				scorm.debug(settings.prefix + ": Developer, your passing a interaction without a ID\nSee question:\n" + data.description, 1);
-				for (var key in data) {
+				for (key in data) {
 					if (data.hasOwnProperty(key)) {
 						scorm.debug("key: " + key + "\n value: " + data[key]);
 					}
@@ -1335,7 +1337,7 @@ function SCOBot(options) {
 						p = scorm.getvalue(p1 + p2) === '-1' ? 0 : scorm.getvalue(p1 + p2);
 						scorm.debug(settings.prefix + ": p is now " + p, 4);
 					}
-					if ( p === "match") {
+					if (p === "match") {
 						scorm.debug(settings.prefix + ": Developer, I've already added this correct response type '" + data.correct_responses[j].pattern + "'", 2);
 					} else {
 						result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
@@ -1465,11 +1467,12 @@ function SCOBot(options) {
 				f = false,
 				def1 = ": Passed no or bad ",
 				def2 = " ignored.",
-				sv = scorm.setvalue;
+				sv = scorm.setvalue,
+				key;
 			scorm.debug(settings.prefix + ": Setting Objective at " + n + " (This may be false)");
 			if (isBadValue(n)) { // First Run
 				n = scorm.getvalue(p1 + '_count');
-				if(n === 'false') {
+				if (n === 'false') {
 					scorm.debug(settings.prefix + ": LMS is return false, can not proceed, check error codes");
 					return n;
 				}
@@ -1482,7 +1485,7 @@ function SCOBot(options) {
 					sv(p1 + 'id', data.id.toString());
 				} else { // Show stopper
 					scorm.debug(settings.prefix + ": You did not pass an objective ID!!  What I did get below:", 1);
-					for (var key in data) {
+					for (key in data) {
 						if (data.hasOwnProperty(key)) {
 							scorm.debug("key: " + key + "\n value: " + data[key]);
 						}
@@ -1491,17 +1494,17 @@ function SCOBot(options) {
 				}
 			}
 			if ($.isPlainObject(data.score)) {
-				result = !isBadValue(data.score.scaled) ? sv(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.scaled: " + data.score.scaled + def2,3);
-				result = !isBadValue(data.score.raw) ? sv(p1 + 'score.raw', trueRound(data.score.raw, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.raw: " + data.score.raw + def2,3);
-				result = !isBadValue(data.score.min) ? sv(p1 + 'score.min', trueRound(data.score.min, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.min: " + data.score.min + def2,3);
-				result = !isBadValue(data.score.max) ? sv(p1 + 'score.max', trueRound(data.score.max, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.max: " + data.score.max + def2,3);
+				result = !isBadValue(data.score.scaled) ? sv(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.scaled: " + data.score.scaled + def2, 3);
+				result = !isBadValue(data.score.raw) ? sv(p1 + 'score.raw', trueRound(data.score.raw, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.raw: " + data.score.raw + def2, 3);
+				result = !isBadValue(data.score.min) ? sv(p1 + 'score.min', trueRound(data.score.min, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.min: " + data.score.min + def2, 3);
+				result = !isBadValue(data.score.max) ? sv(p1 + 'score.max', trueRound(data.score.max, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.max: " + data.score.max + def2, 3);
 			} else {
 				scorm.debug(settings.prefix + ": Did not receive a score object.  May or may not be an issue.", 4);
 			}
-			result = !isBadValue(data.success_status) ? sv(p1 + 'success_status', data.success_status) : scorm.debug(settings.prefix + def1 + p1 + "success_status: " + data.success_status + def2,3);
-			result = !isBadValue(data.completion_status) ? sv(p1 + 'completion_status', data.completion_status) : scorm.debug(settings.prefix + def1 + p1 + "completion_status: " + data.completion_status + def2,3);
-			result = !isBadValue(data.progress_measure) ? sv(p1 + 'progress_measure', data.progress_measure) : scorm.debug(settings.prefix + def1 + p1 + "progress_measure: " + data.progress_measure + def2,3);
-			result = !isBadValue(data.description) ? sv(p1 + 'description', data.description) : scorm.debug(settings.prefix + def1 + p1 + "description: " + data.description + def2,3);
+			result = !isBadValue(data.success_status) ? sv(p1 + 'success_status', data.success_status) : scorm.debug(settings.prefix + def1 + p1 + "success_status: " + data.success_status + def2, 3);
+			result = !isBadValue(data.completion_status) ? sv(p1 + 'completion_status', data.completion_status) : scorm.debug(settings.prefix + def1 + p1 + "completion_status: " + data.completion_status + def2, 3);
+			result = !isBadValue(data.progress_measure) ? sv(p1 + 'progress_measure', data.progress_measure) : scorm.debug(settings.prefix + def1 + p1 + "progress_measure: " + data.progress_measure + def2, 3);
+			result = !isBadValue(data.description) ? sv(p1 + 'description', data.description) : scorm.debug(settings.prefix + def1 + p1 + "description: " + data.description + def2, 3);
 			scorm.debug(settings.prefix + ": Progress\n" + JSON.stringify(checkProgress(), null, " "), 4);
 			return result.toString();
 		}
@@ -1561,15 +1564,15 @@ function SCOBot(options) {
 	 * @param date {Object} New Date object (for timestamp)
 	 * @return {String}
 	 */
-	this.setCommentFromLearner = function(msg, loc, date) {
+	this.setCommentFromLearner = function (msg, loc, date) {
 		if (isStarted) {
 			var p1 = "cmi.comments_from_learner.",
 				n = scorm.getvalue(p1 + "_count");
-			if(n === 'false') {
+			if (n === 'false') {
 				scorm.debug(settings.prefix + ": Sorry, LMS returned a comments count of 'false'.  Review error logs.");
 				return n;
 			}
-			if(msg.length > 0 && msg.length < 4000) {
+			if (msg.length > 0 && msg.length < 4000) {
 				scorm.debug(settings.prefix + ": Sorry, message from learner was empty or exceeded the limit. Length:" + msg.length, 2);
 			}
 			p1 += n + '.';
@@ -1588,7 +1591,7 @@ function SCOBot(options) {
 	 * Special Note: If you are using Objectives, Interactions and set the totals, you do not need to use this method.
 	 * @return {String} 'true' or 'false'
 	 */
-	this.gradeIt = function() {
+	this.gradeIt = function () {
 		var scoreScaled = 1,
 			scoreRaw = scorm.getvalue('cmi.score.raw'),
 			scoreMin = scorm.getvalue('cmi.score.min'),

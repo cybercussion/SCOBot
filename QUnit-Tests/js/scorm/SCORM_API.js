@@ -12,7 +12,7 @@
  * Documentation, samples, resources, and credits: ADL, Claude Ostyn, Pipwerks, SCORM.com
  * Goals: SCORM For Everyone else, low overhead, simple API's, containment, and transparency.
  *
- * Typical CMI Usage:
+ * Typical CMI Usage (if used by itself):
  * var scorm = new SCORM_API({debug: true, exit_type: 'suspend'}),
  *     lmsconnected = scorm.initialize();
  * scorm.getvalue('cmi.location');
@@ -62,9 +62,9 @@ function SCORM_API(options) {
 	"use strict";
 	// Please edit run time options or override them when you instantiate this object.
 	var defaults = {
-			version: "1.4.1",
+			version: "1.5",
 			createDate: "04/05/2011 08:56AM",
-			modifiedDate: "02/14/2013 2:50PM",
+			modifiedDate: "03/05/2013 5:10PM",
 			debug: false,
 			isActive: false,
 			throw_alerts: false,
@@ -269,7 +269,7 @@ function SCORM_API(options) {
 	 * @param str
 	 * @return {Number}
 	 */
-	function ISODurationToCentisec(str)	{
+	function ISODurationToCentisec(str) {
 		// Only gross syntax check is performed here
 		// Months calculated by approximation based on average number
 		// of days over 4 years (365*4+1), not counting the extra days
@@ -282,29 +282,29 @@ function SCORM_API(options) {
 		// 1 day = 8640000 centiseconds
 		// 1 hour = 360000 centiseconds
 		// 1 minute = 6000 centiseconds
-		var aV = [0,0,0,0,0,0],
+		var aV = [0, 0, 0, 0, 0, 0],
 			bErr = !!((str.indexOf("P") !== 0)),
 			bTFound = false,
-			aT = ["Y","M","D","H","M","S"],
-			p=0,
-			i=0;
+			aT = ["Y", "M", "D", "H", "M", "S"],
+			p = 0,
+			i = 0;
 		if (!bErr) {
 			str = str.substr(1); //get past the P
-			for (i = 0 ; i < aT.length; i++) {
-				if (str.indexOf("T") == 0) {
+			for (i = 0; i < aT.length; i += 1) {
+				if (str.indexOf("T") === 0) {
 					str = str.substr(1);
-					i = Math.max(i,3);
+					i = Math.max(i, 3);
 					bTFound = true;
 				}
 				p = str.indexOf(aT[i]);
-				if (p > -1)	{
-					if ((i == 1) && (str.indexOf("T") > -1) && (str.indexOf("T") < p)) {
-						continue;
-					}
-					if (aT[i] == "S") {
-						aV[i] = parseFloat(str.substr(0,p))
+				if (p > -1) {
+					//if ((i === 1) && (str.indexOf("T") > -1) && (str.indexOf("T") < p)) {
+					//	continue; // This not a good approach
+					//}
+					if (aT[i] === "S") {
+						aV[i] = parseFloat(str.substr(0, p));
 					} else {
-						aV[i] = parseInt(str.substr(0,p))
+						aV[i] = parseInt(str.substr(0, p), 10);
 					}
 					if (isNaN(aV[i])) {
 						bErr = true;
@@ -313,17 +313,17 @@ function SCORM_API(options) {
 						bErr = true;
 						break;
 					}
-					str = str.substr(p+1);
+					str = str.substr(p + 1);
 				}
 			}
-			bErr = !!(((!bErr) && (str.length != 0)));
+			bErr = !!(((!bErr) && (str.length !== 0)));
 		}
 		if (bErr) {
 			return 0;
 		}
-		return aV[0]*3155760000 + aV[1]*262980000
-			+ aV[2]*8640000 + aV[3]*360000 + aV[4]*6000
-			+ Math.round(aV[5]*100)
+		return aV[0] * 3155760000 + aV[1] * 262980000
+			+ aV[2] * 8640000 + aV[3] * 360000 + aV[4] * 6000
+			+ Math.round(aV[5] * 100);
 	}
 	/**
 	 * Pad Time
@@ -637,7 +637,7 @@ function SCORM_API(options) {
 			// Clean up Error Codes that are non-critical (like date element not initialized)
 			if (ec === 0 || ec === 403) {
 				// Clean up differences in LMS responses
-				if (typeof v === 'undefined' || v === null || v === 'null') {
+				if (v === 'undefined' || v === null || v === 'null') { // was typeof v
 					v = "";
 				}
 				return String(v);
@@ -777,10 +777,9 @@ function SCORM_API(options) {
 			// Ensure Error Codes not critical
 			if (ec === 0 || ec === 403) {
 				return s;
-			} else {
-				debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + " for " + n + "\nDiagnostic: " + getDiagnostic(ec), 1);
-				return s;
 			}
+			debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + " for " + n + "\nDiagnostic: " + getDiagnostic(ec), 1);
+			return s;
 		}
 		debug(settings.prefix + ": " + n + " Set Aborted, connection not initialized! Locate where you called it after you Terminated.", 2);
 		return 'false';
@@ -1036,12 +1035,12 @@ function SCORM_API(options) {
 			if (win && win !== window) {
 				findAPI(window.parent);
 			}
-		} catch(e) {/* Cross Domain issue */}
+		} catch (e) {/* Cross Domain issue */}
 		if (!API.path) {
 			try {
 				win = window.top.opener;
 				findAPI(win);
-			} catch (e) {/* Cross domain issue */}
+			} catch (ee) {/* Cross domain issue */}
 		}
 		if (API.path) {
 			API.connection = true;
@@ -1055,7 +1054,7 @@ function SCORM_API(options) {
 			API.version = "2004";
 			// May or may not be provided (standalone) if not, this is null (DOA)
 			API.path = typeof (Local_API_1484_11) === 'function' ? new Local_API_1484_11({cmi: settings.cmi}) : null;
-			$(API.path).on('StoreData', function(e) {
+			$(API.path).on('StoreData', function (e) {
 				$(self).triggerHandler({
 					type: 'StoreData',
 					runtimedata: e.runtimedata
@@ -1079,7 +1078,7 @@ function SCORM_API(options) {
 	 * Will tell you if LMS is truly connected or not.  You may be running locally.
 	 * @return {Boolean}
 	 */
-	this.isLMSConnected = function() {
+	this.isLMSConnected = function () {
 		return API.connection;
 	};
 	/**

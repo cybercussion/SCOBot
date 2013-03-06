@@ -31,10 +31,6 @@
 						<!--****** Title of Lesson ******-->
 						<title>Unit X</title>
 						<item identifier="LessonX" isvisible="true">
-							<imsss:sequencing>
-								<!-- Enable choice if you want them to choose, forwardOnly if you don't want them to be able to go back -->
-								<imsss:controlMode choice="true" choiceExit="true" flow="true" forwardOnly="false" />
-							</imsss:sequencing>
 							<title>Lesson X</title>
 							<!-- See i1 link to reference a1 below.  Also notice launch parameters (querystring format) -->
 							<item identifier="ACT-001" identifierref="RES-001" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=06">
@@ -115,6 +111,9 @@
 								</imsss:sequencing>
 							</item>
 						</item>
+						<imsss:sequencing>
+							<imsss:controlMode choice="true" choiceExit="true" flow="true" forwardOnly = "false"/>
+						</imsss:sequencing>
 					</item>
 				</item>
 			</item>
@@ -149,12 +148,12 @@
 			<dependency identifierref="common_files" />
 		</resource>
 		<!-- Shared Assets (optional deployment capability) -->
-		<resource identifier="common_files" type="webcontent" adlcp:scormType="asset">
-			<file href="QUnit-SCORM_API/css/qunit-1.10.0.css" />
-			<file href="QUnit-SCORM_API/js/util/json2.js" />
-			<file href="QUnit-SCORM_API/js/jquery/jquery-1.8.3.js"/>
-			<file href="QUnit-SCORM_API/js/jquery/jquery-1.8.3.min.js"/>
-			<file href="QUnit-SCORM_API/js/jquery/plugins/qunit-1.10.0.js" />
+		<resource identifier="common_files" type="webcontent" xml:base="QUnit-Tests/" adlcp:scormType="asset">
+			<file href="css/qunit-1.11.0.css" />
+			<file href="js/util/json2.js" />
+			<file href="js/jquery/jquery-1.9.0.js"/>
+			<file href="js/jquery/jquery-1.9.0.min.js"/>
+			<file href="js/jquery/plugins/qunit-1.11.0.js" />
 		</resource>
 	</resources>
 </manifest>
