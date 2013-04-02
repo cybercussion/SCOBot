@@ -36,13 +36,6 @@
 							<item identifier="ACT-001" identifierref="RES-001" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=06">
 								<!--****** Title of SCO ******-->
 								<title>QUnit SCORM_API</title>
-								<!--adlnav:presentation>
-									<adlnav:navigationInterface>
-										<adlnav:hideLMSUI>continue</adlnav:hideLMSUI>
-										<adlnav:hideLMSUI>previous</adlnav:hideLMSUI>
-										<adlnav:hideLMSUI>suspendAll</adlnav:hideLMSUI>
-									</adlnav:navigationInterface>
-								</adlnav:presentation-->
 								<!-- Launch Data -->
 								<adlcp:dataFromLMS><![CDATA[name=value]]></adlcp:dataFromLMS>
 								<!-- equates to cmi.completion_threshold -->
@@ -62,13 +55,6 @@
 							<item identifier="ACT-002" identifierref="RES-002" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=09">
 								<!--****** Title of SCO ******-->
 								<title>QUnit SCOBot</title>
-								<!--adlnav:presentation>
-									<adlnav:navigationInterface>
-										<adlnav:hideLMSUI>continue</adlnav:hideLMSUI>
-										<adlnav:hideLMSUI>previous</adlnav:hideLMSUI>
-										<adlnav:hideLMSUI>suspendAll</adlnav:hideLMSUI>
-									</adlnav:navigationInterface>
-								</adlnav:presentation-->
 								<!-- Launch Data -->
 								<adlcp:dataFromLMS><![CDATA[name=value]]></adlcp:dataFromLMS>
 								<!-- equates to cmi.completion_threshold -->
@@ -88,13 +74,32 @@
 							<item identifier="ACT-003" identifierref="RES-003" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=06">
 								<!--****** Title of SCO ******-->
 								<title>QUnit SCOBot Production</title>
-								<adlnav:presentation>
+								<!-- Launch Data -->
+								<adlcp:dataFromLMS><![CDATA[name=value]]></adlcp:dataFromLMS>
+								<!-- equates to cmi.completion_threshold -->
+								<adlcp:completionThreshold>0.75</adlcp:completionThreshold>
+								<imsss:sequencing>
+									<imsss:objectives>
+										<imsss:primaryObjective satisfiedByMeasure="true">
+											<!-- equates to cmi.scaled_passing_score -->
+											<imsss:minNormalizedMeasure>0.6</imsss:minNormalizedMeasure>
+										</imsss:primaryObjective>
+									</imsss:objectives>
+									<!-- Optional: Limit attempts (managed by LMS), and or attemptAbsoluteDurationLimit equates to cmi.max_time_allowed  -->
+									<!--imsss:limitConditions attemptLimit="3" attemptAbsoluteDurationLimit="" /-->
+								</imsss:sequencing>
+							</item>
+							<item identifier="ACT-004" identifierref="RES-004" isvisible="true" parameters="?state=NA&#038;learnerlevel=SE&#038;grade=06">
+								<!--****** Title of SCO ******-->
+								<title>QUnit SCOBot Basic</title>
+								<!-- Optional ability to hide adl.nav capabilities -->
+								<!--adlnav:presentation>
 									<adlnav:navigationInterface>
 										<adlnav:hideLMSUI>continue</adlnav:hideLMSUI>
 										<adlnav:hideLMSUI>previous</adlnav:hideLMSUI>
 										<adlnav:hideLMSUI>suspendAll</adlnav:hideLMSUI>
 									</adlnav:navigationInterface>
-								</adlnav:presentation>
+								</adlnav:presentation-->
 								<!-- Launch Data -->
 								<adlcp:dataFromLMS><![CDATA[name=value]]></adlcp:dataFromLMS>
 								<!-- equates to cmi.completion_threshold -->
@@ -145,6 +150,14 @@
 			<file href="qunit_SCOBot_prod.html" />
 			<file href="js/scorm.bot.pack.js" />
 			<file href="js/test/scobot.js" />
+			<dependency identifierref="common_files" />
+		</resource>
+		<resource identifier="RES-004" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCOBot_basic.html">
+			<metadata />
+			<!--****** FILES ******-->
+			<file href="qunit_SCOBot_basic.html" />
+			<file href="js/scorm.bot.pack.js" />
+			<file href="js/test/scobot_basic.js" />
 			<dependency identifierref="common_files" />
 		</resource>
 		<!-- Shared Assets (optional deployment capability) -->
