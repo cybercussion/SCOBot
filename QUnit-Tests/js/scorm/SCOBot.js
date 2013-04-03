@@ -905,7 +905,7 @@ function SCOBot(options) {
         }
         // Ensure if its not completed its incomplete
         if (scorm.getvalue('cmi.completion_status') !== "completed") {
-            scorm.setvalue('cmi.completion_status', 'incomplete'); //? May not want to do this
+            scorm.setvalue('cmi.completion_status', 'incomplete'); //? May not want to do this (fail safe)
         }
         // Default to completed if its the default status
         if (scorm.get("completion_status") === "completed") {
@@ -1609,7 +1609,7 @@ function SCOBot(options) {
                 scorm.debug(settings.prefix + ": Sorry, LMS returned a comments count of 'false'.  Review error logs.");
                 return n;
             }
-            if (msg.length > 0 && msg.length < 4000) {
+            if (msg.length === 0 || msg.length > 4000) {
                 scorm.debug(settings.prefix + ": Sorry, message from learner was empty or exceeded the limit. Length:" + msg.length, 2);
             }
             p1 += n + '.';
@@ -1660,8 +1660,11 @@ function SCOBot(options) {
     this.happyEnding = function () {
         if (isStarted) {
             scorm.setvalue('cmi.score.scaled', '1');
+            scorm.setvalue('cmi.score.min', '0');
+            scorm.setvalue('cmi.score.max', '1');
             scorm.setvalue('cmi.score.raw', '1');
             scorm.setvalue('cmi.success_status', 'passed');
+            scorm.setvalue('cmi.progress_measure', '1');
             return scorm.setvalue('cmi.completion_status', 'completed');
         }
         return notStartedYet();
