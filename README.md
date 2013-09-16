@@ -1,4 +1,4 @@
-# Shareable Content Object: SCORM API
+# Shareable Content Object: SCORM API - SCOBot Content support:
 I've added Wiki documentation now, so you can read more about the API support in detail.
 Here: https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
 
