@@ -72,4 +72,4 @@ I've worked on a variety of e-learning projects since 2001.  I've utilized sever
 At this point, now that I have the core foundation down, I'll be turning my attention to the SCOBot portion so this is more easily consumable to entry and mid level developers or first time e-learner developers.  Don't feel too horrible if your coming in new to this.  It took years to really consume it.  So much focus is on the content, rarely we get a chance to geek out on what makes a student pass/fail, and all the information thats needed to make that happen.  Course when I finish SCORM 20XX will be out.
 
 Thanks for taking the time to take a look, and thanks to everyone that's assisted with feedback.
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/5c129b14091c3a2874fcb714e7eeaadc "githalytics.com")](http://githalytics.com/cybercussion/SCOBot)
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/3b68b70a86b15441e520b43adf85113a "githalytics.com")](http://githalytics.com/cybercussion/SCOBot)
