@@ -59,6 +59,9 @@ If you're using Flash, I haven't made a External Interface AS2/3 Class to work w
 
 In action at http://hivelms.com/test.html *see QUnit SCO.
 
+I also recommend trying out a bookmarklet I made to check the status of a content object running on your LMS.
+[SCOverseer](http://www.cybercussion.com/bookmarklets/SCORM/) - see the Bookmarklet button on that page (drag it to your bookmarks bar).  Directions on page.
+
 ## Tips on Best Practices:
 I highly recommend anyone who's working with JavaScript consider the use of merging and minifying or doing further and packing their files.  This is why there is not just a single file, and why I'm not setting this up as a 'release'.  It's left broken up so you can choose what you want and don't want.  There are several ways to accomplish this if your not familiar with it.
 Merge would be the act of concatenating all your JavaScript files in the order that they are in within your HTML page.
