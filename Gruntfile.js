@@ -33,7 +33,7 @@ module.exports = function(grunt) {
                 src: ['<%= dirs.src %>*.js'],
                 dest: '<%= dirs.dest %>-merged.js',
             }
-    });
+        }
     
     // Task to run tests
     grunt.registerTask('test', ['jslint', 'qunit', 'concat']);
