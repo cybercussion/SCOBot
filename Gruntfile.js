@@ -5,21 +5,18 @@ module.exports = function(grunt) {
         qunit: {
             files: ['QUnit-Tests/qunit_SCOBot_prod.html']
         },
-        jshint: {
+        jslint: {
             // define the files to lint
-            files: ['QUnit-Tests/js/scorm/*.js'],
-            // configure JSHint (documented at http://www.jshint.com/docs/)
-            options: {
-                // more options here if you want to override JSHint defaults
-                globals: {
-                    jQuery: true,
-                    console: true,
-                    module: true
-                }
+            source: {
+                src: ['QUnit-Tests/js/scorm/*.js']
+            }
+            directives: {
+                browser: true,
+                nomen: true
             }
         }
     });
-
+    grunt.registerTask('default', 'jslint');
     // Task to run tests
-    grunt.registerTask('test', 'qunit');
+    grunt.registerTask('default', 'qunit');
 };
