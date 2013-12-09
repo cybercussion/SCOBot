@@ -1,0 +1,32 @@
+{
+    "name": "SCOBot",
+    "main": "scorm.bot.pack.js",
+    "description": "SCOBot support SCORM 1.2 and SCORM 2004 supplying API's to content developers to accommodate data validation, formatting and transparency.",
+    "version": "2.0.0",
+    "private": false,
+    "homepage": "http://www.cybercussion.com/SCOBot/",
+    "keywords": [
+        "SCORM",
+        "e-learning",
+        "standards"
+    ],
+    "contributors": [
+        {
+            "name": "Mark Statkus",
+            "email": "mark@cybercussion.com"
+        },
+        {
+            "name": "Brandon Bradley",
+            "email": "brandon.bradley@gmail.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/cybercussion/SCOBot"
+        }
+    ],
+    "devDependencies": {
+        "grunt": "~0.4.1"
+    }
+}
