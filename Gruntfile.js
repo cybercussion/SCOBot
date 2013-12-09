@@ -8,19 +8,14 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         jslint: {
             // define the files to lint
-            server: {
+            client: {
                 src: ['QUnit-Tests/js/scorm/*.js'],
                 directives: {
                     browser: true,
                     nomen: true
                 },
                 options: {
-                    junit: 'out/server-junit.xml', // write the output to a JUnit XML
-                    log: 'out/server-lint.log',
-                    jslintXml: 'out/server-jslint.xml',
-                    errorsOnly: true, // only display errors
-                    failOnError: false, // defaults to true
-                    checkstyle: 'out/server-checkstyle.xml' // write a checkstyle-XML
+                    junit: 'out/client-junit.xml', // write the output to a JUnit XML
                 }
             }
             
@@ -29,7 +24,10 @@ module.exports = function(grunt) {
             files: ['QUnit-Tests/qunit_SCOBot_prod.html']
         }
     });
-    grunt.registerTask('default', 'jslint');
+    
     // Task to run tests
-    grunt.registerTask('default', 'qunit');
+    grunt.registerTask('test', ['jslint', 'qunit']);
+    
+    // grunt.registerTask('dist', ['concat:dist', 'uglify:dist']);
+    
 };
