@@ -2,9 +2,6 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        qunit: {
-            files: ['QUnit-Tests/qunit_SCOBot_prod.html']
-        },
         jslint: {
             // define the files to lint
             source: {
@@ -14,6 +11,9 @@ module.exports = function(grunt) {
                 browser: true,
                 nomen: true
             }
+        },
+        qunit: {
+            files: ['QUnit-Tests/qunit_SCOBot_prod.html']
         }
     });
     grunt.registerTask('default', 'jslint');
