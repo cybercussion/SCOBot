@@ -8,13 +8,22 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         jslint: {
             // define the files to lint
-            source: {
-                src: ['QUnit-Tests/js/scorm/*.js']
+            server: {
+                src: ['QUnit-Tests/js/scorm/*.js'],
+                directives: {
+                    browser: true,
+                    nomen: true
+                },
+                options: {
+                    junit: 'out/server-junit.xml', // write the output to a JUnit XML
+                    log: 'out/server-lint.log',
+                    jslintXml: 'out/server-jslint.xml',
+                    errorsOnly: true, // only display errors
+                    failOnError: false, // defaults to true
+                    checkstyle: 'out/server-checkstyle.xml' // write a checkstyle-XML
+                }
             }
-            directives: {
-                browser: true,
-                nomen: true
-            }
+            
         },
         qunit: {
             files: ['QUnit-Tests/qunit_SCOBot_prod.html']
