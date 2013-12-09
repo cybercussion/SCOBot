@@ -3,13 +3,18 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-jslint'); // load the task
     grunt.loadNpmTasks('grunt-contrib-qunit');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        dirs: {
+            src: 'QUnit-Tests/js/scorm/',
+            dest: 'QUnit-Tests/js/<%= pkg.name %>-<%= pkg.version %>',
+        },
         jslint: {
             // define the files to lint
             client: {
-                src: ['QUnit-Tests/js/scorm/*.js'],
+                src: ['<%= dirs.src %>*.js'],
                 directives: {
                     browser: true,
                     nomen: true
@@ -22,11 +27,16 @@ module.exports = function(grunt) {
         },
         qunit: {
             files: ['QUnit-Tests/qunit_SCOBot_prod.html']
-        }
+        },
+        concat: {
+            dist: {
+                src: ['<%= dirs.src %>*.js'],
+                dest: '<%= dirs.dest %>-merged.js',
+            }
     });
     
     // Task to run tests
-    grunt.registerTask('test', ['jslint', 'qunit']);
+    grunt.registerTask('test', ['jslint', 'qunit', 'concat']);
     
     // grunt.registerTask('dist', ['concat:dist', 'uglify:dist']);
     
