@@ -1,4 +1,8 @@
 module.exports = function(grunt) {
+    'use strict';
+
+    grunt.loadNpmTasks('grunt-jslint'); // load the task
+    grunt.loadNpmTasks('grunt-contrib-qunit');
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
