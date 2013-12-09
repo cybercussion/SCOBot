@@ -24,7 +24,7 @@
         "type": "git",
         "url": "git://github.com/cybercussion/SCOBot.git"
     },
-        "bugs": {
+    "bugs": {
         "url": "https://github.com/cybercussion/SCOBot/issues"
     },
     "devDependencies": {
