@@ -20,12 +20,13 @@
             "email": "brandon.bradley@gmail.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/cybercussion/SCOBot"
-        }
-    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/cybercussion/SCOBot.git"
+    },
+        "bugs": {
+        "url": "https://github.com/cybercussion/SCOBot/issues"
+    },
     "devDependencies": {
         "grunt": "~0.4.1"
     }
