@@ -30,4 +30,7 @@
     "devDependencies": {
         "grunt": "~0.4.1"
     }
+    "dependencies": {
+        "jQuery": "~1.10.2"
+    }
 }
