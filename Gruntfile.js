@@ -4,6 +4,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-jslint'); // load the task
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-packer');
     //grunt.loadNpmTasks('grunt-jsmin-sourcemap');
     // Project configuration.
     grunt.initConfig({
@@ -32,12 +33,21 @@ module.exports = function(grunt) {
         concat: {
             dist: {
                 src: ['<%= dirs.src %>*.js'],
-                dest: '<%= dirs.dest %>-merged.js',
+                dest: '<%= dirs.dest %>-min.js',
+            }
+        }
+        packer: {
+            options: {
+                base64: true,
+                shrink: true
+            },
+            files: {
+                '<%= dirs.dest %>-pack.js': '<%= dirs.dest %>-min.js'
             }
         }
     });
     // Task to run tests
-    grunt.registerTask('test', ['jslint', 'qunit', 'concat']);
+    grunt.registerTask('test', ['jslint', 'qunit', 'concat', 'packer']);
     // Task to Distribute
     //grunt.registerTask('dist', ['concat']);
     
