@@ -45,8 +45,9 @@ module.exports = function(grunt) {
             }
         }
     });
+    grunt.loadTasks('tasks');
     // Task to run tests
-    grunt.registerTask('test', ['jslint', 'qunit', 'concat']);
+    grunt.registerTask('test', ['jslint', 'qunit', 'concat', 'packer']);
     // Task to Distribute
     //grunt.registerTask('dist', ['concat']);
     
