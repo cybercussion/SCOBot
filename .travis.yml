@@ -7,4 +7,5 @@ before_script:
   - npm install grunt-contrib-qunit
   - npm install grunt-contrib-concat
   - npm install grunt-packer --save-dev
+  - npm install grunt-sizediff --save-dev
 script: grunt test --verbose --force
