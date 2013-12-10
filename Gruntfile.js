@@ -4,6 +4,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-jslint'); // load the task
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-jsmin-sourcemap');
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -32,6 +33,12 @@ module.exports = function(grunt) {
             dist: {
                 src: ['<%= dirs.src %>*.js'],
                 dest: '<%= dirs.dest %>-merged.js',
+            }
+        }
+        'jsmin-sourcemap': {
+            all: {
+                src:  '<%= dirs.dest %>-merged.js',
+                dest: '<%= dirs.dest %>-min.js' 
             }
         }
     });
