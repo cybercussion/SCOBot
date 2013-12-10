@@ -36,7 +36,7 @@ module.exports = function(grunt) {
                     shrink: true
                 },
                 files: {
-                    'Qunit-Tests/js/' : ['<%= dirs.dest %>-pack.js', '<%= dirs.dest %>-min.js']
+                    'Qunit-Tests/js/<%= pkg.name %>-<%= pkg.version %>-pack.js' : '<%= dirs.dest %>-min.js'
                 }
             }
         },
