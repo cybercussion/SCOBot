@@ -1,6 +1,5 @@
 module.exports = function(grunt) {
     'use strict';
-
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -31,17 +30,19 @@ module.exports = function(grunt) {
             }
         },
         packer: {
-            options: {
-                base64: true,
-                shrink: true
-            },
-            files: {
-                '<%= dirs.dest %>-pack.js': '<%= dirs.dest %>-min.js'
+            default_options: {
+                options: {
+                    base64: true,
+                    shrink: true
+                },
+                files: {
+                    '<%= dirs.dest %>-pack.js': '<%= dirs.dest %>-min.js'
+                }
             }
         }
     });
+    
     // Tasks
-    grunt.loadTasks('tasks');
     grunt.loadNpmTasks('grunt-jslint'); // load the task
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-concat');
@@ -49,7 +50,7 @@ module.exports = function(grunt) {
     //grunt.loadNpmTasks('grunt-jsmin-sourcemap');
     
     // Task to run tests
-    grunt.registerTask('test', ['jslint', 'qunit', 'concat', 'packer']);
+    grunt.registerTask('test', ['jslint', 'qunit', 'concat', 'packer']); // packer (not found?)
     // Task to Distribute
     //grunt.registerTask('dist', ['concat']);
     
