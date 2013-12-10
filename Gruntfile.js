@@ -57,12 +57,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     //grunt.loadNpmTasks('grunt-jsmin-sourcemap');
     // grunt.loadNpmTasks('grunt-packer');
-    grunt.loadNpmTasks('grunt-yui-compressor');
+    //grunt.loadNpmTasks('grunt-yui-compressor');
     grunt.loadNpmTasks('grunt-sizediff');
     
     
     // Task to run tests
-    grunt.registerTask('test', ['jslint', 'qunit', 'concat', 'packjs', 'sizediff']); // packer (not found?)
+    grunt.registerTask('test', ['jslint', 'qunit', 'concat', 'sizediff']); // packer (not found?)
     // Task to Distribute
     //grunt.registerTask('dist', ['concat']);
     
