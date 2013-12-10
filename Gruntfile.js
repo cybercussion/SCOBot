@@ -34,10 +34,10 @@ module.exports = function(grunt) {
                 dest: '<%= dirs.dest %>-merged.js',
             }
         }
-    
+    );
     // Task to run tests
-    grunt.registerTask('test', ['jslint', 'qunit']);
+    grunt.registerTask('test', ['jslint', 'qunit', 'concat']);
     // Task to Distribute
-    grunt.registerTask('dist', ['concat']);
+    //grunt.registerTask('dist', ['concat']);
     
 };
