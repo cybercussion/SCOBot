@@ -29,7 +29,7 @@ module.exports = function(grunt) {
                 dest: '<%= dirs.dest %>-min.js',
             }
         },
-        packer: {
+        packjs: {
             default_options: {
                 options: {
                     base64: true,
