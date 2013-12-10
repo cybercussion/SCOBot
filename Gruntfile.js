@@ -36,8 +36,8 @@ module.exports = function(grunt) {
         }
     
     // Task to run tests
-    grunt.registerTask('test', ['jslint', 'qunit', 'concat:dist']);
-    
-    // grunt.registerTask('dist', ['concat:dist', 'uglify:dist']);
+    grunt.registerTask('test', ['jslint', 'qunit']);
+    // Task to Distribute
+    grunt.registerTask('dist', ['concat']);
     
 };
