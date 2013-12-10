@@ -36,7 +36,8 @@ module.exports = function(grunt) {
                     shrink: true
                 },
                 files: {
-                    'Qunit-Tests/js/<%= pkg.name %>-<%= pkg.version %>-pack.js' : '<%= dirs.dest %>-min.js'
+                    // This is kinda confusing.  Seems to be new "packed" file, and target file, but it is throwing Warning: Arguments to path.join must be strings
+                    'Qunit-Tests/js/<%= pkg.name %>-<%= pkg.version %>-pack.js' : 'Qunit-Tests/js/<%= pkg.name %>-<%= pkg.version %>-min.js'
                 }
             }
         },
