@@ -6,5 +6,5 @@ before_script:
   - npm install grunt-jslint
   - npm install grunt-contrib-qunit
   - npm install grunt-contrib-concat
-  - npm install grunt-jsmin-sourcemap
+  - npm install grunt-packer
 script: grunt test --verbose --force
