@@ -27,7 +27,7 @@ module.exports = function(grunt) {
             }
         },
         qunit: {
-            files: ['QUnit-Tests/qunit_SCOBot_prod.html']
+            files: ['QUnit-Tests/qunit_SCOBot.html']
         },
         concat: {
             dist: {
