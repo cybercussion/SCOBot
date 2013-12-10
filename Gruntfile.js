@@ -50,7 +50,7 @@ module.exports = function(grunt) {
     //grunt.loadNpmTasks('grunt-jsmin-sourcemap');
     
     // Task to run tests
-    grunt.registerTask('test', ['jslint', 'qunit', 'concat', 'packer']); // packer (not found?)
+    grunt.registerTask('test', ['jslint', 'qunit', 'concat', 'packjs']); // packer (not found?)
     // Task to Distribute
     //grunt.registerTask('dist', ['concat']);
     
