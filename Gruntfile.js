@@ -25,7 +25,6 @@ module.exports = function(grunt) {
                     junit: 'out/client-junit.xml', // write the output to a JUnit XML
                 }
             }
-            
         },
         qunit: {
             files: ['QUnit-Tests/qunit_SCOBot_prod.html']
@@ -35,7 +34,7 @@ module.exports = function(grunt) {
                 src: ['<%= dirs.src %>*.js'],
                 dest: '<%= dirs.dest %>-min.js',
             }
-        }
+        },
         packer: {
             options: {
                 base64: true,
