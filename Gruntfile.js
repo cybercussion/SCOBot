@@ -36,8 +36,16 @@ module.exports = function(grunt) {
                     shrink: true
                 },
                 files: {
-                    '<%= dirs.dest %>-pack.js': '<%= dirs.dest %>-min.js'
+                    'Qunit-Tests/js/' : ['<%= dirs.dest %>-pack.js', '<%= dirs.dest %>-min.js']
                 }
+            }
+        },
+        sizediff: {
+            dist: {
+                src: [
+                    '<%= dirs.dest %>-min.js',
+                    '<%= dirs.dest %>-pack.js' // optional
+                ]
             }
         }
     });
@@ -47,10 +55,11 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-packer');
+    grunt.loadNpmTasks('grunt-sizediff');
     //grunt.loadNpmTasks('grunt-jsmin-sourcemap');
     
     // Task to run tests
-    grunt.registerTask('test', ['jslint', 'qunit', 'concat', 'packjs']); // packer (not found?)
+    grunt.registerTask('test', ['jslint', 'qunit', 'concat', 'packjs', 'sizediff']); // packer (not found?)
     // Task to Distribute
     //grunt.registerTask('dist', ['concat']);
     
