@@ -22,6 +22,9 @@
         "e-learning",
         "standards"
     ],
+    "licenses": [
+        "MIT"
+    ],
     "contributors": [
         {
             "name": "Mark Statkus",
