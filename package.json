@@ -5,13 +5,15 @@
     "version": "2.0.0",
     "testling": {
         "html": "Qunit-Tests/qunit_SCOBot_prod.html",
-        "browsers": {
-            "ie": [ 8, 9 ],
-            "firefox": [ 13 ],
-            "chrome": [ 20 ],
-            "safari": [ 4.0 ],
-            "opera": [ 12 ]
-        }
+        "browsers": [
+            "ie/8..latest",
+            "chrome/23..latest",
+            "firefox/17..latest",
+            "safari/5.1..latest",
+            "opera/11.5..latest",
+            "iphone/6..latest",
+            "ipad/6..latest"
+        ]
     },   
     "private": false,
     "homepage": "http://www.cybercussion.com/SCOBot/",
