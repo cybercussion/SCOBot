@@ -44,6 +44,7 @@
     },
     "devDependencies": {
         "grunt": "~0.4.1",
+        "jquery": "~1.8.3",
         "browserify": "~2.7.2"
     },
     "scripts": {
