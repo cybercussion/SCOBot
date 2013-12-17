@@ -41,7 +41,8 @@
     },
     "devDependencies": {
         "grunt": "~0.4.1",
-        "tape": "~0.0.4"
+        "jquery": "~1.10.2",
+        "browserify": "~2.7.2"
     },
     "scripts": {
         "test": "grunt travis --verbose"
