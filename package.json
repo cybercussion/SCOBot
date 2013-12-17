@@ -4,7 +4,7 @@
     "description": "SCOBot support SCORM 1.2 and SCORM 2004 supplying API's to content developers to accommodate data validation, formatting and transparency.",
     "version": "2.0.0",
     "testling": {
-        "html": "Qunit-Tests/qunit_SCOBot_prod.html",
+        "html": "QUnit-Tests/qunit_SCOBot_prod.html",
         "browsers": [
             "ie/8..latest",
             "chrome/23..latest",
