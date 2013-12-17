@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
+[![browser support](https://ci.testling.com/cybercussion/SCOBot.png)](https://ci.testling.com/cybercussion/SCOBot)
+
 ## Shareable Content Object: SCOBot Content support:
 I've added Wiki documentation now, so you can read more about the API support in detail.
 Here: https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
