@@ -15,43 +15,28 @@
  *
  * JSLint recently complained about  tabs.  Switched to spaces.
  *
- * https://github.com/cybercussion/SCORM_API
+ * https://github.com/cybercussion/SCOBot
  * @author Mark Statkus <mark@cybercussion.com>
+ * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
+ * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires scorm, JQuery
+ * @version 3.0.0
  * @param options {Object} override default values
  * @constructor
  */
 /*!
- * SCOBot
- * Copyright (c) 2011-2013 Mark Statkus <mark@cybercussion.com>
- * The MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * SCOBot, Updated January 3rd, 2014
+ * Copyright (c) 2009-2013, Cybercussion Interactive LLC. All rights reserved.
+ * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 function SCOBot(options) {
     // Constructor ////////////
     "use strict";
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var defaults = {
-            version:              "2.0",
+            version:              "3.0.0",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "03/05/2013 5:10PM",
+            modifiedDate:         "01/03/2014 12:16PM",
             prefix:               "SCOBot",
             // SCORM buffers and settings
             launch_data:          {},
@@ -335,6 +320,7 @@ function SCOBot(options) {
             i = 0,
             arr = [],
             arr2 = [],
+            len,
             index;
         switch (type) {
             /*
@@ -459,7 +445,8 @@ function SCOBot(options) {
         case 'matching':
             // tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
             if ($.isArray(value)) {
-                for (i = 0; i < value.length; i += 1) {
+                len = value.length;
+                for (i = 0; i < len; i += 1) {
                     if ($.isArray(value[i])) {
                         arr.push(value[i].join("[.]")); // this isn't working
                     } else {
@@ -502,7 +489,8 @@ function SCOBot(options) {
                     str += "{order_matters=" + value.order_matters + "}";
                 }
                 if ($.isArray(value.answers)) {
-                    for (i = 0; i < value.answers.length; i += 1) {
+                    len = value.answers.length;
+                    for (i = 0; i < len; i += 1) {
                         if ($.isArray(value.answers[i])) {
                             // Need to check if answer is object
                             if ($.isPlainObject(value.answers[i][1])) {
@@ -524,7 +512,8 @@ function SCOBot(options) {
                 }
             } else {
                 if (typeof ($.isArray(value))) { // This would be a Learner Response
-                    for (i = 0; i < value.length; i += 1) {
+                    len = value.length;
+                    for (i = 0; i < len; i += 1) {
                         if ($.isArray(value[i])) {
                             arr.push(value[i].join("[.]")); // this isn't working
                         } else {
@@ -591,6 +580,7 @@ function SCOBot(options) {
         var i = 0,
             arr = [],
             obj = {},
+            len,
             match = false;
         switch (type) {
         case 'true-false':
@@ -688,7 +678,8 @@ function SCOBot(options) {
         case 'matching':
             // tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
             arr = value.split("[,]");
-            for (i = 0; i < arr.length; i += 1) {
+            len = arr.length;
+            for (i = 0; i < len; i += 1) {
                 arr[i] = arr[i].split("[.]"); // this isn't working
             }
             return arr;
@@ -724,7 +715,8 @@ function SCOBot(options) {
                 }
             }
             arr = value.split("[,]");
-            for (i = 0; i < arr.length; i += 1) {
+            len = arr.lengh;
+            for (i = 0; i < len; i += 1) {
                 arr[i] = arr[i].split("[.]"); // this isn't working
             }
             if (match) {
@@ -771,7 +763,6 @@ function SCOBot(options) {
             scorm.debug(settings.suspend_data, 4);
             return 'true';
         }
-        scorm.debug(settings.prefix + ": Sorry, there was an issue saving your suspend data, please review the SCORM Logs", 1);
         return 'false';
     }
 
@@ -962,11 +953,14 @@ function SCOBot(options) {
              * Entry is interesting.  You may or may not be able to rely on it. If the LMS sets it you'd
              * be able identify if this is the first time (ab-intio), or if your resuming.  This would let you know if
              * there was even a bookmark, suspend data to even fetch.  Else, you may have to plug at it anyway.
-             * So is it really worth it to bother with this?
+             * So is it really worth it to bother with this?  Feel free to change the below to fit your needs.
+             * In review mode, we will just assume we are actually reviewing a session.  Entry is really void at
+             * that point, regardless of what the entry type is.  If the LMS is doing odd stuff, let me know, and I may
+             * be able to shed some light on it.
              */
             settings.entry = scorm.getvalue('cmi.entry'); // ab-initio, resume or empty
             // Entry Check-up ...
-            if (settings.entry === '' || settings.entry === 'resume') { // Resume, or possible Resume
+            if (settings.mode === "review" || settings.entry === '' || settings.entry === 'resume') { // Resume, or possible Resume
                 // Get Bookmark
                 settings.location = scorm.getvalue('cmi.location');
                 /* Suspend Data technically should be a JSON String.  Structured data would be best suited to
@@ -1025,11 +1019,11 @@ function SCOBot(options) {
             settings.max_time_allowed = scorm.getvalue('cmi.max_time_allowed');
             if (isISO8601Duration(settings.max_time_allowed)) {
                 if (settings.initiate_timer) {
-                    scorm.debug(settings.prefix + " This SCO has a set time, I am starting the timer for " + settings.max_time_allowed + "...");
+                    scorm.debug(settings.prefix + ": This SCO has a set time, I am starting the timer for " + settings.max_time_allowed + "...");
                     self.startTimer();
                 }
             } else {
-                scorm.debug(settings.prefix + "This is not ISO8601 time duration. " + settings.max_time_allowed);
+                scorm.debug(settings.prefix + ": This is not ISO8601 time duration. " + settings.max_time_allowed);
             }
         } else {
             scorm.debug(settings.prefix + ": You already called start!  I don't see much point in doing this more than once.", 2);
@@ -1163,7 +1157,7 @@ function SCOBot(options) {
      * just a page array.  You may want to add more things to suspend data than just pages.
      * Example structure of this:
      * {
-     *  sco_id: 'A12345',
+     *  sco_id: '12345',
      *  name: 'value',
      *  pages: [
      *      {
@@ -1187,8 +1181,9 @@ function SCOBot(options) {
     this.setSuspendDataByPageID = function (id, title, data) {
         if (isStarted) {
             // Suspend data is a array of pages by ID
-            var i;
-            for (i = 0; i < settings.suspend_data.pages.length; i += 1) {
+            var i,
+                len = settings.suspend_data.pages.length;
+            for (i = 0; i < len; i += 1) {
                 if (settings.suspend_data.pages[i].id === id) {
                     // Update Page data
                     settings.suspend_data.pages[i].data = data; // overwrite existing
@@ -1216,8 +1211,9 @@ function SCOBot(options) {
     this.getSuspendDataByPageID = function (id) {
         if (isStarted) {
             // Suspend data is a array of pages by ID
-            var i;
-            for (i = 0; i < settings.suspend_data.pages.length; i += 1) {
+            var i,
+                len = settings.suspend_data.pages.length;
+            for (i = 0; i < len; i += 1) {
                 if (settings.suspend_data.pages[i].id === id) {
                     return settings.suspend_data.pages[i].data;
                 }
@@ -1280,6 +1276,7 @@ function SCOBot(options) {
                 result, // Result of calling values against the SCORM API
             //cr,
             //cr_hash = '', // Correct Response limit is 5.  If you pass duplicates I'm going to stop it from happening.
+                len,
                 key;
             if (!$.isPlainObject(data)) {
                 scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof data + " instead.", 1);
@@ -1357,7 +1354,8 @@ function SCOBot(options) {
             p2 = 'correct_responses._count';
             if ($.isArray(data.correct_responses)) {
                 // !! Important, some only support 1 correct response pattern (likert, other) !!
-                for (j = 0; j < data.correct_responses.length; j += 1) {
+                len = data.correct_responses.length;
+                for (j = 0; j < len; j += 1) {
                     p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
                     scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
                     if (p === 'false') {
