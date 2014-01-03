@@ -14,12 +14,20 @@ html,body{
 	border: 0;
 }
 body     {
-	font-family: 'Lucida Grande', 'Lucida Sans Unicode', Helvetica, Arial, Verdana, sans-serif;
-	color: #f2f2f2;
-	background-color: #3f562a;
-	font-size: 12px;
-	text-shadow: 0px 2px 5px #333333;
-	height: 100%;
+    background: rgb(58,60,69);
+    background: url('img/noise2.png'), -moz-radial-gradient(center top, ellipse cover, rgba(58,60,69,1) 0%, rgba(0,0,0,1) 100%);
+    background: url('img/noise2.png'), -webkit-gradient(radial, center top, 0px, center center, 100%, color-stop(0%,rgba(58,60,69,1)), color-stop(100%,rgba(0,0,0,1)));
+    background: url('img/noise2.png'), -webkit-radial-gradient(center top, ellipse cover, rgba(58,60,69,1) 0%,rgba(0,0,0,1) 100%);
+    background: url('img/noise2.png'), -o-radial-gradient(center top, ellipse cover, rgba(58,60,69,1) 0%,rgba(0,0,0,1) 100%);
+    background: url('img/noise2.png'), -ms-radial-gradient(center top, ellipse cover, rgba(58,60,69,1) 0%,rgba(0,0,0,1) 100%);
+    background: url('img/noise2.png'), radial-gradient(center top, ellipse cover, rgba(58,60,69,1) 0%,rgba(0,0,0,1) 100%);
+    background-attachment: fixed;
+    /* Base Font single line format - font: style variant weight size / line-height "Family"; */
+    font: normal 12px/15px "Lucida Grande", Helvetica, Verdana, San-serif;
+    color: #f4f4f4;
+    font-smoothing: subpixel-antialiased; /* you need this when translate3d is used */
+    /* End Font */
+	text-shadow: 0px 2px 2px rgba(0,0,0,0.4);
 }
 .graygrad  {background: -webkit-gradient(linear, 0% 0, 0% 100%, from(#9AA7B2), color-stop(0.02, #647482), to(#3E4851)); background: -moz-linear-gradient(top,  #9AA7B2, #647482, #3E4851); filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#9AA7B2', endColorstr='#3E4851'); background-color: #3E4851;}
 a:link              { color:white; text-decoration:underline; }
@@ -70,3 +78,27 @@ a.myButton:active {
 #pfooter{position: fixed; bottom: -2px; left: 0; z-index: 99; width: 100%; height: 65px;}
 #pfooter .info{padding: 10px;}
 #pfooter .nav{position: absolute; right: 10px; top: 15px; width: 400px; text-align: right;}
+
+.rounded {
+    border-radius: 4px;
+}
+.roundedTop{
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+.roundedBottom {
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.shadow {
+    box-shadow: rgba(0,0,0,0.7) 0 5px 8px;
+}
+.shadowright {
+    box-shadow: rgba(0,0,0,0.5) 2px 5px 8px 2px;
+}
+
+#flashObj {
+    width: 935px;
+    height: 535px;
+}
