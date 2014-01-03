@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+  - "0.10"
+before_script:
+  - npm install -g grunt-cli
+  - npm install grunt-jslint
+  - npm install grunt-contrib-qunit
+  - npm install grunt-contrib-concat
+  - npm install grunt-yui-compressor
+  - npm install grunt-sizediff --save-dev
+script: grunt test --verbose --force

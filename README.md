@@ -1,7 +1,9 @@
+[![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
+[![browser support](https://ci.testling.com/cybercussion/SCOBot.png)](https://ci.testling.com/cybercussion/SCOBot)
 
-# Shareable Content Object: SCORM API
+## Shareable Content Object: SCOBot Content support:
 I've added Wiki documentation now, so you can read more about the API support in detail.
-Here: https://github.com/cybercussion/SCORM_API/wiki - Please refer to this for much more detailed information.
+Here: https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
 
 You may be looking for the LMS Runtime API_1484_11.  This project does not currently expose that, but does have a LMS Mimic or Local API_1484_11 used when no LMS is present. More on that below...
 
@@ -60,6 +62,9 @@ If you're using Flash, I haven't made a External Interface AS2/3 Class to work w
 
 In action at http://hivelms.com/test.html *see QUnit SCO.
 
+I also recommend trying out a bookmarklet I made to check the status of a content object running on your LMS.
+[SCOverseer](http://www.cybercussion.com/bookmarklets/SCORM/) - see the Bookmarklet button on that page (drag it to your bookmarks bar).  Directions on page.
+
 ## Tips on Best Practices:
 I highly recommend anyone who's working with JavaScript consider the use of merging and minifying or doing further and packing their files.  This is why there is not just a single file, and why I'm not setting this up as a 'release'.  It's left broken up so you can choose what you want and don't want.  There are several ways to accomplish this if your not familiar with it.
 Merge would be the act of concatenating all your JavaScript files in the order that they are in within your HTML page.
@@ -73,4 +78,4 @@ I've worked on a variety of e-learning projects since 2001.  I've utilized sever
 At this point, now that I have the core foundation down, I'll be turning my attention to the SCOBot portion so this is more easily consumable to entry and mid level developers or first time e-learner developers.  Don't feel too horrible if your coming in new to this.  It took years to really consume it.  So much focus is on the content, rarely we get a chance to geek out on what makes a student pass/fail, and all the information thats needed to make that happen.  Course when I finish SCORM 20XX will be out.
 
 Thanks for taking the time to take a look, and thanks to everyone that's assisted with feedback.
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/5c129b14091c3a2874fcb714e7eeaadc "githalytics.com")](http://githalytics.com/cybercussion/SCORM_API)
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/3b68b70a86b15441e520b43adf85113a "githalytics.com")](http://githalytics.com/cybercussion/SCOBot)
