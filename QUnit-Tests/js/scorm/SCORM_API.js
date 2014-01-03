@@ -31,43 +31,28 @@
  * JSLint was recently changed and its throwing a "use spaces, not tabs" error.  I decided to switch to spaces.
  * https://github.com/douglascrockford/JSLint/pull/140
  *
- * https://github.com/cybercussion/SCORM_API
+ * https://github.com/cybercussion/SCOBot
  * @author Mark Statkus <mark@cybercussion.com>
+ * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
+ * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires JQuery
+ * @version 3.0.0
  * @param options {Object} override default values
  * @constructor
  */
 /*!
- * SCORM_API
- * Copyright (c) 2011-2012 Mark Statkus <mark@cybercussion.com>
- * The MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * SCORM_API, Updated January 3rd, 2014
+ * Copyright (c) 2009-2013, Cybercussion Interactive LLC.
+ * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 function SCORM_API(options) {
     // Constructor ////////////
     "use strict";
     // Please edit run time options or override them when you instantiate this object.
     var defaults = {
-            version:           "1.5",
+            version:           "3.0.0",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "03/05/2013 5:10PM",
+            modifiedDate:      "01/04/2014 12:18PM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -294,10 +279,12 @@ function SCORM_API(options) {
             bTFound = false,
             aT = ["Y", "M", "D", "H", "M", "S"],
             p = 0,
-            i = 0;
+            i = 0,
+            len;
         if (!bErr) {
             str = str.substr(1); //get past the P
-            for (i = 0; i < aT.length; i += 1) {
+            len = aT.length;
+            for (i = 0; i < len; i += 1) {
                 if (str.indexOf("T") === 0) {
                     str = str.substr(1);
                     i = Math.max(i, 3);
@@ -318,14 +305,15 @@ function SCORM_API(options) {
                     if (isNaN(aV[i])) {
                         bErr = true;
                         break;
-                    } else if ((i > 2) && (!bTFound)) {
+                    }
+                    if ((i > 2) && (!bTFound)) {
                         bErr = true;
                         break;
                     }
                     str = str.substr(p + 1);
                 }
             }
-            bErr = !!(((!bErr) && (str.length !== 0)));
+            bErr = !!(((!bErr) && (len !== 0)));
         }
         if (bErr) {
             return 0;
@@ -586,30 +574,39 @@ function SCORM_API(options) {
      * Gets the cmi object value requested
      * @param n {String} CMI Object Path as String
      * @returns {String}
+     * @event 'getvalue'
      */
     this.getvalue = function (n) {
         var v = null, // success
             lms = API.path, // lms shortcut
-            ec = 0, // error code
+            ec = 0,// error code
+            m  = '', // error message
+            d  = '', // error diagnostic
             nn = null, // new number
             ig = false;// ignore
-        // Custom event Trigger getvalue
-        $(self).triggerHandler({
-            'type': "getvalue",
-            'n':    n
-        });
         if (API.isActive) {// it has initialized
             // This is switch cased to appropriately translate SCORM 2004 to 1.2 if needed.
             // Handy if you don't want to go through all your content calls...
             switch (API.version) {
             case "1.2":
                 switch (n) {
+                // SCORM 1.2 is just a comments string with a max char limit of 4096
+                case "cmi.comments_from_lms._count":
+                case "cmi.comments_from_learner._count":
+                    ig = true;
+                    break;
+                case "cmi.credit":
+                    nn = "cmi.core.credit";
+                    break;
                 case "cmi.location":
                     nn = "cmi.core.lesson_location";
                     break;
                 case "cmi.completion_threshold":
                     // unsupported
                     ig = true;
+                    break;
+                case "cmi.entry":
+                    nn = "cmi.core.entry";
                     break;
                 case "cmi.mode":
                     nn = "cmi.core.lesson_mode";
@@ -625,6 +622,27 @@ function SCORM_API(options) {
                     break;
                 case "cmi.score.max":
                     nn = "cmi.core.score.max";
+                    break;
+                case "cmi.scaled_passing_score":
+                    nn = "cmi.student_data.mastery_score";
+                    break;
+                case "cmi.max_time_allowed":
+                    nn = "cmi.student_data.max_time_allowed";
+                    break;
+                case "cmi.time_limit_action":
+                    nn = "cmi.student_data.time_limit_action";
+                    break;
+                case "cmi.learner_preferences.audio_level":
+                    nn = "cmi.student_preferences.audio";
+                    break;
+                case "cmi.learner_preferences.delivery_speed":
+                    nn = "cmi.student_preferences.speed";
+                    break;
+                case "cmi.learner_preferences.language":
+                    nn = "cmi.student_preferences.language";
+                    break;
+                case "cmi.learner_preferences.audio_captioning":
+                    nn = "cmi.student_preferences.text";
                     break;
                 case "cmi.success_status":
                 case "cmi.completion_status":
@@ -654,7 +672,20 @@ function SCORM_API(options) {
                 break;
             }
             ec = getLastErrorCode();
+            m  = getLastErrorMessage(ec);
+            d  = getDiagnostic(ec);
             // Clean up Error Codes that are non-critical (like date element not initialized)
+            // Custom event Trigger getvalue
+            $(self).triggerHandler({
+                'type': "getvalue",
+                'n': n,
+                'v': v,
+                'error': {
+                    'code': ec,
+                    'message': m,
+                    'diagnostic': d
+                }
+            });
             if (ec === 0 || ec === 403) {
                 // Clean up differences in LMS responses
                 if (v === 'undefined' || v === null || v === 'null') { // was typeof v
@@ -662,7 +693,7 @@ function SCORM_API(options) {
                 }
                 return String(v);
             }
-            debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + getLastErrorMessage(ec) + "\nDiagnostic: " + getDiagnostic(ec), 1);
+            debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + m + "\nDiagnostic: " + d, 1);
             return 'false';
         }
         debug(settings.prefix + ": " + n + " Get Aborted, connection not initialized! " + API.isActive, 2);
@@ -674,19 +705,16 @@ function SCORM_API(options) {
      * @param n {String} CMI Object Path as String
      * @param v {String} Value
      * @returns {String}
+     * @event 'setvalue'
      */
     this.setvalue = function (n, v) {
         var s = 'false', // success
             lms = API.path, // lms shortcut
             ec = 0, // error code
+            m = '', // error message
+            d = '', // error diagnostic
             nn = null, // new number
             ig = false; // ignore
-        // Custom Event Trigger setvalue
-        $(self).triggerHandler({
-            'type': "setvalue",
-            'n':    n,
-            'v':    v
-        });
         // Security Consideration?
         // It may be worth some minor security later to validate this is being set from a authorized source.  This is lacking support old versions of IE however.
         //debug(settings.prefix + ": The caller of this method is " + arguments.callee.caller.caller.name, 4);  //arguments.callee.caller
@@ -704,10 +732,6 @@ function SCORM_API(options) {
                         }
                         nn = "cmi.core.lesson_location";
                         break;
-                    case "cmi.completion_threshold":
-                        // unsupported
-                        ig = true;
-                        break;
                     case "cmi.mode":
                         nn = "cmi.core.lesson_mode";
                         break;
@@ -724,16 +748,37 @@ function SCORM_API(options) {
                     case "cmi.score.max":
                         nn = "cmi.core.score.max";
                         break;
+                    case "cmi.score.scaled":
+                        ig = true;
+                        break;
                     case "cmi.success_status":
                     case "cmi.completion_status":
                         nn = "cmi.core.lesson_status";
                         API.data.completion_status = v;
                         // set local status
                         break;
+                    case "cmi.scaled_passing_score":
+                        nn = "cmi.student_data.mastery_score";
+                        break;
+                    case "cmi.learner_preferences.audio_level":
+                        nn = "cmi.student_preferences.audio";
+                        break;
+                    case "cmi.learner_preferences.delivery_speed":
+                        nn = "cmi.student_preferences.speed";
+                        break;
+                    case "cmi.learner_preferences.language":
+                        nn = "cmi.student_preferences.language";
+                        break;
+                    case "cmi.learner_preferences.audio_captioning":
+                        nn = "cmi.student_preferences.text";
+                        break;
                     case "cmi.session_time":
                         nn = "cmi.core.session_time";
                         break;
                         // Possibly need more here, review further later.
+                    case "cmi.total_time":
+                        nn = "cmi.core.total_time";
+                        break;
                     case "cmi.suspend_data":
                         if (v.length > 4096) {
                             debug(settings.prefix + ": Warning, your suspend data is over the limit!!", 2);
@@ -794,6 +839,19 @@ function SCORM_API(options) {
                 break;
             }
             ec = getLastErrorCode();
+            m = getLastErrorMessage(ec);
+            d = getDiagnostic(ec);
+            // Custom Event Trigger setvalue
+            $(self).triggerHandler({
+                'type': "setvalue",
+                'n': n,
+                'v': v,
+                'error': {
+                    'code': ec,
+                    'message': m,
+                    'diagnostic': d
+                }
+            });
             // Ensure Error Codes not critical
             if (ec === 0 || ec === 403) {
                 return s;
@@ -1056,12 +1114,14 @@ function SCORM_API(options) {
                 findAPI(window.parent);
             }
         } catch (e) {/* Cross Domain issue */
+            debug(e, 1);
         }
         if (!API.path) {
             try {
                 win = window.top.opener;
                 findAPI(win);
             } catch (ee) {/* Cross domain issue */
+                debug(ee, 1);
             }
         }
         if (API.path) {

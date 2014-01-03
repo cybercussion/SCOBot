@@ -4,42 +4,27 @@
  * Local API_1484_11
  * Mimics LMS Connectivity in Local Mode i.e. standalone functionality
  *
- * https://github.com/cybercussion/SCORM_API
+ * https://github.com/cybercussion/SCOBot
  * @author Mark Statkus <mark@cybercussion.com>
- * @requires JQuery
+ * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
+ * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
+ * @birequires JQuery
+ * @version 3.0.0
  * @param options {Object} override default values
  * @constructor
  */
 /*!
- * Local_API_1484_11
- * Copyright (c) 2011-2012 Mark Statkus <mark@cybercussion.com>
- * The MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * Local_API_1484_11, Updated January 3rd, 2014
+ * Copyright (c) 2009-2013, Cybercussion Interactive LLC.
+ * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 function Local_API_1484_11(options) {
     // Constructor
     "use strict";
     var defaults = {
-            version:     "2.2",
-            moddate:     "03/05/2013 5:10PM",
+            version:     "3.0.0",
             createdate:  "07/17/2010 08:15AM",
+            moddate:     "01/03/2014 12:16PM",
             prefix:      "Local_API_1484_11",
             errorCode:   0,
             diagnostic:  '',
