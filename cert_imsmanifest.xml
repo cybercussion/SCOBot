@@ -75,11 +75,11 @@
 		</resource>
 		<!-- Shared Assets (optional deployment capability) -->
 		<resource identifier="common_files" type="webcontent" xml:base="QUnit-Tests/" adlcp:scormType="asset">
-			<file href="css/qunit-1.11.0.css" />
+			<file href="css/qunit-1.12.0.css" />
 			<file href="js/util/json2.js" />
-			<file href="js/jquery/jquery-1.9.0.js"/>
-			<file href="js/jquery/jquery-1.9.0.min.js"/>
-			<file href="js/jquery/plugins/qunit-1.11.0.js" />
+			<file href="js/jquery/jquery-1.10.2.js"/>
+			<file href="js/jquery/jquery-1.10.2.min.js"/>
+			<file href="js/jquery/plugins/qunit-1.12.0.js" />
 		</resource>
 	</resources>
 </manifest>
