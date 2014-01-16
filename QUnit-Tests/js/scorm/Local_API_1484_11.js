@@ -9,7 +9,7 @@
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @birequires JQuery
- * @version 3.0.0
+ * @version 3.1.0
  * @param options {Object} override default values
  * @constructor
  */
@@ -22,9 +22,9 @@ function Local_API_1484_11(options) {
     // Constructor
     "use strict";
     var defaults = {
-            version:     "3.0.0",
+            version:     "3.1.0",
             createdate:  "07/17/2010 08:15AM",
-            moddate:     "01/03/2014 12:16PM",
+            moddate:     "01/16/2014 03:57PM",
             prefix:      "Local_API_1484_11",
             errorCode:   0,
             diagnostic:  '',
