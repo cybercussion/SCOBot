@@ -525,7 +525,8 @@ test("Interactions", function () {
         n = '', // for interaction.n Array value (locator)
         m = '', // for Interaction.n.objective.m array value (locator)
         type = ''; // Interaction Type for 3rd or 4th edition
-    endTime.setMinutes(startTime.getMinutes() + 5); // Add 5 minutes for latency, result would be PT5M
+    //endTime.setMinutes(startTime.getMinutes() + 5); // **Danger, FireFox, IE can't seem to cope with this**
+    endTime.setMilliseconds(startTime.getMilliseconds() + (60000 * 5)); // Thanks Brandon Bradley
 
     if (SB.getEntry() !== 'resume') {
         strictEqual(SB.getvalue('cmi.interactions._count'), '0', "Getting interactions._count, should be '0'");

@@ -507,12 +507,15 @@ function Local_API_1484_11(options) {
                             // Objectives require a unique ID
                             if (tiers[5] === "id") {
                                 count = parseInt(cmi.interactions[tiers[2]].objectives._count, 10);
-                                for (z = 0; z < count; z += 1) {
+                                z = count;
+                                //for (z = 0; z < count; z += 1) {
+                                while (z < count) {
                                     if (cmi.interactions[tiers[2]].objectives[z].id === v) {
                                         return throwGeneralSetError(key, v, z);
                                         //settings.errorCode = "351";
                                         //settings.diagnostic = "The objectives.id element must be unique.  The value '" + v + "' has already been set in objective #" + z;
                                     }
+                                    z += 1;
                                 }
                             } else {
                                 return throwVocabError(key, v);
@@ -535,12 +538,14 @@ function Local_API_1484_11(options) {
                         // Objectives require a unique ID, which to me contradicts journaling
                         if (tiers[3] === "id") {
                             count = parseInt(cmi.objectives._count, 10);
-                            for (z = 0; z < count; z += 1) {
+                            //for (z = 0; z < count; z += 1) {
+                            while (z < count) {
                                 if (cmi.objectives[z].id === v) {
                                     settings.errorCode = "351";
                                     settings.diagnostic = "The objectives.id element must be unique.  The value '" + v + "' has already been set in objective #" + z;
                                     return 'false';
                                 }
+                                z += 1;
                             }
                         }
                         // End Unique ID Check

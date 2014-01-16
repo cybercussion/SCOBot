@@ -284,7 +284,9 @@ function SCORM_API(options) {
         if (!bErr) {
             str = str.substr(1); //get past the P
             len = aT.length;
-            for (i = 0; i < len; i += 1) {
+            i = 0;
+            //for (i = 0; i < len; i += 1) {
+            while (i < len) {
                 if (str.indexOf("T") === 0) {
                     str = str.substr(1);
                     i = Math.max(i, 3);
@@ -312,6 +314,7 @@ function SCORM_API(options) {
                     }
                     str = str.substr(p + 1);
                 }
+                i += 1;
             }
             bErr = !!(((!bErr) && (len !== 0)));
         }
@@ -1014,13 +1017,16 @@ function SCORM_API(options) {
             return 'false';
         }
         count = parseInt(count, 10) - 1; // convert from string
-        for (i = count; i >= 0; i -= 1) {
+        i = count;
+        //for (i = count; i >= 0; i -= 1) {
+        while (i >= 0) {
             tID = self.getvalue("cmi.objectives." + i + ".id");
             //scorm.debug(settings.prefix + ": Objective ID Check for " + i + " : " + id + " vs " + tID, 4);
             if (id === tID) {
                 scorm.debug(settings.prefix + ": Objective ID Match on " + i, 4);
                 return i;
             }
+            i -= 1;
         }
         return 'false';
     };
@@ -1041,13 +1047,16 @@ function SCORM_API(options) {
         }
         count = parseInt(count, 10) - 1; // convert from string
         scorm.debug(settings.prefix + ": Getting interactions from count " + count, 4);
-        for (i = count; i >= 0; i -= 1) {
+        i = count;
+        //for (i = count; i >= 0; i -= 1) {
+        while (i >= 0) {
             tID = this.getvalue("cmi.interactions." + i + ".id");
             //scorm.debug(settings.prefix + ": Interaction ID Check for " + i + " : " + tID + " vs " + id, 4);
             if (id === tID) {
                 scorm.debug(settings.prefix + ": Interaction By ID Returning " + i);
                 return i;
             }
+            i -= 1;
         }
         return 'false';
     };
@@ -1064,13 +1073,16 @@ function SCORM_API(options) {
         }
         count = parseInt(count, 10) - 1; // convert from string
         scorm.debug(settings.prefix + ": Getting interaction objectives from count " + count, 4);
-        for (i = count; i >= 0; i -= 1) {
+        i = count;
+        //for (i = count; i >= 0; i -= 1) {
+        while (i >= 0) {
             tID = self.getvalue("cmi.interactions." + n + ".objectives." + i + ".id");
             //scorm.debug(settings.prefix + ": Interaction Objective ID Check for " + i + " : " + tID + " vs " + id, 4);
             if (id === tID) {
                 scorm.debug(settings.prefix + ": Interaction Objective By ID Returning " + i);
                 return i;
             }
+            i -= 1;
         }
         return 'false';
     };
@@ -1088,13 +1100,16 @@ function SCORM_API(options) {
         }
         count = parseInt(count, 10) - 1; // convert from string
         scorm.debug(settings.prefix + ": Getting interaction correct responses from count " + count, 4);
-        for (i = count; i >= 0; i -= 1) {
+        i = count;
+        //for (i = count; i >= 0; i -= 1) {
+        while (i >= 0) {
             p = self.getvalue("cmi.interactions." + n + ".correct_responses." + i + ".pattern");
             //scorm.debug(settings.prefix + ": Interaction Correct Responses Pattern Check for " + i + " : " + p + " vs " + pattern, 4);
             if (pattern === p) {
                 scorm.debug(settings.prefix + ": Interaction Correct Responses By Pattern Returning " + i);
                 return "match";
             }
+            i -= 1;
         }
         return 'false';
     };

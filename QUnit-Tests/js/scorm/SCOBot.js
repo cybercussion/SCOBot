@@ -446,13 +446,16 @@ function SCOBot(options) {
             // tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
             if ($.isArray(value)) {
                 len = value.length;
-                for (i = 0; i < len; i += 1) {
+                i = 0;
+                while (i < len) {
+                //for (i = 0; i < len; i += 1) {
                     if ($.isArray(value[i])) {
                         arr.push(value[i].join("[.]")); // this isn't working
                     } else {
                         scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof value + " instead", 1);
                         return '';
                     }
+                    i += 1;
                 }
                 str = arr.join("[,]");
                 value = str;
@@ -490,7 +493,9 @@ function SCOBot(options) {
                 }
                 if ($.isArray(value.answers)) {
                     len = value.answers.length;
-                    for (i = 0; i < len; i += 1) {
+                    i = 0;
+                    //for (i = 0; i < len; i += 1) {
+                    while (i < len) {
                         if ($.isArray(value.answers[i])) {
                             // Need to check if answer is object
                             if ($.isPlainObject(value.answers[i][1])) {
@@ -504,6 +509,7 @@ function SCOBot(options) {
                             scorm.debug(value, 1);
                             return '';
                         }
+                        i += 1;
                     }
                     str += arr.join("[,]");
                 } else {
@@ -513,7 +519,9 @@ function SCOBot(options) {
             } else {
                 if (typeof ($.isArray(value))) { // This would be a Learner Response
                     len = value.length;
-                    for (i = 0; i < len; i += 1) {
+                    i = 0;
+                    //for (i = 0; i < len; i += 1) {
+                    while (i < len) {
                         if ($.isArray(value[i])) {
                             arr.push(value[i].join("[.]")); // this isn't working
                         } else {
@@ -521,6 +529,7 @@ function SCOBot(options) {
                             scorm.debug(value, 1);
                             return '';
                         }
+                        i += 1;
                     }
                     str = arr.join("[,]");
                 } else {
@@ -679,8 +688,11 @@ function SCOBot(options) {
             // tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
             arr = value.split("[,]");
             len = arr.length;
-            for (i = 0; i < len; i += 1) {
+            i = 0;
+            //for (i = 0; i < len; i += 1) {
+            while (i < len) {
                 arr[i] = arr[i].split("[.]"); // this isn't working
+                i += 1;
             }
             return arr;
             /*
@@ -715,9 +727,12 @@ function SCOBot(options) {
                 }
             }
             arr = value.split("[,]");
-            len = arr.lengh;
-            for (i = 0; i < len; i += 1) {
+            len = arr.length;
+            i = 0;
+            //for (i = 0; i < len; i += 1) {
+            while (i < len) {
                 arr[i] = arr[i].split("[.]"); // this isn't working
+                i += 1;
             }
             if (match) {
                 obj.answers = arr;
@@ -804,7 +819,9 @@ function SCOBot(options) {
             scorm.debug(settings.prefix + " Count is " + count);
             if (count > 0) {
                 count = count - 1; //subtract 1 (max count)
-                for (i = count; i >= 0; i -= 1) {
+                //for (i = count; i >= 0; i -= 1) {
+                i = count;
+                while (i >= 0) {
                     // Count up totalObjectivesCompleted
                     //scoreMax += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.max'), 10); // should be un-used, might validate
                     //scoreMin += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.min'), 10); // should be un-used, might validate
@@ -818,6 +835,7 @@ function SCOBot(options) {
                     if (scorm.getvalue('cmi.objectives.' + i + '.completion_status') === 'completed') {
                         totalObjectivesCompleted += 1;
                     }
+                    i -= 1;
                 }
             }
             // Set Score Raw
@@ -868,13 +886,16 @@ function SCOBot(options) {
                 return 'false';
             }
             count -= 1;
-            for (i = 0; i <= count; i += 1) {
+            i = 0;
+            //for (i = 0; i <= count; i += 1) {
+            while (i <= count) {
                 p1 += i + '.';
                 obj.comment = scorm.getvalue(p1 + 'comment');
                 obj.location = scorm.getvalue(p1 + 'location');
                 obj.timestamp = scorm.getvalue(p1 + 'timestamp');
                 response.push(obj);
                 obj = {};
+                i += 1;
             }
             return response;
         }
@@ -1181,9 +1202,10 @@ function SCOBot(options) {
     this.setSuspendDataByPageID = function (id, title, data) {
         if (isStarted) {
             // Suspend data is a array of pages by ID
-            var i,
+            var i = 0,
                 len = settings.suspend_data.pages.length;
-            for (i = 0; i < len; i += 1) {
+            //for (i = 0; i < len; i += 1) {
+            while (i < len) {
                 if (settings.suspend_data.pages[i].id === id) {
                     // Update Page data
                     settings.suspend_data.pages[i].data = data; // overwrite existing
@@ -1192,6 +1214,7 @@ function SCOBot(options) {
                     return setSuspendData();
                     //return 'true';
                 }
+                i += 1;
             }
             // new page push
             settings.suspend_data.pages.push({'id': id, 'title': title, 'data': data});
@@ -1211,12 +1234,14 @@ function SCOBot(options) {
     this.getSuspendDataByPageID = function (id) {
         if (isStarted) {
             // Suspend data is a array of pages by ID
-            var i,
+            var i = 0,
                 len = settings.suspend_data.pages.length;
-            for (i = 0; i < len; i += 1) {
+            //for (i = 0; i < len; i += 1) {
+            while (i < len) {
                 if (settings.suspend_data.pages[i].id === id) {
                     return settings.suspend_data.pages[i].data;
                 }
+                i += 1;
             }
             return 'false';
         }
@@ -1337,13 +1362,17 @@ function SCOBot(options) {
             // result = scorm.setvalue('cmi.interactions.'+n+'.objectives.'+m+".id", data.objectives[i].id);
             p2 = 'objectives._count';
             if (data.objectives !== undefined) {
-                for (i = 0; i < data.objectives.length; i += 1) {
+                i = 0;
+                len = data.objectives.length;
+                while (i < len) {
+                //for (i = 0; i < data.objectives.length; i += 1) {
                     // We need to find out if the objective is already added
                     m = scorm.getInteractionObjectiveByID(n, data.objectives[i].id); // will return 0 or the locator where it existed or false (not found)
                     if (m === 'false') {
                         m = scorm.getvalue(p1 + p2) === '-1' ? '0' : scorm.getvalue(p1 + p2);
                     }
                     result = scorm.setvalue(p1 + 'objectives.' + m + '.id', data.objectives[i].id);
+                    i += 1;
                 }
             }
             if (data.timestamp !== undefined) {
@@ -1354,8 +1383,10 @@ function SCOBot(options) {
             p2 = 'correct_responses._count';
             if ($.isArray(data.correct_responses)) {
                 // !! Important, some only support 1 correct response pattern (likert, other) !!
+                j = 0;
                 len = data.correct_responses.length;
-                for (j = 0; j < len; j += 1) {
+                while (j < len) {
+                //for (j = 0; j < len; j += 1) {
                     p = scorm.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
                     scorm.debug(settings.prefix + ": Trying to locate pattern " + data.correct_responses[j].pattern + " resulted in " + p, 4);
                     if (p === 'false') {
@@ -1367,6 +1398,7 @@ function SCOBot(options) {
                     } else {
                         result = scorm.setvalue(p1 + 'correct_responses.' + p + '.pattern', encodeInteractionType(data.type, data.correct_responses[j].pattern));
                     }
+                    j += 1;
                 }
             } else {
                 scorm.debug(settings.prefix + ": Something went wrong with Correct Responses, it wasn't an Array.", 1);
@@ -1448,10 +1480,12 @@ function SCOBot(options) {
             obj.objectives = [];
             if (m !== 'false') {
                 //m -= 1; // Subtract one since the _count is the next avail slot
-                for (i = 0; i < m; i += 1) {
+                while (i < m) {
+                //for (i = 0; i < m; i += 1) {
                     obj.objectives.push({
                         id: scorm.getvalue(p1 + 'objectives.' + i + '.id')
                     });
+                    i += 1;
                 }
             }
             obj.timestamp = timestamp;
@@ -1459,10 +1493,13 @@ function SCOBot(options) {
             obj.correct_responses = [];
             if (p !== 'false') {
                 // Loop thru and grab the patterns
-                for (i = 0; i < p; i += 1) {
+                i = 0;
+                while (i < p) {
+                //for (i = 0; i < p; i += 1) {
                     obj.correct_responses.push({
                         pattern: decodeInteractionType(obj.type, scorm.getvalue(p1 + 'correct_responses.' + i + '.pattern'))
                     });
+                    i += 1;
                 }
             }
             obj.weighting = scorm.getvalue(p1 + 'weighting');
