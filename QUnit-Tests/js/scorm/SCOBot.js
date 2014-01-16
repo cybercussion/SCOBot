@@ -20,7 +20,7 @@
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires scorm, JQuery
- * @version 3.0.0
+ * @version 3.1.0
  * @param options {Object} override default values
  * @constructor
  */
@@ -34,9 +34,9 @@ function SCOBot(options) {
     "use strict";
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var defaults = {
-            version:              "3.0.0",
+            version:              "3.1.0",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "01/03/2014 12:16PM",
+            modifiedDate:         "01/16/2014 03:57PM",
             prefix:               "SCOBot",
             // SCORM buffers and settings
             launch_data:          {},

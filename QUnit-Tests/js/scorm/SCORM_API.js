@@ -36,7 +36,7 @@
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires JQuery
- * @version 3.0.0
+ * @version 3.1.0
  * @param options {Object} override default values
  * @constructor
  */
@@ -50,9 +50,9 @@ function SCORM_API(options) {
     "use strict";
     // Please edit run time options or override them when you instantiate this object.
     var defaults = {
-            version:           "3.0.0",
+            version:           "3.1.0",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "01/04/2014 12:18PM",
+            modifiedDate:      "01/16/2014 03:57PM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
