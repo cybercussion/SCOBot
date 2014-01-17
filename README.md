@@ -2,7 +2,7 @@
 [![browser support](https://ci.testling.com/cybercussion/SCOBot.png)](https://ci.testling.com/cybercussion/SCOBot)
 - please note I'm working thru plugging in testling.  My QUnit tests actually throw some console errors so that may trip up its testing.
 
-SCOBot Content support:
+##SCOBot Content support:
 Shareable Content Objects (SCOs) are these little portable webpages that can interact with a Learning Management System (LMS).  SCORM is self, is a specification from ADL (Advanced Distributed Learning), though it based much of its work on IMSGlobal, IEEE, AICC and others.
 SCOBot gives you the developer, the ability to drop in some JavaScript, and have the capability to communicate with the LMS.  The communication portion of the SCORM standard allows you to call specific Application Programming Interfaces (APIs) that expect everything in a specific format.  SCOBot actually handles much of the pain and suffering trying to figure this all out.
 I've added Wiki documentation now, so you can read more about the API support in detail.
