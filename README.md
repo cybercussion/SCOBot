@@ -1,7 +1,10 @@
 [![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
 [![browser support](https://ci.testling.com/cybercussion/SCOBot.png)](https://ci.testling.com/cybercussion/SCOBot)
+- please note I'm working thru plugging in testling.  My QUnit tests actually throw some console errors so that may trip up its testing.
 
-## Shareable Content Object: SCOBot Content support:
+SCOBot Content support:
+Shareable Content Objects (SCOs) are these little portable webpages that can interact with a Learning Management System (LMS).  SCORM is self, is a specification from ADL (Advanced Distributed Learning), though it based much of its work on IMSGlobal, IEEE, AICC and others.
+SCOBot gives you the developer, the ability to drop in some JavaScript, and have the capability to communicate with the LMS.  The communication portion of the SCORM standard allows you to call specific Application Programming Interfaces (APIs) that expect everything in a specific format.  SCOBot actually handles much of the pain and suffering trying to figure this all out.
 I've added Wiki documentation now, so you can read more about the API support in detail.
 Here: https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
 
@@ -20,7 +23,7 @@ The portions of this project is split into the following sections:
 
 * **QUnit-Tests/js/scorm/SCORM_API.js** (Required in a deployment)-
 Tip: This file technically shouldn't be edited.
-This is the main 'long-hand' SCORM 2004 that connects to the LMS 'API_1484_11' (2004) or 'API' (1.2).  With some additions to rollback to SCORM 1.2.  Please note, I've only taken the SCORM 1.2 rollback so far, as it was needed on another project I worked on.  There will be cases where there just isn't enough space to store some items if your going from 2004 to 1.2.  Ok, fair warning.  This supplies the base support of SCORM (Connection to the LMS, initialize, get/set value, commit, terminate).
+This is the main 'long-hand' SCORM 2004 that connects to the LMS 'API_1484_11' (2004) or 'API' (1.2).  With some additions to rollback to SCORM 1.2.  Please note, I've only taken the SCORM 1.2 rollback so far, as it was needed on another project I worked on.  There will be cases where there just isn't enough space to store some items if your going from 2004 to 1.2 (fair warning).  This supplies the base support of SCORM (Connection to the LMS, initialize, get/set value, commit, terminate).
 
 * **QUnit-Tests/js/scorm/SCOBot.js** (Optional in a deployment)-
 Tip: This is totally customizable to fit your needs.  Edit away.
@@ -31,15 +34,6 @@ Tip: This file can be modified if needed.  This holds the CMI Object (customizab
 This is a LMS mimic as boiled down, and will slowly be strengthened with-in reason.  Its not the most strict so don't expect it to throw every single error right now.  It keeps the entire CMI object and console logs the JSON object so you can view whats changed during local testing.  If it doesn't cost (lines of code and or file size) a huge amount to strengthen it up I'll slowly be rolling in those error handlers and validators.  SCORM is a rather large spec to enforce however, and my only concern is this might cost more than its worth.  I had considered adding local storage here however in the case of a offline SCO since it could connect to this when its ran offline.  But, this will also add more code and I'd rather that be an option later when and if it arises.
 
 * Also have now added a minified, or packed version of all 3 of these files in a 29KB easy to use single file for those not doing there own builds.  See the **scorm.bot.pack.js** which is only the 3 above files merged, minified and packed.
-
-## So what are you looking at?
-I re-bundled this project with all the files you would need to construct a Content Aggregation Model (Package you import into a LMS that supports SCORM 2004).
-I hope this helps some people with that process that are manually creating content.  The imsmanifest.xml files within have some example structures and parameters that will hopefully aid you in defining your course, lesson or topics.
-
-## Flavors/Approaches:
-You could just use the SCORM_API.js and get down the road.  But, what I've found is you commonly do things that will have to re-entering several bits of this code anyway. I'm leaving the SCOBot open to additions and something that can be customizable.  If anything maybe just something to springboard off of.  The Local_API_1484_11 offers the support of a LMS in standalone mode.  It will not store your data after you exit the browser.  But, it will allow your content to run locally.
-
-This requires you to have a base understanding of SCORM or be open to trying to learn it.  There are several online resources from ADL on this subject which cover the specification in detail.  I'm not even going to make a feeble attempt as it took them over 200 pages to describe the standard.  I couldn't even begin to do it justice in this little README.
 
 ## QUnit Launchables:
 If your testing a LMS, feel free to edit the imsmanifest.xml to fit your needs.  Change the tests to match your launch parameters or launch data.  These tests are not meant to remain static.  Make it fit your needs.
