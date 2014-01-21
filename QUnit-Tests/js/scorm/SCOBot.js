@@ -1325,12 +1325,12 @@ function SCOBot(options) {
             data.timestamp = timestamp;
             //if (typeof (data.latency) === "object") {
             if ($.type(data.latency) === "date") {
-                latency = (data.latency.getTime() - orig_timestamp.getTime()) / 1000;
+                latency = (data.latency.getTime() - orig_timestamp.getTime()) * 0.001;
                 data.latency = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
             } else if (data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
                 // may want to force latency?
                 data.latency = new Date();
-                latency = (data.latency.getTime() - orig_timestamp.getTime()) / 1000;
+                latency = (data.latency.getTime() - orig_timestamp.getTime()) * 0.001;
                 data.latency = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
             } // Else you won't record latency as the student didn't touch the question.
             // Check for Interaction Mode
