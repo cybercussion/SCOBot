@@ -65,9 +65,6 @@ Packing would be the process of shrinking variables, remove line returns and bas
 You'll see a 50+% reduction in size, and with gzipping can see 70-80% reduction from the source code.  This is a reduction of HTTP hits and bandwidth.
 Please use JSLint to verify other code in your project will not break as a result of this.  Most common error is missing semi-colons.  Once line returns are removed, this will result in a JavaScript error.
 
-## About the Author:
-I've worked on a variety of e-learning projects since 2001.  I've utilized several 3rd Party API's, and for better or worse after dealing with unmanaged JavaScript code or lacking features opted to dive into figuring this out.  I have written a LMS API_1484_11 runtime, at the same time as making the client API.  This allowed me to put the reference materials in practice and write tests that to work against the specification.
-At this point, now that I have the core foundation down, I'll be turning my attention to the SCOBot portion so this is more easily consumable to entry and mid level developers or first time e-learner developers.  Don't feel too horrible if your coming in new to this.  It took years to really consume it.  So much focus is on the content, rarely we get a chance to geek out on what makes a student pass/fail, and all the information thats needed to make that happen.  Course when I finish SCORM 20XX will be out.
 
 Thanks for taking the time to take a look, and thanks to everyone that's assisted with feedback.
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/3b68b70a86b15441e520b43adf85113a "githalytics.com")](http://githalytics.com/cybercussion/SCOBot)
