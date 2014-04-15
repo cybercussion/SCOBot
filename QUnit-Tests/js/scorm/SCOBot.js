@@ -1422,7 +1422,7 @@ function SCOBot(options) {
                 if (version !== "1.2") {
                     result = scorm.setvalue(p1 + 'timestamp', data.timestamp);
                 } else {
-                    result = scorm.setvalue(p1 + 'time', data.timestamp); // todo need to convert to SCORM 1.2 time format
+                    result = scorm.setvalue(p1 + 'time', data.timestamp);
                 }
             }
             // Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type

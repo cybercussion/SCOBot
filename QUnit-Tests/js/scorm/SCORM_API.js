@@ -380,8 +380,7 @@ function SCORM_API(options) {
      * @returns {number} total milliseconds
      */
     function scorm12toMS(n) {
-        var t_arr = [],
-            timeNS;
+        var t_arr = [];
         t_arr = n.split(":");
         return Math.round(t_arr[0] * 3600000) + (t_arr[1] * 60000) + (t_arr[2] * 1000);
     }
@@ -693,7 +692,7 @@ function SCORM_API(options) {
                             // ok
                             break;
                         default:
-                            if (!isNaN(parseInt(tiers[2]))) {
+                            if (!isNaN(parseInt(tiers[2], 10))) {
                                 switch (tiers[3]) {
                                 case "objectives":
                                 case "correct_responses":
