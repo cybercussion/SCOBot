@@ -36,7 +36,7 @@
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires JQuery
- * @version 3.1.0
+ * @version 3.2.0
  * @param options {Object} override default values
  * @constructor
  */
@@ -50,9 +50,9 @@ function SCORM_API(options) {
     "use strict";
     // Please edit run time options or override them when you instantiate this object.
     var defaults = {
-            version:           "3.1.0",
+            version:           "3.2.0",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "01/16/2014 03:57PM",
+            modifiedDate:      "04/15/2014 04:05PM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -157,7 +157,8 @@ function SCORM_API(options) {
      * @param win {object} Window level
      */
     function findAPI(win) {
-        var attempts = 0, limit = 500;
+        var attempts = 0,
+            limit = 500;
         while ((!win.API && !win.API_1484_11) && (win.parent) && (win.parent !== win) && (attempts <= limit)) {
             attempts += 1;
             win = win.parent;
@@ -179,7 +180,8 @@ function SCORM_API(options) {
     // SCORM Time centric to SCORM 2004 and 1.2 Compatibility
     /**
      * Centiseconds To ISO Duration
-     * Borrowed from Claude Ostyn, but touched up for JSLint/JavaScript and evil "with" statement
+     * Borrowed from Claude Ostyn, but touched up for JSLint/JavaScript and evil "with" statement.  Tested on
+     * JSPerf for speed.
      * @param n {Number} Total Seconds
      * @param bPrecise {Boolean} Only Set true if were dealing with months, years (highly unlikely)
      * @returns {String} SCORM 2004 Time PT0H0M0S Format
@@ -253,6 +255,44 @@ function SCORM_API(options) {
             str = "PT0H0M0S";
         }
         // technically PT0S should do but SCORM test suite assumes longer form.
+        return str;
+    }
+
+    /**
+     * Centiseconds to SCORM 1.2 Duration
+     * @param n
+     * @returns {string}
+     */
+    function centisecsToSCORM12Duration(n) {
+        // Format is [HH]HH:MM:SS[.SS]
+        var nH = Math.floor(n / 360000),
+            nCs = n - nH * 360000,
+            nM = Math.floor(nCs / 6000),
+            nS,
+            str;
+        nCs = nCs - nM * 6000;
+        nS = Math.floor(nCs / 100);
+        nCs = Math.floor(nCs - nS * 100);
+        if (nH > 9999) {
+            nH = 9999;
+        }
+        str = "0000" + nH + ":";
+        str = str.substr(str.length - 5, 5);
+        if (nM < 10) {
+            str += "0";
+        }
+        str += nM + ":";
+        if (nS < 10) {
+            str += "0";
+        }
+        str += nS;
+        if (nCs > 0) {
+            str += ".";
+            if (nCs < 10) {
+                str += "0";
+            }
+            str += nCs;
+        }
         return str;
     }
 
@@ -335,6 +375,31 @@ function SCORM_API(options) {
     }
 
     /**
+     * SCORM 1.2 Time to Milliseconds
+     * @param n HHHH:MM:SS.SS
+     * @returns {number} total milliseconds
+     */
+    function scorm12toMS(n) {
+        var t_arr = [],
+            timeNS;
+        t_arr = n.split(":");
+        return Math.round(t_arr[0] * 3600000) + (t_arr[1] * 60000) + (t_arr[2] * 1000);
+    }
+
+    /**
+     * Date To SCORM 1.2 Time
+     * @param date
+     * @returns {string}
+     */
+    function dateToscorm12Time(date) {
+        var h = date.getHours(),
+            m = date.getMinutes(),
+            s = date.getSeconds();
+
+        return padTime(h) + ":" + padTime(m) + ":" + padTime(s);
+    }
+
+    /**
      * ISO 8601 Date String UTC
      * Converts date object into ISO 8601 standard
      * returns {String} ISO 8601 + UTC
@@ -399,54 +464,6 @@ function SCORM_API(options) {
         }
     }
     /*jslint unparam: false*/
-
-    /**
-     * Centiseconds To SCORM 1.2 Duration
-     * Borrowed from Claude Ostyn, but touched up for JSLint/JavaScript and evil "with" statement
-     * @param n {Number} Total Seconds
-     * @returns {String} SCORM 2004 Time PT0H0M0S Format
-     */
-    function centisecsToSCORM12Duration(n) {
-        // Format is [HH]HH:MM:SS[.SS]
-        var //bTruncated = false,
-            str,
-            nH,
-            nCs,
-            nM,
-            nS;
-        //with (Math) { agrumentavely considered harmful
-        n = Math.round(n);
-        nH = Math.floor(n / 360000);
-        nCs = n - nH * 360000;
-        nM = Math.floor(nCs / 6000);
-        nCs = nCs - nM * 6000;
-        nS = Math.floor(nCs / 100);
-        nCs = nCs - nS * 100;
-        //}
-        /*if (nH > 9999) {
-         nH = 9999;
-         bTruncated = true;
-         }*/
-        str = "0000" + nH + ":";
-        str = str.substr(str.length - 5, 5);
-        if (nM < 10) {
-            str += "0";
-        }
-        str += nM + ":";
-        if (nS < 10) {
-            str += "0";
-        }
-        str += nS;
-        if (nCs > 0) {
-            str += ".";
-            if (nCs < 10) {
-                str += "0";
-            }
-            str += nCs;
-        }
-        //if (bTruncated) alert ("Hours truncated to 9999 to fit HHHH:MM:SS.SS format")
-        return str;
-    }
 
     // End SCORM Time Handlers /////////////////////////////
     /**
@@ -586,6 +603,7 @@ function SCORM_API(options) {
             m  = '', // error message
             d  = '', // error diagnostic
             nn = null, // new number
+            tiers = [],
             ig = false;// ignore
         if (API.isActive) {// it has initialized
             // This is switch cased to appropriately translate SCORM 2004 to 1.2 if needed.
@@ -593,20 +611,22 @@ function SCORM_API(options) {
             switch (API.version) {
             case "1.2":
                 switch (n) {
+                // Get all the ignore calls out of the way...
                 // SCORM 1.2 is just a comments string with a max char limit of 4096
                 case "cmi.comments_from_lms._count":
+                case "cmi.comments_from_lms._children":
                 case "cmi.comments_from_learner._count":
-                    ig = true;
+                case "cmi.comments_from_learner._children":
+                case "cmi.score.scaled":
+                case "cmi.progress_measure":
+                case "cmi.completion_threshold":
+                    ig = true; // unsupported, no fail over
                     break;
                 case "cmi.credit":
                     nn = "cmi.core.credit";
                     break;
                 case "cmi.location":
                     nn = "cmi.core.lesson_location";
-                    break;
-                case "cmi.completion_threshold":
-                    // unsupported
-                    ig = true;
                     break;
                 case "cmi.entry":
                     nn = "cmi.core.entry";
@@ -630,10 +650,16 @@ function SCORM_API(options) {
                     nn = "cmi.student_data.mastery_score";
                     break;
                 case "cmi.max_time_allowed":
-                    nn = "cmi.student_data.max_time_allowed";
+                    nn = "cmi.student_data.max_time_allowed"; // appears to return 0000:00:00.0
                     break;
                 case "cmi.time_limit_action":
                     nn = "cmi.student_data.time_limit_action";
+                    break;
+                case "cmi.learner_id":
+                    nn = "cmi.core.student_id";
+                    break;
+                case "cmi.learner_name":
+                    nn = "cmi.core.student_name";
                     break;
                 case "cmi.learner_preferences.audio_level":
                     nn = "cmi.student_preferences.audio";
@@ -654,14 +680,72 @@ function SCORM_API(options) {
                 case "cmi.session_time":
                     nn = "cmi.core.session_time";
                     break;
-                    // Possibly need more here, review further later.
-                case "cmi.suspend_data":
-                    nn = n;
+                case "cmi.total_time":
+                    nn = "cmi.core.total_time";
                     break;
                 default:
-                    nn = n;
+                    // Enhanced cmi.objectives, interactions handler
+                    tiers = n.split(".");
+                    if (tiers[1] === "interactions") {
+                        switch (tiers[2]) {
+                        case "_children":
+                        case "_count":
+                            // ok
+                            break;
+                        default:
+                            if (!isNaN(parseInt(tiers[2]))) {
+                                switch (tiers[3]) {
+                                case "objectives":
+                                case "correct_responses":
+                                    // ok
+                                    break;
+                                default:
+                                    scorm.debug(settings.prefix + ": Requesting cmi.interactions." + tiers.join(".") + " is a write-only value.  Please check your code.", 2);
+                                    return 'false'; // not allowed
+                                }
+                            }
+                        }
+                    }
+                    if (tiers[1] === "objectives") {
+                        switch (tiers[2]) {
+                        case "_children":
+                        case "_count":
+                            // ok
+                            break;
+                        default:
+                            // need to rollback or ignore values that do not exist
+                            switch (tiers[3]) {
+                                // Deal with Objective differences
+                            case "id":
+                            case "status":
+                                //ok
+                                break;
+                            case "success_status":
+                            case "completion_status":
+                                tiers[3] = 'status'; // consolidate
+                                break;
+                            case "progress_measure":
+                            case "description":
+                                ig = true;
+                                break;
+                            case "score":
+                                if (tiers[4] === "scaled") {
+                                    ig = true;
+                                }
+                                break;
+                            default:
+                                scorm.debug(settings.prefix + ": Unexpected namespace passed in '" + n + "', please verify your code.", 2);
+                                break;
+                            }
+                            break;
+                        }
+                        nn = tiers.join(".");
+                    } else {
+                        nn = n; // no change
+                    }
                     break;
                 }
+
                 if (ig) {
                     return 'false';
                 }
@@ -694,6 +778,11 @@ function SCORM_API(options) {
                 if (v === 'undefined' || v === null || v === 'null') { // was typeof v
                     v = "";
                 }
+                if (API.version === "1.2") {
+                    if (v === "0000:00:00.0") {
+                        v = ''; // Normalize max_time_allowed
+                    }
+                }
                 return String(v);
             }
             debug(settings.prefix + ": Error\nError Code: " + ec + "\nError Message: " + m + "\nDiagnostic: " + d, 1);
@@ -716,6 +805,7 @@ function SCORM_API(options) {
             ec = 0, // error code
             m = '', // error message
             d = '', // error diagnostic
+            tiers = [],
             nn = null, // new number
             ig = false; // ignore
         // Security Consideration?
@@ -729,6 +819,17 @@ function SCORM_API(options) {
                 API.mode = API.mode === "" ? lms.LMSGetValue('cmi.core.lesson_mode') : API.mode;
                 if (API.mode === "normal") {
                     switch (n) {
+                    case "cmi.score.scaled":
+                    case "cmi.progress_measure":
+
+                        ig = true;
+                        break;
+                    case "cmi.comments_from_learner.comment":
+                        if (v.length > 4096) {
+                            debug(settings.prefix + ": Warning, the comment is over the limit!!", 2);
+                        }
+                        nn = "cmi.comments"; // may need to add option to append or delimit
+                        break;
                     case "cmi.location":
                         if (v.length > 255) {
                             debug(settings.prefix + ": Warning, your bookmark is over the limit!!", 2);
@@ -750,9 +851,6 @@ function SCORM_API(options) {
                         break;
                     case "cmi.score.max":
                         nn = "cmi.core.score.max";
-                        break;
-                    case "cmi.score.scaled":
-                        ig = true;
                         break;
                     case "cmi.success_status":
                     case "cmi.completion_status":
@@ -789,9 +887,83 @@ function SCORM_API(options) {
                         nn = n;
                         break;
                     default:
-                        nn = n;
+                        // Enhanced Analysis/Failover
+                        tiers = n.split(".");
+                        switch (tiers[1]) {
+                        case "comments_from_learner":
+                            switch (tiers[3]) { // unsupported in SCORM 1.2
+                            case "location":
+                            case "timestamp":
+                                return 'false';
+                            }
+                            break;
+                        case "interactions":
+                            if (tiers[2] === 'false') { // count check
+                                // something went wrong ignore this
+                                scorm.debug(settings.prefix + ": Developer, the interaction count was 'false', and I'm stopping you from pushing this against the LMS.  Verify the code getting interaction count.", 2);
+                                return 'false';
+                            }
+                            switch (tiers[3]) {
+                            case "timestamp":
+                                tiers[3] = "time";
+                                break;
+                            case "learner_response":
+                                tiers[3] = "student_response";
+                                break;
+                            case "type":
+                                if (v === "long-fill-in" || v === "other") { // unsupported interaction types
+                                    //v = "fill-in"; // salvage it?
+                                    scorm.debug(settings.prefix + ": Developer, consider revising your recorded interactions.  SB.getAPIVersion() of '1.2' does not support type of " + v, 2);
+                                }
+                                break;
+                            case "result":
+                                if (v === "incorrect") {
+                                    v = "wrong";
+                                }
+                                break;
+                            default:
+                                // nothing to check
+                                break;
+                            }
+                            nn = tiers.join(".");
+                            break;
+                        case "objectives":
+                            // need to rollback or ignore values that do not exist
+                            switch (tiers[3]) {
+                            case "id":
+                                // ok
+                                break;
+                            case "status":
+                            case "success_status":
+                            case "completion_status":
+                                tiers[3] = 'status'; // consolidate
+                                if (v === "unknown") { // not supported
+                                    v = "not attempted"; // or browsed?
+                                }
+                                break;
+                            case "progress_measure":
+                            case "description":
+                                // Could consider formatting description to the objective.n.id (alphanumeric 255)
+                                ig = true;
+                                break;
+                            case "score":
+                                if (tiers[4] === "scaled") {
+                                    ig = true;
+                                }
+                                break;
+                            default:
+                                scorm.debug(settings.prefix + ": Unexpected value passed in '" + n + "', please verify your code.", 2);
+                                break;
+                            }
+                            nn = tiers.join(".");
+                            break;
+                        default:
+                            nn = n; // no change
+                            break;
+                        }
                         break;
                     }
+
                     if (ig) {
                         return 'false';
                     }
@@ -1042,8 +1214,13 @@ function SCORM_API(options) {
         var count = self.getvalue("cmi.interactions._count"), // obtain total objectives
             i,
             tID;
-        if (count === "" || count === 'false' || count === '-1') {
+        if (count === "" || count === 'false' || count === '-1') { // could be unsupported in SCORM 1.2
             return 'false';
+        }
+        if (API.version === "1.2") {
+            // SCORM 1.2 cannot read these values, but it needs to know the next count.
+            scorm.debug(settings.prefix + ": Developer, consider ignoring these requests if SB.getAPIVersion is equal to 1.2", 2);
+            return count;
         }
         count = parseInt(count, 10) - 1; // convert from string
         scorm.debug(settings.prefix + ": Getting interactions from count " + count, 4);
@@ -1070,6 +1247,11 @@ function SCORM_API(options) {
             tID;
         if (count === "" || count === 'false') {
             return '0';
+        }
+        if (API.version === "1.2") {
+            // SCORM 1.2 cannot read these values.
+            scorm.debug(settings.prefix + ": Developer, consider ignoring these requests if SB.getAPIVersion is equal to 1.2", 2);
+            return 'false';
         }
         count = parseInt(count, 10) - 1; // convert from string
         scorm.debug(settings.prefix + ": Getting interaction objectives from count " + count, 4);
@@ -1129,14 +1311,16 @@ function SCORM_API(options) {
                 findAPI(window.parent);
             }
         } catch (e) {/* Cross Domain issue */
-            debug(e, 1);
+            debug(settings.prefix + " Possible Cross-domain issue/local mode (ignore).", 2);
+            //debug(e, 1);
         }
         if (!API.path) {
             try {
                 win = window.top.opener;
                 findAPI(win);
             } catch (ee) {/* Cross domain issue */
-                debug(ee, 1);
+                debug(settings.prefix + " Possible Cross-domain issue/local mode (ignore).", 2);
+                //debug(ee, 1);
             }
         }
         if (API.path) {
@@ -1177,6 +1361,14 @@ function SCORM_API(options) {
      */
     this.isLMSConnected = function () {
         return API.connection;
+    };
+    /**
+     * Get API Version
+     * Will return the SCORM API version
+     * @return {String} 1.2, 2004
+     */
+    this.getAPIVersion = function () {
+        return API.version;
     };
     /**
      * Set (Internal API)
@@ -1233,6 +1425,8 @@ function SCORM_API(options) {
     this.isoDateToStringUTC = isoDateToStringUTC;
     this.isoDateToString = isoDateToString;
     this.isoStringToDate = isoStringToDate;
+    this.scorm12toMS = scorm12toMS; // may just make it a date object.
+    this.dateToscorm12Time = dateToscorm12Time;
     this.makeBoolean = makeBoolean;
     this.debug = debug;
     // Self Initialize, note you could make this call outside, but later I decided to do it by default.
