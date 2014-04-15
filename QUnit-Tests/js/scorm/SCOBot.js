@@ -20,7 +20,7 @@
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires scorm, JQuery
- * @version 3.1.0
+ * @version 3.2.0
  * @param options {Object} override default values
  * @constructor
  */
@@ -34,9 +34,9 @@ function SCOBot(options) {
     "use strict";
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var defaults = {
-            version:              "3.1.0",
+            version:              "3.2.0",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "01/16/2014 03:57PM",
+            modifiedDate:         "04/15/2014 04:05PM",
             prefix:               "SCOBot",
             // SCORM buffers and settings
             launch_data:          {},
@@ -46,6 +46,7 @@ function SCOBot(options) {
             scorm_strict:         true, // You can override this.  Will enforce SPM of SCORM Spec
             scorm_edition:        "3rd", // or 4th - this is a issue with "editions" of SCORM 2004 that differ
             success_status:       "unknown", // used as local status * see SCORM_API for override
+            scorm_status_persist: "success_status", // could alternatively set it to 'completion_status' (*SCORM 1.2 only)
             location:             "",
             completion_status:    "", // used as local status * see SCORM_API for override
             suspend_data:         {pages: []},
@@ -326,10 +327,14 @@ function SCOBot(options) {
             /*
              * True / False
              * This will expect a {Boolean}, else it will throw error.
+             * In SCORM 1.2 this has to be t, f or 0, 1
              */
         case 'true-false':
-            value = value.toString();
+            value = value.toString().toLowerCase();
             if (value === 'true' || value === 'false') {
+                if (scorm.getAPIVersion() === "1.2") {
+                    return value.substring(0, 1); // return first char
+                }
                 return value;
             }
             scorm.debug(settings.prefix + ": Developer, you're not passing true or false for true-false.  I got " + value + " instead", 1);
@@ -343,26 +348,39 @@ function SCOBot(options) {
              * Sequencing
              * This will expect an {Array}
              * Similar to multiple choice
+             * In SCORM 1.2 Choice is different.  a, b, c or 1, 2, 3
              */
+            if (scorm.getAPIVersion() === "1.2") {
+                if ($.isArray(value)) {
+                    if (value.length > 26 && settings.scorm_strict) {
+                        scorm.debug(settings.prefix + ": Developer, you're passing a sum of values that exceeds SCORMs limit of 26 for this pattern.  Consider using 'performance' instead.", 2);
+                    }
+                    // Check char limit?
+                    return value.join(",");
+                }
+                scorm.debug(settings.prefix + ": Developer, you're not passing a array type for sequencing/choice.  I got " + typeof value + " instead\n" + JSON.stringify(value), 1);
+                value = '';
+            }
+            /* falls through */
         case 'sequencing':
-            // a[,]b
+            // 2004 a[,]b and in 1.2 this was a alpha numeric string: Diagnosis SCORM 2004 format is fine.
             if ($.isArray(value)) {
                 index = 0;
                 // Quck validation it doesn't exceed array length 36
                 if (value.length > 36 && settings.scorm_strict) {
-                    scorm.debug(settings.prefix + ": Developer, you're passing a sum of values that exceeds SCORM's limit of 36 for this pattern.", 2);
+                    scorm.debug(settings.prefix + ": Developer, you're passing a sum of values that exceeds SCORMs limit of 36 for this pattern.", 2);
                     value = value.slice(0, 36);
                 }
                 // Quick validation of short_identifier_types
                 for (index in value) {
                     if (value.hasOwnProperty(index)) {
                         if (value[index].length > 10 && settings.scorm_strict) {
-                            scorm.debug(settings.prefix + ": Developer, you're passing values that exceed SCORM's limit of 10 characters.  Yours have " + value[index].length + ". I will truncate this as not to lose data.", 2);
+                            scorm.debug(settings.prefix + ": Developer, you're passing values that exceed SCORMs limit of 10 characters.  Yours have " + value[index].length + ". I will truncate this as not to lose data.", 2);
                             value[index] = value[index].substring(0, 10);
                         }
                     }
                 }
-                str = value.join("[,]");
+                str = scorm.getAPIVersion() === "1.2" ? value.join(",") : value.join("[,]");
                 value = str;
             } else {
                 scorm.debug(settings.prefix + ": Developer, you're not passing a array type for sequencing/choice.  I got " + typeof value + " instead\n" + JSON.stringify(value), 1);
@@ -383,8 +401,10 @@ function SCOBot(options) {
              * }
              */
         case 'fill-in':
-            // Word
-            // {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
+            /* Word
+             * {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
+             * In SCORM 1.2 this is expected to be alpha-numeric only.  These special symbols won't work.
+             */
             if ($.isPlainObject(value)) {
                 // Check for case_matters
                 if (value.case_matters !== undefined) {
@@ -398,7 +418,11 @@ function SCOBot(options) {
                 if (value.lang !== undefined) {
                     str += "{lang=" + value.lang + "}";
                 }
-                str += value.words.join("[,]");
+                if ($.isArray(value.words)) { // new error check
+                    str += value.words.join("[,]");
+                } else {
+                    scorm.debug(settings.prefix + ": Developer, expected an array of word(s) for fill-in.  I got " + typeof value.words + " instead", 1);
+                }
                 value = str;
             } else {
                 scorm.debug(settings.prefix + ": Developer, you're not passing a object type for fill in.  I got " + typeof value + " instead", 1);
@@ -443,21 +467,22 @@ function SCOBot(options) {
              * ]
              */
         case 'matching':
-            // tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2
+            // tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2 (SCORM 2004)
+            // tile1.target1,tile2.target3,tile3.target2 (SCORM 1.2)
             if ($.isArray(value)) {
                 len = value.length;
                 i = 0;
                 while (i < len) {
                 //for (i = 0; i < len; i += 1) {
                     if ($.isArray(value[i])) {
-                        arr.push(value[i].join("[.]")); // this isn't working
+                        arr.push(scorm.getAPIVersion() === "1.2" ? value[i].join(".") : value[i].join("[.]"));
                     } else {
                         scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof value + " instead", 1);
                         return '';
                     }
                     i += 1;
                 }
-                str = arr.join("[,]");
+                str = scorm.getAPIVersion() === "1.2" ? arr.join(",") : arr.join("[,]");
                 value = str;
             } else {
                 scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof value + " instead", 1);
@@ -485,7 +510,8 @@ function SCOBot(options) {
              * ]
              */
         case 'performance':
-            //
+            // 255 alpha numeric SCORM 1.2 (uncertain if {} [] : characters will work.)
+            // SCORM 2004 greatly expanded delimiters see page 136
             if (!$.isArray(value)) { // This would be a Correct Response Pattern
                 // Check for order_matters
                 if (value.order_matters !== undefined) {
@@ -593,8 +619,12 @@ function SCOBot(options) {
             match = false;
         switch (type) {
         case 'true-false':
+            if (scorm.getAPIVersion() === "1.2") {
+                return value === "t" ? "true" : "false"; // put it back to expected format
+            }
             return value;
         case 'choice':
+            // Do if condition here for SCORM 1.2 then break;  Same format as sequence in 2004.
         case 'sequencing':
             // a[,]b to array
             arr = value.split("[,]");
@@ -616,6 +646,7 @@ function SCOBot(options) {
         case 'fill-in':
             // Word
             // {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
+            // In SCORM 1.2 this is alpha numeric only.  Need to handle with if/else.
             // Check for case_matters
             arr = findResponseType('case_matters', value);
             if (arr !== null) {
@@ -656,6 +687,7 @@ function SCOBot(options) {
         case 'long-fill-in':
             // Bunch of text...
             // {case_matters=true}{lang=en}Bunch of text...
+            // Unsupported in SCORM 1.2
             // Check for case_matters
             arr = findResponseType('case_matters', value);
             if (arr !== null) {
@@ -1288,7 +1320,8 @@ function SCOBot(options) {
      */
     this.setInteraction = function (data) {
         if (isStarted) {
-            var n, // Reserved for the count within interactions.n
+            var version = scorm.getAPIVersion(),
+                n, // Reserved for the count within interactions.n
                 m, // Reserved for the count within interactions.n.objectives.m
                 i, // Reserved for objective loop
                 j, // Reserved for correct responses loop
@@ -1320,23 +1353,23 @@ function SCOBot(options) {
             //Time stuff will need to move after ID is added
             //if (typeof (data.timestamp) === "object") {
             if ($.type(data.timestamp) === "date") {
-                timestamp = scorm.isoDateToString(data.timestamp); // 2012-02-12T00:37:29 formatted
+                timestamp = scorm.getAPIVersion() === "1.2" ? scorm.dateToscorm12Time(data.timestamp) : scorm.isoDateToString(data.timestamp); // HH:MM:SS vs 2012-02-12T00:37:29
             }
-            data.timestamp = timestamp;
+            data.timestamp = timestamp; // SCORM API Will convert timestamp to time
             //if (typeof (data.latency) === "object") {
             if ($.type(data.latency) === "date") {
                 latency = (data.latency.getTime() - orig_timestamp.getTime()) * 0.001;
-                data.latency = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
+                data.latency = scorm.getAPIVersion() === "1.2" ? scorm.centisecsToSCORM12Duration(latency * 100) : scorm.centisecsToISODuration(latency * 100, true);
             } else if (data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
                 // may want to force latency?
                 data.latency = new Date();
                 latency = (data.latency.getTime() - orig_timestamp.getTime()) * 0.001;
-                data.latency = scorm.centisecsToISODuration(latency * 100, true);  // PT0H0M0S
+                data.latency = scorm.getAPIVersion() === "1.2" ? scorm.centisecsToSCORM12Duration(latency * 100) : scorm.centisecsToISODuration(latency * 100, true);
             } // Else you won't record latency as the student didn't touch the question.
             // Check for Interaction Mode
             p2 = '_count';
-            if (settings.interaction_mode === "journaled") {
-                // Explicitly stating they want a history of interactions
+            if (settings.interaction_mode === "journaled" || version === "1.2") {
+                // Explicitly stating they want a history of interactions (default behavior of SCORM 1.2)
                 n = scorm.getvalue(p1 + p2) === "-1" ? '0' : scorm.getvalue(p1 + p2); // we want to use cmi.interactions._count
             } else {
                 // Default to state, which will update by id
@@ -1355,7 +1388,17 @@ function SCOBot(options) {
                 result = scorm.setvalue(p1 + 'id', data.id);
             }
             if (!isBadValue(data.type)) {
-                result = scorm.setvalue(p1 + 'type', data.type);
+                if (scorm.getAPIVersion() === "1.2") {
+                    switch (data.type) {
+                    case "other":
+                    case "long-fill-in":
+                        data.type = "fill-in";
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                result = scorm.setvalue(p1 + 'type', data.type); // SCORM 1.2 doesn't support long-fill-in or other.  May need to re-route?  Performance or fill-in?
             }
             // Objectives will require a loop within data.objectives.length, and we may want to validate if an objective even exists?
             // Either ignore value because its already added, or add it based on _count
@@ -1376,7 +1419,11 @@ function SCOBot(options) {
                 }
             }
             if (data.timestamp !== undefined) {
-                result = scorm.setvalue(p1 + 'timestamp', data.timestamp);
+                if (version !== "1.2") {
+                    result = scorm.setvalue(p1 + 'timestamp', data.timestamp);
+                } else {
+                    result = scorm.setvalue(p1 + 'time', data.timestamp); // todo need to convert to SCORM 1.2 time format
+                }
             }
             // Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type
             //result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
@@ -1407,7 +1454,11 @@ function SCOBot(options) {
                 result = scorm.setvalue(p1 + 'weighting', data.weighting);
             }
             if (!isBadValue(data.learner_response)) {
-                result = scorm.setvalue(p1 + 'learner_response', encodeInteractionType(data.type, data.learner_response));
+                if (version !== "1.2") {
+                    result = scorm.setvalue(p1 + 'learner_response', encodeInteractionType(data.type, data.learner_response));
+                } else {
+                    result = scorm.setvalue(p1 + 'student_response', encodeInteractionType(data.type, data.learner_response));
+                }
             } // will need to format by interaction type
             if (!isBadValue(data.result)) {
                 result = scorm.setvalue(p1 + 'result', data.result);
@@ -1415,8 +1466,10 @@ function SCOBot(options) {
             if (!isBadValue(data.latency)) {
                 result = scorm.setvalue(p1 + 'latency', data.latency);
             }
-            if (!isBadValue(data.description)) {
-                result = scorm.setvalue(p1 + 'description', data.description);
+            if (version !== "1.2") { // not supported in SCORM 1.2
+                if (!isBadValue(data.description)) {
+                    result = scorm.setvalue(p1 + 'description', data.description);
+                }
             }
             return result;
         }
@@ -1470,6 +1523,7 @@ function SCOBot(options) {
             p1 += n + '.';
             obj.id = id;
             obj.type = scorm.getvalue(p1 + 'type');
+            // SCORM 1.2 interactions are write only so no need to translate.  Shouldn't even allow it to make the call.
             m = scorm.getvalue(p1 + 'objectives._count');
             // Fix the time stamps up ...
             ts = scorm.getvalue(p1 + 'timestamp');
@@ -1540,7 +1594,8 @@ function SCOBot(options) {
                 def1 = ": Passed no or bad ",
                 def2 = " ignored.",
                 sv = scorm.setvalue,
-                key;
+                key,
+                version = scorm.getAPIVersion();
             scorm.debug(settings.prefix + ": Setting Objective at " + n + " (This may be false)");
             if (isBadValue(n)) { // First Run
                 n = scorm.getvalue(p1 + '_count');
@@ -1566,17 +1621,24 @@ function SCOBot(options) {
                 }
             }
             if ($.isPlainObject(data.score)) {
-                result = !isBadValue(data.score.scaled) ? sv(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.scaled: " + data.score.scaled + def2, 3);
+                if (version === "2004") {
+                    result = !isBadValue(data.score.scaled) ? sv(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.scaled: " + data.score.scaled + def2, 3);
+                }
                 result = !isBadValue(data.score.raw) ? sv(p1 + 'score.raw', trueRound(data.score.raw, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.raw: " + data.score.raw + def2, 3);
                 result = !isBadValue(data.score.min) ? sv(p1 + 'score.min', trueRound(data.score.min, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.min: " + data.score.min + def2, 3);
                 result = !isBadValue(data.score.max) ? sv(p1 + 'score.max', trueRound(data.score.max, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.max: " + data.score.max + def2, 3);
             } else {
                 scorm.debug(settings.prefix + ": Did not receive a score object.  May or may not be an issue.", 4);
             }
-            result = !isBadValue(data.success_status) ? sv(p1 + 'success_status', data.success_status) : scorm.debug(settings.prefix + def1 + p1 + "success_status: " + data.success_status + def2, 3);
-            result = !isBadValue(data.completion_status) ? sv(p1 + 'completion_status', data.completion_status) : scorm.debug(settings.prefix + def1 + p1 + "completion_status: " + data.completion_status + def2, 3);
-            result = !isBadValue(data.progress_measure) ? sv(p1 + 'progress_measure', data.progress_measure) : scorm.debug(settings.prefix + def1 + p1 + "progress_measure: " + data.progress_measure + def2, 3);
-            result = !isBadValue(data.description) ? sv(p1 + 'description', data.description) : scorm.debug(settings.prefix + def1 + p1 + "description: " + data.description + def2, 3);
+            if (version === "2004") {
+                result = !isBadValue(data.success_status) ? sv(p1 + 'success_status', data.success_status) : scorm.debug(settings.prefix + def1 + p1 + "success_status: " + data.success_status + def2, 3);
+                result = !isBadValue(data.completion_status) ? sv(p1 + 'completion_status', data.completion_status) : scorm.debug(settings.prefix + def1 + p1 + "completion_status: " + data.completion_status + def2, 3);
+                result = !isBadValue(data.progress_measure) ? sv(p1 + 'progress_measure', data.progress_measure) : scorm.debug(settings.prefix + def1 + p1 + "progress_measure: " + data.progress_measure + def2, 3);
+                result = !isBadValue(data.description) ? sv(p1 + 'description', data.description) : scorm.debug(settings.prefix + def1 + p1 + "description: " + data.description + def2, 3);
+            } else {
+                // Above not supported by SCORM 1.2, but 'status' could be success_status or completion_status
+                result = !isBadValue(data[settings.scorm_status_persist]) ? sv(p1 + 'status', data[settings.scorm_status_persist]) : scorm.debug(settings.prefix + def1 + p1 + "status: " + data[settings.scorm_status_persist] + def2, 3);
+            }
             scorm.debug(settings.prefix + ": Progress\n" + JSON.stringify(checkProgress(), null, " "), 4);
             return result.toString();
         }
@@ -1615,15 +1677,15 @@ function SCOBot(options) {
             return {
                 id:                scorm.getvalue(p1 + "id"),
                 score:             {
-                    scaled: scorm.getvalue(p1 + "score.scaled"),
+                    scaled: scorm.getvalue(p1 + "score.scaled"),            // false in SCORM 1.2
                     raw:    scorm.getvalue(p1 + "score.raw"),
                     min:    scorm.getvalue(p1 + "score.min"),
                     max:    scorm.getvalue(p1 + "score.max")
                 },
-                success_status:    scorm.getvalue(p1 + "success_status"),
+                success_status:    scorm.getvalue(p1 + "success_status"),   // Merged with 'status'
                 completion_status: scorm.getvalue(p1 + "completion_status"),
-                progress_measure:  scorm.getvalue(p1 + "progress_measure"),
-                description:       scorm.getvalue(p1 + "description")
+                progress_measure:  scorm.getvalue(p1 + "progress_measure"), // false in SCORM 1.2
+                description:       scorm.getvalue(p1 + "description")       // false in SCORM 1.2
             };
         }
         return notStartedYet();
@@ -1767,6 +1829,12 @@ function SCOBot(options) {
      * @returns {Boolean} true/false
      */
     this.isISO8601 = isISO8601;
+    /**
+     * Get API Version
+     * Hook back to scorm incase your talking to SB exclusively
+     * @returns {String} 1.2, 2004
+     */
+    this.getAPIVersion = scorm.getAPIVersion;
     /**
      * Set
      * This locally sets values local to this API
