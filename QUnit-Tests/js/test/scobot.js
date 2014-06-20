@@ -1278,7 +1278,7 @@ test("Suspend SCO", function () {
 });
 
 // Optional, comment out if you don't want to terminate.
-test("Termiante SCO", function () {
+test("Terminate SCO", function () {
     "use strict";
     SB.debug(">>>>>>>>> Terminating <<<<<<<<<<<<<");
     strictEqual(SB.finish(), 'true', "Terminating SCO."); // Comment this out if you want to leave it up.
