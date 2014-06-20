@@ -28,7 +28,7 @@ var scorm = new SCORM_API({
     local = false,
     setvalue_calls = 0,
     getvalue_calls = 0,
-// These things tend to happen during authoring/creation. We'll use this later to put into suspend data
+    // These things tend to happen during authoring/creation. We'll use this later to put into suspend data
     character_str = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ˜‌‍‎‏–—―‗‘’‚‛“”„†‡•…‰′″‹›‼‾⁄₣₤₧₪₫€℅ℓ№™Ω℮⅓⅔⅛⅜⅝⅞←↑→↓∂√∞∩∫≠≡■□▲△▼○●♀♂♪";
 $(scorm).on("setvalue", function (e) {
     "use strict";
@@ -63,6 +63,21 @@ test("ISO 8601 UTC Time", function () {
     strictEqual(SB.isISO8601('2012-02-12T00:37:29.0Z'), true, 'Checking a UTC example 2012-02-12T00:37:29.0Z');
     strictEqual(SB.isISO8601('2012-02-12T00:37:29'), false, 'Checking a non-UTC example 2012-02-12T00:37:29');
     strictEqual(SB.isISO8601('2012-02-1200:37:29'), false, 'Checking a malformed example 2012-02-1200:37:29');
+    var date = scorm.isoStringToDate('2012-03-20T17:47:54.0Z'); // PDT
+
+    // Due to time zones some quick code to adjust
+    var x = new Date(),
+        PDTOffset  = 420,// -07:00 * 60 (Doesn't solve daylight savings)
+        yourOffset = x.getTimezoneOffset(),
+        newDate = new Date(),
+        offset = 0;
+
+    if (PDTOffset !== yourOffset) {
+        offset = yourOffset - PDTOffset;
+    }
+    newDate.setTime(date.getTime() + (offset * 60000)); // great, sets the time, but not the timezone
+    // No way I'm aware to tweak the timezone without doing heavier manipulation.
+    strictEqual(newDate.toString().split("GMT")[0] + "GMT-0700 (PDT)", 'Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)', 'Checking ISO8601 UTC String to Date equals - Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)');
 });
 test("ISO 8601 Time", function () {
     "use strict";
@@ -71,13 +86,28 @@ test("ISO 8601 Time", function () {
     strictEqual(SB.isISO8601('2012-02-27T15:33:08'), true, 'Checking a non-UTC example 2012-02-27T15:33:08');
     strictEqual(SB.isISO8601('2012-02-1200:37:29'), false, 'Checking a malformed example 2012-02-1200:37:29');
     strictEqual(SB.isISO8601('2012-02-12T00:37:29Z'), false, 'Checking a UTC example 2012-02-12T00:37:29Z');
+});
+test("ISO 8601 GMT Time", function () {
+    "use strict";
     // GMT
     scorm.set("time_type", "GMT");
     strictEqual(SB.isISO8601('2009-03-24T16:24:32.5+01:00'), true, 'Checking a GMT example 2009-03-24T16:24:32.5+01:00');
     strictEqual(SB.isISO8601('2012-02-27T15:33:08.08:00'), false, 'Checking a GMT example 2012-02-27T15:33:08.08:00');
-    //strictEqual(scorm.isoStringToDate('2012-03-20T10:47:54.0-07:00'), 'March 20, 2012 - 10:47PM', "Checking ISO String back to date");
-    var date = scorm.isoStringToDate('2012-03-20T10:47:54.0-07:00');
-    strictEqual(String(date), 'Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)', 'Checking ISO8601 String to Date equals - Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)');
+    // This can be adjusted to your date, but this mainly just checking that a time stamp can be converted back to a date.
+    var date = scorm.isoStringToDate('2012-03-20T10:47:54.0-07:00'); // PDT
+    // Due to time zones some quick code to adjust
+    var x = new Date(),
+        PDTOffset  = 420,// -07:00 * 60 (Doesn't solve daylight savings)
+        yourOffset = x.getTimezoneOffset(),
+        newDate = new Date(),
+        offset = 0;
+
+    if (PDTOffset !== yourOffset) {
+        offset = yourOffset - PDTOffset;
+    }
+    newDate.setTime(date.getTime() + (offset * 60000)); // great, sets the time, but not the timezone
+    // No way I'm aware to tweak the timezone without doing heavier manipulation.
+    strictEqual(newDate.toString().split("GMT")[0] + "GMT-0700 (PDT)", 'Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)', 'Checking ISO8601 String to Date equals - Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)');
 });
 test("Set Totals", function () {
     "use strict";
@@ -1237,11 +1267,20 @@ test("Suspend SCO", function () {
     strictEqual(scorm.commit(), 'true', "Committing to check navigation possibilities.");
     if (!local || SB.getAPIVersion() === "2004") { // SCORM 2004 support, but technically you need to adjust your imsmanifest.xml for this to succeed.
         var canContinue = SB.getvalue('adl.nav.request_valid.continue');
-        strictEqual(canContinue, 'true', 'Checking for adl.nav.request_valid.continue'); // Check your imss sequencing flow control!!!
+        strictEqual(canContinue, 'true', 'Checking for adl.nav.request_valid.continue.  This would allow you to seamlessly move to the next SCO in the progression.'); // Check your imss sequencing flow control!!!
         if (canContinue === 'true' || canContinue === 'unknown') {
-            //SB.setvalue('adl.nav.request', 'continue'); // Enable if you want it to cruise past this SCO
+            SB.setvalue('adl.nav.request', 'continue'); // Enable if you want it to cruise past this SCO
         }
     }
+    // Optional, either suspend, terminate, or let the SCO's default exit behavior do the work for you "window.unload" which is managed by SCOBot
     //strictEqual(SB.suspend(), 'true', 'Suspending SCO');
     SB.debug("SetValue Calls: " + setvalue_calls + "\nGetValue Calls: " + getvalue_calls, 4);
+});
+
+// Optional, comment out if you don't want to terminate.
+test("Termiante SCO", function () {
+    "use strict";
+    SB.debug(">>>>>>>>> Terminating <<<<<<<<<<<<<");
+    strictEqual(SB.finish(), 'true', "Terminating SCO."); // Comment this out if you want to leave it up.
+
 });
