@@ -20,7 +20,7 @@
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires scorm, JQuery
- * @version 3.2.0
+ * @version 3.2.1
  * @param options {Object} override default values
  * @constructor
  */
@@ -34,9 +34,9 @@ function SCOBot(options) {
     "use strict";
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var defaults = {
-            version:              "3.2.0",
+            version:              "3.2.1",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "04/15/2014 04:05PM",
+            modifiedDate:         "06/19/2014 06:19PM",
             prefix:               "SCOBot",
             // SCORM buffers and settings
             launch_data:          {},
@@ -350,7 +350,7 @@ function SCOBot(options) {
              * Similar to multiple choice
              * In SCORM 1.2 Choice is different.  a, b, c or 1, 2, 3
              */
-            if (scorm.getAPIVersion() === "1.2") {
+            if (scorm.getAPIVersion() === "1.2") { // not a fan of doing this but I didn't want to add more code.  JSLint will complain.
                 if ($.isArray(value)) {
                     if (value.length > 26 && settings.scorm_strict) {
                         scorm.debug(settings.prefix + ": Developer, you're passing a sum of values that exceeds SCORMs limit of 26 for this pattern.  Consider using 'performance' instead.", 2);
@@ -848,7 +848,7 @@ function SCOBot(options) {
             }
             // Set Score Totals (raw, min, max) and count up totalObjectivesCompleted
             count = parseInt(scorm.getvalue('cmi.objectives._count'), 10);
-            scorm.debug(settings.prefix + " Count is " + count);
+            scorm.debug(settings.prefix + ": Objectives Count is " + count);
             if (count > 0) {
                 count = count - 1; //subtract 1 (max count)
                 //for (i = count; i >= 0; i -= 1) {
@@ -858,11 +858,11 @@ function SCOBot(options) {
                     //scoreMax += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.max'), 10); // should be un-used, might validate
                     //scoreMin += parseInt(scorm.getvalue('cmi.objectives.' + i + '.score.min'), 10); // should be un-used, might validate
                     tmpRaw = parseFloat(scorm.getvalue('cmi.objectives.' + i + '.score.raw'));
-                    scorm.debug('Score Raw: ' + tmpRaw);
+                    scorm.debug(settings.prefix + ': Score Raw: ' + tmpRaw);
                     if (!isNaN(tmpRaw)) {
                         scoreRaw += parseFloat(tmpRaw); // Whoops, said Int instead of Float.  Updated 8/14
                     } else {
-                        scorm.debug(settings.prefix + " We got a NaN converting objectives." + i + ".score.raw", 2);
+                        scorm.debug(settings.prefix + ": We got a NaN converting objectives." + i + ".score.raw.  This may be a global/local objective via the imsmanifest.xml.", 2);
                     }
                     if (scorm.getvalue('cmi.objectives.' + i + '.completion_status') === 'completed') {
                         totalObjectivesCompleted += 1;
@@ -889,6 +889,7 @@ function SCOBot(options) {
             settings.completion_status = (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) ? 'completed' : 'incomplete';
             scorm.setvalue('cmi.completion_status', settings.completion_status);
             // Set Success Status
+            scorm.debug(settings.prefix + ": Pass/Fail check - Calculated scaled score:" + parseFloat(scoreScaled) + " vs. " + parseFloat(settings.scaled_passing_score), 3);
             settings.success_status = (parseFloat(scoreScaled) >= parseFloat(settings.scaled_passing_score)) ? 'passed' : 'failed';
             scorm.setvalue('cmi.success_status', settings.success_status);
             return {

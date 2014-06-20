@@ -36,7 +36,7 @@
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires JQuery
- * @version 3.2.0
+ * @version 3.2.1
  * @param options {Object} override default values
  * @constructor
  */
@@ -50,9 +50,9 @@ function SCORM_API(options) {
     "use strict";
     // Please edit run time options or override them when you instantiate this object.
     var defaults = {
-            version:           "3.2.0",
+            version:           "3.2.1",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "04/15/2014 04:05PM",
+            modifiedDate:      "06/19/2014 06:19PM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -430,27 +430,48 @@ function SCORM_API(options) {
             uoffset,
             offset = 0,
             mil = 0,
-            dd;
+            dd,
+            timebits,
+            m,
+            resultDate,
+            utcdate,
+            offsetMinutes;
         /*jslint unparam: true*/
         switch (settings.time_type) {
         case "UTC":
-            d = str.replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))(|Z)/, function ($0, $Year, $Month, $Day, $Hour, $Min, $Sec) {
-                return MM[$Month - 1] + " " + $Day + ", " + $Year + " " + $Hour + ":" + $Min + ":" + $Sec;
-            });
-            dd = new Date.UTC(d);
-            return dd;
+            timebits = /^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2})(?::([0-9]*)(\.[0-9]*)?)?(?:([+\-])([0-9]{2})([0-9]{2}))?/;
+            m = timebits.exec(str);
+            if (m) {
+                utcdate = Date.UTC(
+                    parseInt(m[1], 10),
+                    parseInt(m[2], 10) - 1, // months are zero-offset (!)
+                    parseInt(m[3], 10),
+                    parseInt(m[4], 10),
+                    parseInt(m[5], 10), // hh:mm
+                    ((m[6] && parseInt(m[6], 10)) || 0),  // optional seconds
+                    ((m[7] && parseFloat(m[7]) * 1000)) || 0
+                ); // optional fraction
+                // utcdate is milliseconds since the epoch
+                if (m[9] && m[10]) {
+                    offsetMinutes = parseInt(m[9], 10) * 60 + parseInt(m[10], 10);
+                    utcdate += (m[8] === '+' ? -1 : +1) * offsetMinutes * 60000;
+                }
+                resultDate = new Date(utcdate);
+            } else {
+                resultDate = null;
+            }
+            return resultDate;
         case "GMT":
             d = str.replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))([\+|\-]\d+:\d+)/, function ($0, $Year, $Month, $Day, $Hour, $Min, $Sec, $Ms, $Offset) {
-                offset = parseInt($Offset.substring(1, $Offset.length), 10) * 60 * 60 * 60;
+                offset = parseInt($Offset.substring(1, $Offset.length), 10) * 60;
                 mil = $Ms;
                 return MM[$Month - 1] + " " + $Day + ", " + $Year + " " + $Hour + ":" + $Min + ":" + $Sec;
-                //return $Year + "," + ($Month - 1) + "," + $Day + "," + $Hour + "," + $Min + "," + $Sec + "," + $Ms;
             });
             // At this point we have to convert the users offset to the recorded offset to set the date properly.
             dd = new Date(d);
-            uoffset = dd.getTimezoneOffset() * 60 * 60;
+            uoffset = dd.getTimezoneOffset();
             if (uoffset !== offset) {
-                dd = new Date(dd.getTime() + offset + uoffset);
+                dd = new Date(dd.getTime() + (offset - uoffset) * 60000);
                 dd.setMilliseconds(mil);
             }
             return dd;
