@@ -1,10 +1,13 @@
-/*global $, JQuery, QUnit, ok, module, test, strictEqual, equal, SCORM_API, SCOBot, debug, enableDebug, learner_name, learner_id */
-/**
- * This is a basic test of SCOBot, no real interactive or objective information passed.
- * Think of this more like a less advanced implementation where scoring and progress are not tied to anything.
+/*global QUnit, ok, module, test, strictEqual, equal, SCOBotUtil, SCOBotBase, SCOBot, debug, learner_name, learner_id */
+/*
+ * Hi,
+ * This is a watered down basic test of commonly used SCORM calls.  For the full test see scobot.js.
+ *
+ * jQuery requirement lifted in 4.0.0
  */
 QUnit.config.reorder = false;
-var scorm = new SCORM_API({
+var $     = SCOBotUtil,
+    scorm = new SCOBotBase({
         debug:          true,
         throw_alerts:   false,
         time_type:      'GMT',
@@ -22,18 +25,26 @@ var scorm = new SCORM_API({
     getvalue_calls = 0,
 // These things tend to happen during authoring/creation. We'll use this later to put into suspend data
     character_str = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ˜‌‍‎‏–—―‗‘’‚‛“”„†‡•…‰′″‹›‼‾⁄₣₤₧₪₫€℅ℓ№™Ω℮⅓⅔⅛⅜⅝⅞←↑→↓∂√∞∩∫≠≡■□▲△▼○●♀♂♪";
-$(scorm).on("setvalue", function (e) {
+$.addEvent(SB, "load", function (e) {
+    "use strict";
+    SB.debug("------SCOBot Fired Load Event Example: your player can begin. -------");
+});
+$.addEvent(scorm, "setvalue", function (e) {
     "use strict";
     setvalue_calls += 1;
 });
-$(scorm).on("getvalue", function (e) {
+$.addEvent(scorm, "getvalue", function (e) {
     "use strict";
     getvalue_calls += 1;
 });
-$(scorm).on("StoreData", function (e) {
+$.addEvent(scorm, "StoreData", function (e) {
     "use strict";
-    SB.debug("Call to Store Data was made.", 3);
+    SB.debug("--- Call to Store Data was made. ---\nExample: You could use localStorage to hold the student attempt.\nSee Object below:", 3);
     SB.debug(e.runtimedata);
+});
+$.addEvent(scorm, "terminated", function (e) {
+    "use strict";
+    SB.debug("SetValue Calls: " + setvalue_calls + "\nGetValue Calls: " + getvalue_calls, 4);
 });
 
 // Much of SCOBOT is a bit auto-pilot so several SCORM calls may be made on one API reference.
@@ -230,5 +241,5 @@ test("Suspend SCO", function () {
         }
     }*/
     strictEqual(SB.suspend(), 'true', 'Suspending SCO');
-    SB.debug("SetValue Calls: " + setvalue_calls + "\nGetValue Calls: " + getvalue_calls, 4);
+    //SB.debug("SetValue Calls: " + setvalue_calls + "\nGetValue Calls: " + getvalue_calls, 4);
 });

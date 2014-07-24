@@ -1,33 +1,36 @@
-/*global $, JQuery, QUnit, ok, module, test, strictEqual, equal, SCORM_API, debug, learner_name, learner_id, mode */
+/*global SCOBotUtil, SCOBotBase, QUnit, ok, module, test, strictEqual, equal, SCOBotBase, debug, learner_name, learner_id, mode */
+/*
+ * This is purely the core communication API to the LMS.  More of a classic 'wrapper' for the SCORM API the content
+ * can use to talk to the LMS.  Please see SCOBot for more full tests, or feel free to expand the ones below.
+ */
 QUnit.config.reorder = false;
-var scorm,
-    isLocal = false,
-    version = '',
-    canContinue = '';
-// This is required by the isLocal SCORM API_1484_11
 
-// SCORM API (the long-hand scorm calls a more granular test)
-module("SCORM_API");
-var setvalue_calls = 0,
-    getvalue_calls = 0;
-scorm = new SCORM_API({
-    debug:        true,
-    throw_alerts: true
-});
-// Some Events fired from SCORM_API
+module("SCOBotBase");
+var $              = SCOBotUtil,
+    local          = false,
+    version        = '',
+    canContinue    = '',
+    setvalue_calls = 0,
+    getvalue_calls = 0,
+    scorm = new SCOBotBase({
+        debug:        true,
+        throw_alerts: true
+    });
+// Some Events fired from SCOBotBase
 // 'on()' is available as of 1.7 JQuery instead of bind()
-$(scorm).on("setvalue", function (e) {
+$.addEvent(scorm, "setvalue", function (e) {
+    "use strict";
     setvalue_calls += 1;
-    return false;
 });
-$(scorm).on("getvalue", function (e) {
+$.addEvent(scorm, "getvalue", function (e) {
+    "use strict";
     getvalue_calls += 1;
-    return false;
 });
 
 // END
 // Debug
 test("scorm.debug", function () {
+    "use strict";
     var sub_method = scorm.debug;
     ok(sub_method("Error Message", 1), "Valid error message");
     ok(sub_method("Warning Message", 2), "Valid warning message");
@@ -37,17 +40,24 @@ test("scorm.debug", function () {
 });
 // Initialize
 test("initialize", function () {
+    "use strict";
     ok(scorm.initialize(), "initialize");
     version = scorm.getvalue('cmi._version');
-    if (version === "Local 1.0") {
-        isLocal = true;
-    } else {
-        isLocal = false;
-    }
-    // Internal SCORM_API get/set tests (not setvalue, getvalue)
+    local = version === "Local 1.0";
+    /**
+     * Verify LMS Connected
+     */
+    test("LMS Connected", function () {
+        if (local) {
+            strictEqual(scorm.isLMSConnected(), false, 'Local enabled, should not find a LMS.');
+        } else {
+            strictEqual(scorm.isLMSConnected(), true, 'Local disabled, should find a LMS.');
+        }
+    });
+    // Internal SCOBotBase get/set tests (not setvalue, getvalue)
     // Get
     test("get", function () {
-        if (isLocal) {
+        if (local) {
             ok(scorm.get('standalone'), "Standalone checkup - " + scorm.get('standalone'));
         } else {
             ok(!scorm.get('standalone'), "Standalone checkup - " + scorm.get('standalone'));
@@ -65,9 +75,9 @@ test("initialize", function () {
         var getvalue = scorm.getvalue;
         strictEqual(getvalue('cmi.mode'), 'normal', "Requested cmi.mode - " + getvalue('cmi.mode'));
         strictEqual(getvalue('cmi.session_time'), 'false', "Requested cmi.session_time - (not allowed, will throw error 405)");
-        if (isLocal) {
+        if (local) {
             // First time this will be blank / null, since this is isLocal your pretty much always in the "first time" category
-            strictEqual(getvalue('cmi.launch_data'), '?name1=value1&name2=value2&name3=value3', "Requested cmi.launch_data - " + getvalue('cmi.launch_data'));
+            strictEqual(getvalue('cmi.launch_data'), '?name=value1&name2=value2&name3=value3', "Requested cmi.launch_data - " + getvalue('cmi.launch_data'));
             strictEqual(getvalue('cmi.entry'), 'ab-initio', "Requested cmi.entry - " + getvalue('cmi.entry'));
             strictEqual(getvalue('cmi.credit'), 'no-credit', "Requested cmi.credit - " + getvalue('cmi.credit'));
             strictEqual(getvalue('cmi.location'), "", "Getting cmi.location - " + getvalue('cmi.location') + "(this should be empty)");
@@ -78,22 +88,14 @@ test("initialize", function () {
             strictEqual(getvalue('cmi.learner_name'), learner_name, "Getting cmi.learner_name");
             strictEqual(getvalue('cmi.learner_id'), learner_id, "Getting cmi.learner_id");
         } else {
-            /**
-             This is mildly tricky.  There isn't a great way to know that you've been here before without physically checking to see if you have some
-             Data.  So what I'll do here is check to see if there is a bookmark, then dish it out accordingly.  This test case will put in values
-             we can spot check below, so looking for "strictEqual" in some cases can cause failing tests.  This is why you have to check if you were here before
-             or not.
-             Oh, but it doesn't end there, some LMS's throw "data model element value not initialized" which results in error codes being thrown in SCORM.  This
-             results in error tracking to kick in resulting in turning something that should be empty, into something undefined or 'false' etc ...
-             */
-            strictEqual(getvalue('cmi.launch_data'), 'state=NA&learnerlevel=SE&grade=06', "Requested cmi.launch_data - " + getvalue('cmi.launch_data'));
-            if (getvalue('cmi.location') === "") {// SCORM_API should ensure we get empty values when things are null, undefined or any combo there-in.
+            strictEqual(getvalue('cmi.launch_data'), 'name=value', "Requested cmi.launch_data - " + getvalue('cmi.launch_data'));
+            if (getvalue('cmi.location') === "") {// SCOBotBase should ensure we get empty values when things are null, undefined or any combo there-in.
                 // First time
                 strictEqual(getvalue('cmi.location'), "", "Getting cmi.location - " + getvalue('cmi.location') + "(this should be empty)");
                 // this may need to be "false"
                 strictEqual(getvalue('cmi.success_status'), "unknown", "Getting cmi.success_status");
                 strictEqual(getvalue('cmi.suspend_data'), "", "Getting cmi.suspend_data (should be empty)");
-                strictEqual(getvalue('cmi.completion_status'), "incomplete", "Getting cmi.completion_status - " + getvalue('cmi.completion_status'));
+                strictEqual(getvalue('cmi.completion_status'), "unknown", "Getting cmi.completion_status - " + getvalue('cmi.completion_status'));
             } else {
                 // Been here before (bookmarking was set to '4' prior), if you changed that please update this test.
                 strictEqual(getvalue('cmi.location'), "4", "Getting cmi.location - " + getvalue('cmi.location') + " (this should be 4)");
@@ -126,13 +128,13 @@ test("initialize", function () {
             scorm.debug(">>>>>>>>>>>> start set value test <<<<<<<<<<<<<<<<<<<", 4);
             strictEqual(setvalue('cmi.mode', 'browse'), 'false', "Setting cmi.mode (not allowed, will throw error 404)"); // This is not allowed validate
             ok(setvalue('cmi.location', '4'), "Setting cmi.location to 4");
-            strictEqual(setvalue('cmi.completion_status', "total failure"), 'false', "Setting cmi.completion_status to total failure (not allowed, will throw error 406)");	// This is not allowed validate
+            strictEqual(setvalue('cmi.completion_status', "total failure"), 'false', "Setting cmi.completion_status to total failure (not allowed, will throw error 406)");// This is not allowed validate
             ok(setvalue('cmi.completion_status', "incomplete"), "Setting cmi.completion_status to incomplete");
             ok(setvalue('cmi.success_status', "passed"), "Setting cmi.success_status to passed");
             ok(setvalue('cmi.score.min', '0'), "Setting cmi.score.min to 0");
             ok(setvalue('cmi.score.max', '1'), "Setting cmi.score.max to 1");
             // This is not allowed validate
-            if (isLocal) { // isLocal
+            if (local) { // isLocal
                 //[BLOCK1]
                 // New Objective
                 strictEqual(setvalue('cmi.objectives.' + objectiveIndex + '.id', '0_1_1'), 'true', 'Setting cmi.objectives.' + objectiveIndex + '.id');
@@ -332,7 +334,7 @@ test("initialize", function () {
                 scorm.debug(">>>>>>>>>>>> start get value test <<<<<<<<<<<<<<<<<<<", 4);
                 strictEqual(getvalue('cmi.mode'), 'normal', "Requested cmi.mode - " + getvalue('cmi.mode'));
                 strictEqual(getvalue('cmi.location'), "4", 'Getting cmi.location - ' + getvalue('cmi.location') + ' (this should be 4)');
-                if (isLocal) {
+                if (local) {
                     strictEqual(interactionIndex, 2, "Getting Objective by ID 0_1");
                 } else {
                     strictEqual(interactionIndex, interactionIndex, "Getting Objective by ID 0_1");
@@ -342,7 +344,7 @@ test("initialize", function () {
                 strictEqual(getvalue('cmi.interactions.' + interactionIndex + '.result'), 'correct', 'Getting cmi.interactions.' + interactionIndex + '.result - ' + getvalue('cmi.interactions.' + interactionIndex + '.result') + ' (this should be correct)');
                 strictEqual(getvalue('cmi.interactions.' + interactionIndex + '.type'), 'true-false', 'Getting cmi.interactions.' + interactionIndex + '.type - ' + getvalue('cmi.interactions.' + interactionIndex + '.type') + ' (this should be true-false)');
 
-                if (isLocal) {
+                if (local) {
                     strictEqual(getvalue('cmi.interactions._count'), '3', "Getting Objective Count, expecting 3");
                 } else {
                     strictEqual(getvalue('cmi.interactions._count'), getvalue('cmi.interactions._count'), "Getting Objective Count, expecting " + getvalue('cmi.interactions._count'));
@@ -359,14 +361,16 @@ test("initialize", function () {
                     strictEqual(scorm.commit(), 'true', "Commit data (should respond true)");
                     // Test to see if adl.nav.request_valid.continue functions
                     canContinue = scorm.getvalue('adl.nav.request_valid.continue');
-                    strictEqual(canContinue, 'true', 'Checking for adl.nav.request_valid.continue');
+
+                    if (canContinue === 'true' || canContinue === 'unknown') {
+                        scorm.setvalue('adl.nav.request', 'continue');  // Enable this if you want it to cruise thru the whole lesson
+                        // Commit will be called on terminate!!
+                    }
+                    //strictEqual(canContinue, 'true', 'Checking for adl.nav.request_valid.continue');
                 });
                 // Terminate
                 test("terminate", function () {
-                    if (canContinue === 'true' || canContinue === 'unknown') {
-                        //scorm.setvalue('adl.nav.request', 'continue');  // Enable this if you want it to cruise thru the whole lesson
-                        // Commit will be called on terminate!!
-                    }
+
                     strictEqual(scorm.setvalue('cmi.exit', 'normal'), 'true', "Setting Exit type normal");
                     strictEqual(scorm.terminate(), 'true', "Termination (you can't do anything else after this technically)");
 

@@ -117,7 +117,7 @@
 							</item>
 						</item>
 						<imsss:sequencing>
-							<imsss:controlMode choice="true" choiceExit="true" flow="true" forwardOnly = "false"/>
+							<imsss:controlMode choice="true" choiceExit="true" flow="true" forwardOnly="false"/>
 						</imsss:sequencing>
 					</item>
 				</item>
@@ -125,48 +125,50 @@
 		</organization>
 	</organizations>
 	<resources>
-		<resource identifier="RES-001" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCORM_API.html">
+		<resource identifier="RES-001" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCOBotBase.html">
 			<metadata />
 			<!--****** FILES ******-->
-			<file href="qunit_SCORM_API.html" />
-			<file href="js/scorm/Local_API_1484_11.js" />
-			<file href="js/scorm/SCORM_API.js" />
-			<file href="js/test/scorm_api.js" />
-			<dependency identifierref="common_files" />
+			<file href="qunit_SCOBotBase.html" />
+			<file href="js/scorm/SCOBotUtil.js" />
+			<file href="js/scorm/SCOBot_API_1484_11.js" />
+			<file href="js/scorm/SCOBotBase.js" />
+			<file href="js/test/scobotbase.js" />
+			<!--dependency identifierref="common_files" /-->
 		</resource>
-		<resource identifier="RES-002" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCOBot.html">
+		<resource identifier="RES-002" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCOBot_dev_full.html">
 			<metadata />
 			<!--****** FILES ******-->
-			<file href="qunit_SCOBot.html" />
-			<file href="js/scorm/Local_API_1484_11.js" />
-			<file href="js/scorm/SCORM_API.js" />
+			<file href="qunit_SCOBot_dev_full.html" />
+			<file href="js/scorm/SCOBotUtil.js" />
+			<file href="js/scorm/SCOBot_API_1484_11.js" />
+			<file href="js/scorm/SCOBotBase.js" />
 			<file href="js/scorm/SCOBot.js" />
 			<file href="js/test/scobot.js" />
-			<dependency identifierref="common_files" />
+			<!--dependency identifierref="common_files" /-->
 		</resource>
-		<resource identifier="RES-003" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCOBot_prod.html">
+		<resource identifier="RES-003" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCOBot_prod_full.html">
 			<metadata />
 			<!--****** FILES ******-->
-			<file href="qunit_SCOBot_prod.html" />
+			<file href="qunit_SCOBot_prod_full.html" />
 			<file href="js/scorm.bot.pack.js" />
 			<file href="js/test/scobot.js" />
-			<dependency identifierref="common_files" />
+			<!--dependency identifierref="common_files" /-->
 		</resource>
-		<resource identifier="RES-004" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCOBot_basic.html">
+		<resource identifier="RES-004" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCOBot_prod_basic.html">
 			<metadata />
 			<!--****** FILES ******-->
-			<file href="qunit_SCOBot_basic.html" />
+			<file href="qunit_SCOBot_prod_basic.html" />
 			<file href="js/scorm.bot.pack.js" />
 			<file href="js/test/scobot_basic.js" />
-			<dependency identifierref="common_files" />
+			<!--dependency identifierref="common_files" /-->
 		</resource>
 		<!-- Shared Assets (optional deployment capability) -->
-		<resource identifier="common_files" type="webcontent" xml:base="QUnit-Tests/" adlcp:scormType="asset">
+		<!--resource identifier="common_files" type="webcontent" xml:base="QUnit-Tests/" adlcp:scormType="asset">
 			<file href="css/qunit-1.12.0.css" />
 			<file href="js/util/json2.js" />
 			<file href="js/jquery/jquery-1.10.2.js"/>
 			<file href="js/jquery/jquery-1.10.2.min.js"/>
 			<file href="js/jquery/plugins/qunit-1.12.0.js" />
-		</resource>
+		</resource-->
 	</resources>
 </manifest>

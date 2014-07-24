@@ -1,31 +1,44 @@
-/*global $, JQuery, debug, scorm */
+/*global debug, scorm, SCOBotUtil */
 /*jslint devel: true, browser: true, nomen: true */
 /**
- * Local API_1484_11
- * Mimics LMS Connectivity in Local Mode i.e. standalone functionality
+ * SCOBot API_1484_11
+ * Mimics LMS Connectivity in Local Mode i.e. standalone functionality and is not meant to be confused with a actual
+ * LMS Runtime Environment.  It does not include all the rich error management and is meant to be a light weight way
+ * to continue to work offline hoping saving you several round trips packaging and uploading your content to an LMS.
+ * By no means if everything is great here, does it mean it will be great on the LMS.  Learning Management Systems have
+ * mixed or partial implementations which need to be tested.
  *
- * https://github.com/cybercussion/SCOBot
- * @author Mark Statkus <mark@cybercussion.com>
+ * jQuery dependency removed, and now utilizes SCOBotUtil.
+ *
+ * For your purposes you can override the cmi (student attempt) below vs. editing the one here (default).  Please read
+ * more on the wiki via github. https://github.com/cybercussion/SCOBot
+ *
+ * Recommend a minify/merge before pushing to a production environment. (JSMin, YUI Compressor, Dojo Shrinksafe etc ...)
+ *
+ * @event StoreData
+ *
+ * @author Cybercussion Interactive, LLC <info@cybercussion.com>
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @birequires JQuery
- * @version 3.1.0
+ * @requires SCOBotUtil, SCOBotBase
+ * @version 4.0.0
  * @param options {Object} override default values
  * @constructor
  */
 /*!
  * Local_API_1484_11, Updated January 3rd, 2014
- * Copyright (c) 2009-2013, Cybercussion Interactive LLC.
+ * Copyright (c) 2009-2014, Cybercussion Interactive LLC.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
-function Local_API_1484_11(options) {
+function SCOBot_API_1484_11(options) {
     // Constructor
     "use strict";
-    var defaults = {
-            version:     "3.1.0",
+    var $        = SCOBotUtil,
+        defaults = {
+            version:     "4.0.0",
             createdate:  "07/17/2010 08:15AM",
-            moddate:     "01/16/2014 03:57PM",
-            prefix:      "Local_API_1484_11",
+            moddate:     "07/24/2014 10:34PM",
+            prefix:      "SCOBot_API_1484_11",
             errorCode:   0,
             diagnostic:  '',
             initialized: 0,
@@ -596,11 +609,10 @@ function Local_API_1484_11(options) {
      * @returns {String} "true" or "false"
      */
     this.Commit = function () {
-        scorm.debug(settings.prefix + ": Commit CMI Object:", 4);
-        scorm.debug(cmi);
-        scorm.debug(settings.prefix + ": Suspend Data Usage " + suspendDataUsageStatistic());
-        $(self).triggerHandler({
-            type:        "StoreData",
+        scorm.debug(settings.prefix + ": Commit called.\nSuspend Data Usage " + suspendDataUsageStatistic(), 4);
+        //$(self).triggerHandler({
+        $.triggerEvent(self, 'StoreData', {
+            name: 'StoreData',
             runtimedata: cmi
         });
         return 'true';
@@ -611,7 +623,7 @@ function Local_API_1484_11(options) {
      */
     this.Terminate = function () {
         // Could do things here like a LMS
-        self.Commit();
+        //self.Commit();
         settings.terminated = 1;
         settings.initialized = 0;
         return 'true';
