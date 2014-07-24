@@ -4,7 +4,7 @@
     "description": "SCOBot support SCORM 1.2 and SCORM 2004 supplying API's to content developers to accommodate data validation, formatting and transparency.",
     "version": "3.1.0",
     "private": false,
-    "homepage": "http://www.cybercussion.com/SCOBot/",
+    "homepage": "http://www.cybercussion.com",
     "keywords": [
         "SCORM",
         "e-learning",
@@ -34,7 +34,6 @@
     "jsdom": "~0.5.0"
     },
     "devDependencies": {
-        "jquery": "~1.8.3",
         "grunt": "~0.4.0",
         "browserify": "~2.7.2"
     },
@@ -42,7 +41,7 @@
         "test": "grunt travis --verbose"
     },
     "testling": {
-        "html": "QUnit-Tests/qunit_SCOBot_prod.html",
+        "html": "QUnit-Tests/qunit_SCOBot_prod_full.html",
         "browsers": [
             "ie/8..latest",
             "chrome/23..latest",
