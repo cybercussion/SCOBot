@@ -21,7 +21,7 @@ You may be looking for the LMS Runtime API_1484_11.  This project does not curre
 I've kept this project split up into 4 logical portions, leaving room for anyone to add or subtract from the complete package. The main focal point would be 'QUnit-Tests/js/scorm/', as the surrounding files are simply supporting files like JQuery, QUnit, and further README files.  I've also added all the files that go into a Content Aggregation Model.  This is a package used to export your content to a learning management server.
 The portions of this project is split into the following sections:
 
-### Now no longer requires JQuery in 4.x.x.  So where's the code?
+### Now no longer requires JQuery in v4.x.x.?  So where's the code?
 
 #### Utilities
 * **QUnit-Tests/js/scorm/SCOBotUtil.js** (Required in a deployment)-
