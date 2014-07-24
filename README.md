@@ -52,6 +52,9 @@ The test for this is found at 'js/test/scobotbase.js'.
 * **qunit_SCOBot_prod_full.html** - This is the same as the one above, but using the minified/packed JavaScript (single file) scorm.bot.pack.js @~39KB.  Ensures the build process works and puts the code in a state for deployment.
 Optionally, you may want to blend this code in with all your base player code instead and make it part of a whole build.
 
+#### So why do some tests fail?
+Some are cosmetic (date differences between browsers), launch data or values that were written for something used vs. where it is now deployed or packaged.  Comment out any tests you aren't using, modify the data its comparing to get your test(s) passing.
+
 ### Further Reading:
 See the Wiki link on github for more detailed info.  I based much the work on the fact that it's been many many years since SCORM 2004, and JavaScript has come quite a ways since those days.  Getting this into JSLint, QUnit and some more structured code made good solid sense to me.  Since this is on peoples radar in such a broad audience its extremely difficult to speak in API terms to someone that wants to just record some information, and has no idea where in the spec to put it.  I understand when building e-learning content you are often faced with teams of people that don't fully grasp or aren't working in the realm of SCORM.  Terms won't always line up, and the sequence doesn't always match up.  You may run out of space within a few areas due to character limits.  These things cause architectual directional changes and can create problems when your close to deploying.  So I'd highly recommend getting more reading online in if you're new to this.
 Diagram (from Brandon Bradley) - http://www.xmind.net/share/brandonbradley/xmind-421310/
