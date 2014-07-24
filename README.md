@@ -6,6 +6,8 @@ SCOBot gives you the developer, the ability to drop in some JavaScript, and have
 I've added Wiki documentation now, so you can read more about the API support in detail.
 Here: https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
 
+Feel free to email or post any issues you run into.  At the same time this has been built and maintained, its getting used, so having a broader scope of deployment feedback is invaluable. 
+
 You may be looking for the LMS Runtime API_1484_11.  This project does not currently expose that, but does have a LMS Mimic or Local API_1484_11 used when no LMS is present. More on that below...
 
 ## Goals:
