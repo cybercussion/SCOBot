@@ -16,21 +16,25 @@ You may be looking for the LMS Runtime API_1484_11.  This project does not curre
 * **Test** - Drove the whole project with unit tests against the specification.  Scenarios, make having a complete test impossible.  Which is why there is always room for more testing.
 
 ## About the Project:
-I've kept this project split up into 3 logical portions, leaving room for anyone to add or subtract from the complete package. The main focal point would be 'QUnit-Tests/js/scorm/', as the surrounding files are simply supporting files like JQuery, QUnit, and further README files.  I've also added all the files that go into a Content Aggregation Model.  This is a package used to export your content to a learning management server.
+I've kept this project split up into 4 logical portions, leaving room for anyone to add or subtract from the complete package. The main focal point would be 'QUnit-Tests/js/scorm/', as the surrounding files are simply supporting files like JQuery, QUnit, and further README files.  I've also added all the files that go into a Content Aggregation Model.  This is a package used to export your content to a learning management server.
 The portions of this project is split into the following sections:
 
 ### Now no longer requires JQuery in 4.x.x.  So where's the code?
 
+#### Utilities
 * **QUnit-Tests/js/scorm/SCOBotUtil.js** (Required in a deployment)-
 Utilitiy funcitons replacing lost functionality used by jQuery in 3.x.x and prior.
 Includes an event system for JavaScript.  Wiki covers the audit.  Now removed '$' so if you are using jQuery, you don't have to worry about conflicts.  Minified this was a hit for 3.8KB vs 95KB of jQuery.
 
+#### Base Functionality
 * **QUnit-Tests/js/scorm/SCOBotBase.js** (Required in a deployment)-
 This is now expanded to backwards support SCORM 1.2 with some warnings and limitations.  Will connect to API or API_1484_11 supported by a LMS that hosts SCORM content.  This is the core LMS API lookup, and switchboard used to talk to the Runtime API on the LMS.
 
+#### Full Automation
 * **QUnit-Tests/js/scorm/SCOBot.js** (Optional in a deployment)-
 This is the automatic sequenced out SCORM calls commonly used.  Supports and boils down some of the more complicated parts of the standard by supporting time stamps (UTC/GMT), duration/latency, formatting interaction info, objectives and rolled up scoring if you choose. You must inform SCOBot how many interactions you have in order for it to caclulate score.  Otherwise, you need to write your own score management internal to your SCO.  Also supports timmed instances.
 
+#### Standalone, Local or Offline failover
 * **QUnit-Tests/js/scorm/SCOBot_API_1484_11.js** (Optional in a deployment)-
 This is the LMS mimic capability for local testing (non-LMS).  May save you some round trips testing out SCORM Calls, or may even allow you to support taking your content offline or running in a non-LMS fashion.
 
