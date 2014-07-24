@@ -50,7 +50,7 @@ function SCOBotBase(options) {
     // Constructor ////////////
     "use strict";
     // Please edit run time options or override them when you instantiate this object.
-    var $        = SCOBotUtil,
+    var Utl      = SCOBotUtil,
         defaults = {
             version:           "4.0.0",
             createDate:        "04/05/2011 08:56AM",
@@ -68,7 +68,7 @@ function SCOBotBase(options) {
             cmi:               null
         },
     // Settings merged with defaults and extended options
-        settings = $.extend(defaults, options),
+        settings = Utl.extend(defaults, options),
     // Internal API Error Boolean, Error Code object
         isError = 0,
         error = {
@@ -110,7 +110,7 @@ function SCOBotBase(options) {
             'msg':  msg,
             'lvl':  lvl
         });*/
-        $.triggerEvent(self, debug, {msg: msg, lvl: lvl});
+        Utl.triggerEvent(self, debug, {msg: msg, lvl: lvl});
     }
 
     /**
@@ -533,7 +533,7 @@ function SCOBotBase(options) {
      */
     function triggerException(msg) {
         //$(self).triggerHandler({
-        $.triggerEvent(self, 'exception', {
+        Utl.triggerEvent(self, 'exception', {
             //'type':  'exception',
             'error': msg
         });
@@ -788,7 +788,7 @@ function SCOBotBase(options) {
             // Clean up Error Codes that are non-critical (like date element not initialized)
             // Custom event Trigger getvalue
             //$(self).triggerHandler({
-            $.triggerEvent(self, 'getvalue', {
+            Utl.triggerEvent(self, 'getvalue', {
                 //'type': "getvalue",
                 'n': n,
                 'v': v,
@@ -1043,7 +1043,7 @@ function SCOBotBase(options) {
             d = getDiagnostic(ec);
             // Custom Event Trigger setvalue
             //$(self).triggerHandler({
-            $.triggerEvent(self, 'setvalue', {
+            Utl.triggerEvent(self, 'setvalue', {
                 //'type': "setvalue",
                 'n': n,
                 'v': v,
@@ -1182,7 +1182,7 @@ function SCOBotBase(options) {
                 }
                 if (makeBoolean(s)) {
                     debug(settings.prefix + ": Terminated.", 3);
-                    $.triggerEvent(self, 'terminated', {});
+                    Utl.triggerEvent(self, 'terminated', {});
                     API.isActive = false;
                 } else {
                     ec = getLastErrorCode();
@@ -1364,9 +1364,9 @@ function SCOBotBase(options) {
             API.path = typeof SCOBot_API_1484_11 === 'function' ? new SCOBot_API_1484_11({cmi: settings.cmi}) : null;
             //$(API.path).on('StoreData', function (e) {
             // Add 'StoreData' listener to rebroadcast
-            $.addEvent(API.path, 'StoreData', function (e) {
+            Utl.addEvent(API.path, 'StoreData', function (e) {
                 //$(self).triggerHandler({
-                $.triggerEvent(self, 'StoreData', e);
+                Utl.triggerEvent(self, 'StoreData', e);
             });
             return true;
         }

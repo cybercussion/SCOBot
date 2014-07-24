@@ -33,7 +33,7 @@
 function SCOBot_API_1484_11(options) {
     // Constructor
     "use strict";
-    var $        = SCOBotUtil,
+    var Utl      = SCOBotUtil,
         defaults = {
             version:     "4.0.0",
             createdate:  "07/17/2010 08:15AM",
@@ -96,7 +96,7 @@ function SCOBot_API_1484_11(options) {
             }
         },
     // Settings merged with defaults and extended options */
-        settings = $.extend(defaults, options),
+        settings = Utl.extend(defaults, options),
         cmi = {},
         /**
          * Completion Status's that are allowed
@@ -491,19 +491,19 @@ function SCOBot_API_1484_11(options) {
                         }
                         // Interactions uses objectives and correct_repsponses that need to be constructed.
                         // Legal build of interaction array item
-                        if (!$.isPlainObject(cmi.interactions[tiers[2]])) {
+                        if (!Utl.isPlainObject(cmi.interactions[tiers[2]])) {
                             if (tiers[3] === "id") {
                                 cmi.interactions[tiers[2]] = {};
                                 setData(k.substr(4, k.length), v, cmi);
                                 cmi.interactions._count = (getObjLength(cmi.interactions) - 2).toString(); // Why -2?  _count and _children
-                                if (!$.isPlainObject(cmi.interactions[tiers[2]].objectives)) {
+                                if (!Utl.isPlainObject(cmi.interactions[tiers[2]].objectives)) {
                                     // Setup Objectives for the first time
                                     scorm.debug(settings.prefix + ": Constructing objectives object for new interaction", 4);
                                     cmi.interactions[tiers[2]].objectives = {};
                                     cmi.interactions[tiers[2]].objectives._count = "-1";
                                 }
                                 // Wait, before you go trying set a count on a undefined object, lets make sure it exists...
-                                if (!$.isPlainObject(cmi.interactions[tiers[2]].correct_responses)) {
+                                if (!Utl.isPlainObject(cmi.interactions[tiers[2]].correct_responses)) {
                                     // Setup Objectives for the first time
                                     scorm.debug(settings.prefix + ": Constructing correct responses object for new interaction", 4);
                                     cmi.interactions[tiers[2]].correct_responses = {};
@@ -611,7 +611,7 @@ function SCOBot_API_1484_11(options) {
     this.Commit = function () {
         scorm.debug(settings.prefix + ": Commit called.\nSuspend Data Usage " + suspendDataUsageStatistic(), 4);
         //$(self).triggerHandler({
-        $.triggerEvent(self, 'StoreData', {
+        Utl.triggerEvent(self, 'StoreData', {
             name: 'StoreData',
             runtimedata: cmi
         });

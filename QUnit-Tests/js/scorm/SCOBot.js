@@ -44,7 +44,7 @@ function SCOBot(options) {
     // Constructor ////////////
     "use strict";
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
-    var $        = SCOBotUtil, // Hook for jQuery 'like' functionality
+    var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
             version:              "4.0.0",
             createDate:           "04/07/2011 09:33AM",
@@ -71,7 +71,7 @@ function SCOBot(options) {
             startTime:            0
         },
         // Settings merged with defaults and extended options
-        settings     = $.extend(defaults, options),
+        settings     = Utl.extend(defaults, options),
         lmsconnected = false,
         isError      = false,
         isStarted    = false,
@@ -97,7 +97,7 @@ function SCOBot(options) {
             /*$(self).triggerHandler({
                 'type': "load"
             });*/
-            $.triggerEvent(self, "load");
+            Utl.triggerEvent(self, "load");
         }
         return lmsconnected;
     }
@@ -116,7 +116,7 @@ function SCOBot(options) {
             /*$(self).triggerHandler({
                 'type': "unload"
             });*/
-            $.triggerEvent(self, "unload");
+            Utl.triggerEvent(self, "unload");
             switch (scorm.get('exit_type')) {
             case "finish":
                 self.finish();
@@ -157,7 +157,7 @@ function SCOBot(options) {
             'type':  'exception',
             'error': msg
         });*/
-        $.triggerEvent(self, 'exception', {error: msg});
+        Utl.triggerEvent(self, 'exception', {error: msg});
     }
 
     /**
@@ -309,7 +309,7 @@ function SCOBot(options) {
                 'type': "message",
                 'text': "Time Limit Exceeded"
             });*/
-            $.triggerEvent(self, 'message', {text: "Time Limit Exceeded"});
+            Utl.triggerEvent(self, 'message', {text: "Time Limit Exceeded"});
         }
         scorm.set('exit_type', "timeout");
         if (time_action[0] === "exit") {
@@ -320,7 +320,7 @@ function SCOBot(options) {
             /*$(self).triggerHandler({
                 'type': "continue"
             });*/
-            $.triggerEvent(self, 'continue');
+            Utl.triggerEvent(self, 'continue');
         }
     }
 
@@ -368,7 +368,7 @@ function SCOBot(options) {
              * In SCORM 1.2 Choice is different.  a, b, c or 1, 2, 3
              */
             if (scorm.getAPIVersion() === "1.2") { // not a fan of doing this but I didn't want to add more code.  JSLint will complain.
-                if ($.isArray(value)) {
+                if (Utl.isArray(value)) {
                     if (value.length > 26 && settings.scorm_strict) {
                         scorm.debug(settings.prefix + ": Developer, you're passing a sum of values that exceeds SCORMs limit of 26 for this pattern.  Consider using 'performance' instead.", 2);
                     }
@@ -381,7 +381,7 @@ function SCOBot(options) {
             /* falls through */
         case 'sequencing':
             // 2004 a[,]b and in 1.2 this was a alpha numeric string: Diagnosis SCORM 2004 format is fine.
-            if ($.isArray(value)) {
+            if (Utl.isArray(value)) {
                 index = 0;
                 // Quck validation it doesn't exceed array length 36
                 if (value.length > 36 && settings.scorm_strict) {
@@ -422,7 +422,7 @@ function SCOBot(options) {
              * {case_matters=true}{order_matters=true}{lang=en-us}word1[,]word2
              * In SCORM 1.2 this is expected to be alpha-numeric only.  These special symbols won't work.
              */
-            if ($.isPlainObject(value)) {
+            if (Utl.isPlainObject(value)) {
                 // Check for case_matters
                 if (value.case_matters !== undefined) {
                     str += "{case_matters=" + value.case_matters + "}";
@@ -435,7 +435,7 @@ function SCOBot(options) {
                 if (value.lang !== undefined) {
                     str += "{lang=" + value.lang + "}";
                 }
-                if ($.isArray(value.words)) { // new error check
+                if (Utl.isArray(value.words)) { // new error check
                     str += value.words.join("[,]");
                 } else {
                     scorm.debug(settings.prefix + ": Developer, expected an array of word(s) for fill-in.  I got " + typeof value.words + " instead", 1);
@@ -458,7 +458,7 @@ function SCOBot(options) {
         case 'long-fill-in':
             // Bunch of text...
             // {case_matters=true}{lang=en}Bunch of text...
-            if ($.isPlainObject(value)) {
+            if (Utl.isPlainObject(value)) {
                 // Check for case_matters
                 if (value.case_matters !== undefined) {
                     str += "{case_matters=" + value.case_matters + "}";
@@ -486,12 +486,12 @@ function SCOBot(options) {
         case 'matching':
             // tile1[.]target1[,]tile2[.]target3[,]tile3[.]target2 (SCORM 2004)
             // tile1.target1,tile2.target3,tile3.target2 (SCORM 1.2)
-            if ($.isArray(value)) {
+            if (Utl.isArray(value)) {
                 len = value.length;
                 i = 0;
                 while (i < len) {
                 //for (i = 0; i < len; i += 1) {
-                    if ($.isArray(value[i])) {
+                    if (Utl.isArray(value[i])) {
                         arr.push(scorm.getAPIVersion() === "1.2" ? value[i].join(".") : value[i].join("[.]"));
                     } else {
                         scorm.debug(settings.prefix + ": Developer, you're not passing a array type for matching/performance.  I got " + typeof value + " instead", 1);
@@ -529,19 +529,19 @@ function SCOBot(options) {
         case 'performance':
             // 255 alpha numeric SCORM 1.2 (uncertain if {} [] : characters will work.)
             // SCORM 2004 greatly expanded delimiters see page 136
-            if (!$.isArray(value)) { // This would be a Correct Response Pattern
+            if (!Utl.isArray(value)) { // This would be a Correct Response Pattern
                 // Check for order_matters
                 if (value.order_matters !== undefined) {
                     str += "{order_matters=" + value.order_matters + "}";
                 }
-                if ($.isArray(value.answers)) {
+                if (Utl.isArray(value.answers)) {
                     len = value.answers.length;
                     i = 0;
                     //for (i = 0; i < len; i += 1) {
                     while (i < len) {
-                        if ($.isArray(value.answers[i])) {
+                        if (Utl.isArray(value.answers[i])) {
                             // Need to check if answer is object
-                            if ($.isPlainObject(value.answers[i][1])) {
+                            if (Utl.isPlainObject(value.answers[i][1])) {
                                 arr2 = [trueRound(value.answers[i][1].min, 7), trueRound(value.answers[i][1].max, 7)];
                                 str2 = arr2.join("[:]");
                                 value.answers[i][1] = str2;
@@ -560,12 +560,12 @@ function SCOBot(options) {
                     scorm.debug(value, 1);
                 }
             } else {
-                if ($.isArray(value)) { // This would be a Learner Response Dev: had 'typeof' on it?
+                if (Utl.isArray(value)) { // This would be a Learner Response Dev: had 'typeof' on it?
                     len = value.length;
                     i = 0;
                     //for (i = 0; i < len; i += 1) {
                     while (i < len) {
-                        if ($.isArray(value[i])) {
+                        if (Utl.isArray(value[i])) {
                             arr.push(value[i].join("[.]")); // this isn't working
                         } else {
                             scorm.debug(settings.prefix + ": Developer, you're not passing a array type for performance learner response.  I got " + typeof value[i] + " instead on " + i, 1);
@@ -589,7 +589,7 @@ function SCOBot(options) {
         case 'numeric':
             if (typeof value === "number") {
                 str = value.toString();
-            } else if ($.isPlainObject(value)) {
+            } else if (Utl.isPlainObject(value)) {
                 arr = [trueRound(value.min, 7), trueRound(value.max, 7)];
                 str = arr.join("[:]");
             } else {
@@ -1355,7 +1355,7 @@ function SCOBot(options) {
             //cr_hash = '', // Correct Response limit is 5.  If you pass duplicates I'm going to stop it from happening.
                 len,
                 key;
-            if (!$.isPlainObject(data)) {
+            if (!Utl.isPlainObject(data)) {
                 scorm.debug(settings.prefix + ": Developer, your not passing a {object} argument!!  Got " + typeof data + " instead.", 1);
                 return 'false';
             }
@@ -1371,12 +1371,12 @@ function SCOBot(options) {
             }
             //Time stuff will need to move after ID is added
             //if (typeof (data.timestamp) === "object") {
-            if ($.type(data.timestamp) === "date") {
+            if (Utl.type(data.timestamp) === "date") {
                 timestamp = scorm.getAPIVersion() === "1.2" ? scorm.dateToscorm12Time(data.timestamp) : scorm.isoDateToString(data.timestamp); // HH:MM:SS vs 2012-02-12T00:37:29
             }
             data.timestamp = timestamp; // SCORM API Will convert timestamp to time
             //if (typeof (data.latency) === "object") {
-            if ($.type(data.latency) === "date") {
+            if (Utl.type(data.latency) === "date") {
                 latency = (data.latency.getTime() - orig_timestamp.getTime()) * 0.001;
                 data.latency = scorm.getAPIVersion() === "1.2" ? scorm.centisecsToSCORM12Duration(latency * 100) : scorm.centisecsToISODuration(latency * 100, true);
             } else if (data.learner_response.length > 0 && !isBadValue(data.learner_response)) {
@@ -1447,7 +1447,7 @@ function SCOBot(options) {
             // Correct Responses Pattern will require a loop within data.correct_responses.length, may need to format by interaction type
             //result = scorm.setvalue('cmi.interactions.'+n+'.correct_responses.'+p+'.pattern', data.correct_responses[j].pattern);
             p2 = 'correct_responses._count';
-            if ($.isArray(data.correct_responses)) {
+            if (Utl.isArray(data.correct_responses)) {
                 // !! Important, some only support 1 correct response pattern (likert, other) !!
                 j = 0;
                 len = data.correct_responses.length;
@@ -1639,7 +1639,7 @@ function SCOBot(options) {
                     return 'false';
                 }
             }
-            if ($.isPlainObject(data.score)) {
+            if (Utl.isPlainObject(data.score)) {
                 if (version === "2004") {
                     result = !isBadValue(data.score.scaled) ? sv(p1 + 'score.scaled', trueRound(data.score.scaled, 7).toString()) : scorm.debug(settings.prefix + def1 + p1 + "score.scaled: " + data.score.scaled + def2, 3);
                 }
@@ -1905,9 +1905,9 @@ function SCOBot(options) {
     $(scorm).on('exception', function (e) {
         triggerException(e.error);
     });*/
-    $.addEvent(window, 'loaded', initSCO);
-    $.addEvent(window, 'unload', exitSCO);
-    $.addEvent(scorm, 'exception', function (e) {
+    Utl.addEvent(window, 'loaded', initSCO);
+    Utl.addEvent(window, 'unload', exitSCO);
+    Utl.addEvent(scorm, 'exception', function (e) {
         triggerException(e.error);
     });
 }
