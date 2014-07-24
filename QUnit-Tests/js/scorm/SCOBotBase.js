@@ -1,62 +1,64 @@
-/*global window, alert, console, $, JQuery, debug, scorm, Local_API_1484_11 */
+/*global window, alert, console, SCOBotUtil, debug, scorm, SCOBot_API_1484_11 */
 /*jslint devel: true, browser: true */
 /**
- * SCORM API
- * This is a content API, it self-establishes communication with the LMS in SCORM 2004 or 1.2.
- * Switch statements will convert some SCORM 2004 calls to SCORM 1.2, but you must understand there are limitations
- * on data storage between versions. Example: Suspend Data 64,000 vs 4096 or Bookmark(location) 1000 vs 255.
- * Depending on your use, your content may not squeeze into the SCORM 1.2 available space.  Because of this, log messages
- * will be output so you can monitor your cmi "set" value length.  Ultimately, a LMS may block your request because of this.
- * This API is meant to simplify common SCORM Tasks, but also offers the ability to use it 'long hand'. Several other
- * public API's are available online, some free some charge, and this is a best effort to boil it all down.
- * Documentation, samples, resources, and credits: ADL, Claude Ostyn, Pipwerks, SCORM.com
- * Goals: SCORM For Everyone else, low overhead, simple API's, containment, and transparency.
+ * SCOBot Base
+ * Add this to your content to achieve connection to an LMS supporting SCORM 1.2 or 2004.  This API provides the base
+ * support to manually make requests via the methods and functionality within this API.
+ * Add SCOBot.js to gain the automatic Initialization, Termination/Suspend capability, as well as further friendly API's
+ * to assist you managing more aspects of the SCORM Specification.  Also adds in further error management and reporting.
  *
- * Typical CMI Usage (if used by itself):
- * var scorm = new SCORM_API({debug: true, exit_type: 'suspend'}),
- *     lmsconnected = scorm.initialize();
+ * Documentation, samples, resources, and credits: ADL, IMSGlobal, Claude Ostyn, Pipwerks, SCORM.com, and StackOverflow
+ * Goals: SCORM For Everyone else, low overhead, simple API's, containment, framework independent, and transparency.
+ *
+ * Please see the wiki below for more information about going commando, and or utilizing the rest of the library.
+ * https://github.com/cybercussion/SCOBot
+ *
+ * Recommend a minify/merge before pushing to a production environment. (JSMin, YUI Compressor, Dojo Shrinksafe etc ...)
+ *
+ * jQuery dependency removed, and not utilizes SCOBotUtil.
+ *
+ * @usage
+ * var scorm = new SCOBotBase({
+ *         debug: true,
+ *         time_type: "UTC",           // or GMT
+ *         exit_type: 'suspend',       // or finish
+ *         success_status: 'unknown',  // passed, failed, unknown
+ *         cmi: your_own_runtime_data  // optional way to resume locally or some other custom use case
+ *    }),
+ *    lmsconnected = scorm.initialize(); // recommend a window.load event.
+ * // Sample requests, methods (see wiki for more)
  * scorm.getvalue('cmi.location');
  * scorm.setvalue('cmi.location', '4');
  * scorm.commit();
  * scorm.terminate();
  *
- * HTML Event Setup:
- * If you choose not to use SCOBot tips for onload and onunload, onbeforeunload events you may need to make init, exit methods to do other things
- * vs. directly referencing the SCORM API here.  Feel free to make those methods if you need to.  'window.top' can be used because
- * some deployments self occur within a popup in a IFRAME will not fire properly on exit, in some Mozilla browsers.  Last checked, window worked with
- * JQuery 1.7+ however.  If you have issues trapping the unload event, please try window.top.
- * $(window).bind('load', YOUR_INITIALIZATION_METHOD);
- * $(window).bind('unload', YOUR_EXIT_METHOD);
+ * @event debug, getvalue, setvalue, exception, terminated, StoreData
  *
- * JSLint was recently changed and its throwing a "use spaces, not tabs" error.  I decided to switch to spaces.
- * https://github.com/douglascrockford/JSLint/pull/140
- *
- * https://github.com/cybercussion/SCOBot
- * @author Mark Statkus <mark@cybercussion.com>
+ * @author Cybercussion Interactive, LLC <info@cybercussion.com>
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @requires JQuery
- * @version 3.2.1
+ * @version 4.0.0
  * @param options {Object} override default values
  * @constructor
  */
 /*!
- * SCORM_API, Updated January 3rd, 2014
- * Copyright (c) 2009-2013, Cybercussion Interactive LLC.
+ * SCOBotBase, Updated July 23rd, 2014
+ * Copyright (c) 2009-2014, Cybercussion Interactive LLC.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
-function SCORM_API(options) {
+function SCOBotBase(options) {
     // Constructor ////////////
     "use strict";
     // Please edit run time options or override them when you instantiate this object.
-    var defaults = {
-            version:           "3.2.1",
+    var $        = SCOBotUtil,
+        defaults = {
+            version:           "4.0.0",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "06/19/2014 06:19PM",
+            modifiedDate:      "07/23/2014 10:40AM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
-            prefix:            "SCORM_API",
+            prefix:            "SCOBotBase",
             exit_type:         "suspend", // suspend, finish, or "" (undetermined)
             success_status:    "unknown", // passed, failed, unknown
             use_standalone:    true,
@@ -79,8 +81,8 @@ function SCORM_API(options) {
             connection: false,
             version:    "none", // 2004, 1.2 or none
             mode:       "",
-            path:       false, // Set Path to LMS API or maybe something local later by default?
-            data:       {// Defaults, I'm moving a few of the SCORM defaults into this data object, they will be maintained here thereafter.
+            path:       false,  // Set Path to LMS API or maybe something local later by default?
+            data:       {       // Defaults, I'm moving a few of the SCORM defaults into this data object, they will be maintained here thereafter.
                 completion_status: settings.completion_status,
                 success_status:    settings.success_status,
                 exit_type:         settings.exit_type
@@ -103,11 +105,12 @@ function SCORM_API(options) {
      */
     function noconsole(msg, lvl) {
         // ignore (IE 8 and prior or other browser that doesn't support it).  Routing event out so it can be handled.
-        $(self).triggerHandler({
+        /*$(self).triggerHandler({
             'type': "debug",
             'msg':  msg,
             'lvl':  lvl
-        });
+        });*/
+        $.triggerEvent(self, debug, {msg: msg, lvl: lvl});
     }
 
     /**
@@ -529,8 +532,9 @@ function SCORM_API(options) {
      * Trigger Exception
      */
     function triggerException(msg) {
-        $(self).triggerHandler({
-            'type':  'exception',
+        //$(self).triggerHandler({
+        $.triggerEvent(self, 'exception', {
+            //'type':  'exception',
             'error': msg
         });
     }
@@ -783,8 +787,9 @@ function SCORM_API(options) {
             d  = getDiagnostic(ec);
             // Clean up Error Codes that are non-critical (like date element not initialized)
             // Custom event Trigger getvalue
-            $(self).triggerHandler({
-                'type': "getvalue",
+            //$(self).triggerHandler({
+            $.triggerEvent(self, 'getvalue', {
+                //'type': "getvalue",
                 'n': n,
                 'v': v,
                 'error': {
@@ -1037,8 +1042,9 @@ function SCORM_API(options) {
             m = getLastErrorMessage(ec);
             d = getDiagnostic(ec);
             // Custom Event Trigger setvalue
-            $(self).triggerHandler({
-                'type': "setvalue",
+            //$(self).triggerHandler({
+            $.triggerEvent(self, 'setvalue', {
+                //'type': "setvalue",
                 'n': n,
                 'v': v,
                 'error': {
@@ -1162,7 +1168,7 @@ function SCORM_API(options) {
             if (lms) {
                 // if not completed or passed, suspend the content.
                 debug(settings.prefix + ": completion_status = " + API.data.completion_status + "|| success_status = " + API.data.success_status, 3);
-                self.commit(); // Store Data before Terminating
+                self.commit(); // Store Data before Terminating (can't trust if LMS wil ldo this)
                 switch (API.version) {
                 case "1.2":
                     s = lms.LMSFinish(""); //makeBoolean(lms.LMSFinish(""));
@@ -1176,6 +1182,7 @@ function SCORM_API(options) {
                 }
                 if (makeBoolean(s)) {
                     debug(settings.prefix + ": Terminated.", 3);
+                    $.triggerEvent(self, 'terminated', {});
                     API.isActive = false;
                 } else {
                     ec = getLastErrorCode();
@@ -1354,12 +1361,12 @@ function SCORM_API(options) {
             settings.standalone = true;
             API.version = "2004";
             // May or may not be provided (standalone) if not, this is null (DOA)
-            API.path = typeof Local_API_1484_11 === 'function' ? new Local_API_1484_11({cmi: settings.cmi}) : null;
-            $(API.path).on('StoreData', function (e) {
-                $(self).triggerHandler({
-                    type:        'StoreData',
-                    runtimedata: e.runtimedata
-                });
+            API.path = typeof SCOBot_API_1484_11 === 'function' ? new SCOBot_API_1484_11({cmi: settings.cmi}) : null;
+            //$(API.path).on('StoreData', function (e) {
+            // Add 'StoreData' listener to rebroadcast
+            $.addEvent(API.path, 'StoreData', function (e) {
+                //$(self).triggerHandler({
+                $.triggerEvent(self, 'StoreData', e);
             });
             return true;
         }

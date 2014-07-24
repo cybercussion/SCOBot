@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>QUnit for SCOBot (dev-full)</title>
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/qunit/1.14.0/qunit.min.css" type="text/css"/>
+        <!--[if lt IE 8]>
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>
+        <![endif]-->
+        <script type="text/javascript">
+            // Please edit this stuff to match your test scenario
+            var learner_name = "Simulated User",  // Local LMS username
+                learner_id   = "100";             // Local LMS student id
+        </script>
+        <!-- JQuery and Plugins -->
+        <!--script type="text/javascript" src="js/jquery/jquery-1.10.2.js"> </script>
+        <script>
+            jQuery.noConflict();
+        </script-->
+        <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/qunit/1.14.0/qunit.min.js"></script>
+
+        <!-- SCOBot SCORM 2004 / 1.2 -->
+        <script type="text/javascript" src="js/scorm/SCOBotUtil.js"></script>
+        <script type="text/javascript" src="js/scorm/SCOBot_API_1484_11.js"></script>
+        <script type="text/javascript" src="js/scorm/SCOBotBase.js"></script>
+        <script type="text/javascript" src="js/scorm/SCOBot.js"></script>
+
+        <!-- Unit Tests -->
+        <script type="text/javascript" src="js/test/scobot.js"></script>
+    </head>
+    <body>
+        <h1 id="qunit-header">QUnit for SCOBot (dev-full)</h1>
+        <h2 id="qunit-banner"></h2>
+        <h2 id="qunit-userAgent"></h2>
+        <ol id="qunit-tests">
+        </ol>
+    </body>
+</html>

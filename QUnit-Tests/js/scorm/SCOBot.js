@@ -1,42 +1,54 @@
-/*global $, JQuery, scorm, window */
+/*global $, SCOBotUtil, scorm, window */
 /*jslint devel: true, browser: true, regexp: true */
 /**
- * This is a sample SCORM Startup sequence and handicap API's for ease of use.
- * General Concept: When the LMS connects, call var SB = new SCOBot();
  * SCOBot
- * This only works with the SCORM_API, but has the basis to work with other API's.
- * Several public API's will call one to many SCORM Calls and this will make every attempt to
- * do common SCORM Tasks or boil down SCORM tasks into a smaller easy to use method.
- * Mode: {get} Browse, Review, Normal
- * Bookmark: {get/set} SCO Progress
- * Suspend Data: {get/set} Suspend Data Object
- * Interactions: {set} Interaction(s)
- * Objectives: {set} Objective(s)
+ * This only works with the SCOBotBase and will not work standalone.  It will not work standalone (without a LMS)
+ * unless you include the SCOBot_API_1484_11.
+ * The 'Bot' in SCOBot is in this API.  This manages the time duration, stamps, interaction and objective formats, as
+ * well as sequences/manages many aspects you'd have to construct by hand anyway if you were about to start talking
+ * directly to the SCORM Runtime at the LMS.
  *
- * JSLint recently complained about  tabs.  Switched to spaces.
- *
+ * Please see the wiki below for more information about going commando, and or utilizing the rest of the library.
  * https://github.com/cybercussion/SCOBot
- * @author Mark Statkus <mark@cybercussion.com>
+ *
+ * jQuery dependency removed, and not utilizes SCOBotUtil.
+ *
+ * Recommend a minify/merge before pushing to a production environment. (JSMin, YUI Compressor, Dojo Shrinksafe etc ...)
+ *
+ * @usage
+ * var SB = new SCOBot({
+ *         interaction_mode: "state",         // or journaled
+ *         scaled_passing_score: '0.6',       // default passing score (60%) 0.1 - 1
+ *         completion_threshold: '1',         // 0.1 - 1
+ *         initiate_timer: false,             // max_time_allowed? let SCOBot manage it- true
+ *         scorm_strict: true                 // SPM Management and truncation of data to keep things working
+ *    });
+ * SCOBot comes pre-baked with load/unload listeners among others...
+ *
+ * @event exception, load, unload, message, continue, comments_lms
+ *
+ * @author Cybercussion Interactive, LLC <info@cybercussion.com>
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @requires scorm, JQuery
- * @version 3.2.1
+ * @requires SCOBotBase, SCOBotUtil
+ * @version 4.0.0
  * @param options {Object} override default values
  * @constructor
  */
 /*!
- * SCOBot, Updated January 3rd, 2014
- * Copyright (c) 2009-2013, Cybercussion Interactive LLC. All rights reserved.
+ * SCOBot, Updated July 23rd, 2014
+ * Copyright (c) 2009-2014, Cybercussion Interactive LLC. All rights reserved.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 function SCOBot(options) {
     // Constructor ////////////
     "use strict";
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
-    var defaults = {
-            version:              "3.2.1",
+    var $        = SCOBotUtil, // Hook for jQuery 'like' functionality
+        defaults = {
+            version:              "4.0.0",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "06/19/2014 06:19PM",
+            modifiedDate:         "07/23/2014 10:51PM",
             prefix:               "SCOBot",
             // SCORM buffers and settings
             launch_data:          {},
@@ -58,14 +70,14 @@ function SCOBot(options) {
             totalObjectives:      0,
             startTime:            0
         },
-    // Settings merged with defaults and extended options
-        settings = $.extend(defaults, options),
+        // Settings merged with defaults and extended options
+        settings     = $.extend(defaults, options),
         lmsconnected = false,
-        isError = false,
-        isStarted = false,
-        badValues = '|null|undefined|false|NaN|| |',
-        error = scorm.get('error'), // no sense retyping this
-        self = this; // Hook
+        isError      = false,
+        isStarted    = false,
+        badValues    = '|null|undefined|false|NaN|| |',
+        error        = scorm.get('error'), // no sense retyping this
+        self         = this; // Hook
     // End Constructor ////////
     ///////////////////////////
     // Private ////////////////
@@ -82,9 +94,10 @@ function SCOBot(options) {
         if (lmsconnected) {
             self.start(); // Things you'd do like getting mode, suspend data
             // Custom Event Trigger load
-            $(self).triggerHandler({
+            /*$(self).triggerHandler({
                 'type': "load"
-            });
+            });*/
+            $.triggerEvent(self, "load");
         }
         return lmsconnected;
     }
@@ -100,9 +113,10 @@ function SCOBot(options) {
         scorm.debug("SCO is being asked, *cough* forced to exit ...", 3);
         if (isStarted) {
             // Custom Event Trigger load
-            $(self).triggerHandler({
+            /*$(self).triggerHandler({
                 'type': "unload"
-            });
+            });*/
+            $.triggerEvent(self, "unload");
             switch (scorm.get('exit_type')) {
             case "finish":
                 self.finish();
@@ -139,10 +153,11 @@ function SCOBot(options) {
      * This would be common to a non-compliance in an LMS and loss of student data.
      */
     function triggerException(msg) {
-        $(self).triggerHandler({
+        /*$(self).triggerHandler({
             'type':  'exception',
             'error': msg
-        });
+        });*/
+        $.triggerEvent(self, 'exception', {error: msg});
     }
 
     /**
@@ -290,10 +305,11 @@ function SCOBot(options) {
         var time_action = scorm.getvalue('cmi.time_limit_action').split(','),
             message = !!((time_action[1] === "message"));
         if (message) {
-            $(self).triggerHandler({
+            /*$(self).triggerHandler({
                 'type': "message",
                 'text': "Time Limit Exceeded"
-            });
+            });*/
+            $.triggerEvent(self, 'message', {text: "Time Limit Exceeded"});
         }
         scorm.set('exit_type', "timeout");
         if (time_action[0] === "exit") {
@@ -301,9 +317,10 @@ function SCOBot(options) {
             // switch default exit type to time-out
             exitSCO();
         } else {
-            $(self).triggerHandler({
+            /*$(self).triggerHandler({
                 'type': "continue"
-            });
+            });*/
+            $.triggerEvent(self, 'continue');
         }
     }
 
@@ -543,7 +560,7 @@ function SCOBot(options) {
                     scorm.debug(value, 1);
                 }
             } else {
-                if (typeof ($.isArray(value))) { // This would be a Learner Response
+                if ($.isArray(value)) { // This would be a Learner Response Dev: had 'typeof' on it?
                     len = value.length;
                     i = 0;
                     //for (i = 0; i < len; i += 1) {
@@ -1064,10 +1081,11 @@ function SCOBot(options) {
             settings.comments_from_lms = getCommentsFromLMS();
             if (settings.comments_from_lms !== 'false') {
                 // Custom Event Trigger load
-                $(self).triggerHandler({
+                /*$(self).triggerHandler({
                     'type': "comments_lms",
                     'data': settings.comments_from_lms
-                });
+                });*/
+                $.triggerEvent(self, 'comments_lms', {data: settings.comments_from_lms});
             }
             // Check if there is a max_time_allowed
             settings.max_time_allowed = scorm.getvalue('cmi.max_time_allowed');
@@ -1878,12 +1896,18 @@ function SCOBot(options) {
      * At the time, I used window.top to get around this.  Later I started seeing with JQuery
      * different behavior once I incorporated it.  So at this point I'm using window not window.top.
      */
+    /*
     $(window).bind('load', initSCO);
     //$(window).bind('beforeunload', exitSCO); // You want to confirm exit?
     $(window).bind('unload', exitSCO);
     //$(window.top).bind('unload', exitSCO); // for those ugly situations
     // Listen for SCORM API Exception
     $(scorm).on('exception', function (e) {
+        triggerException(e.error);
+    });*/
+    $.addEvent(window, 'loaded', initSCO);
+    $.addEvent(window, 'unload', exitSCO);
+    $.addEvent(scorm, 'exception', function (e) {
         triggerException(e.error);
     });
 }
