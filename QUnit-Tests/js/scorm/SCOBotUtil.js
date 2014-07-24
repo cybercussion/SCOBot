@@ -315,6 +315,8 @@ var SCOBotUtil = function () {
                         if (document.documentElement.doScroll && window === window.top) {
                             checkLoaded(handler);
                         }
+                    //} else if (event === "unload") {
+                        // We want to ensure we catch IE unload events (still testing)
                     } else {
                         target.attachEvent('on' + event, handler);
                     }
