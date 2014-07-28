@@ -40,7 +40,7 @@ This is the automatic sequenced out SCORM calls commonly used.  Supports and boi
 * **QUnit-Tests/js/scorm/SCOBot_API_1484_11.js** (Optional in a deployment)-
 This is the LMS mimic capability for local testing (non-LMS).  May save you some round trips testing out SCORM Calls, or may even allow you to support taking your content offline or running in a non-LMS fashion.
 
-* Also have now added a minified, or packed version of all 3 of these files in a 29KB easy to use single file for those not doing there own builds.  See the **scorm.bot.pack.js** which is only the 3 above files merged, minified and packed.
+* Also have now added a minified, or packed version of all 3 of these files in a 39KB easy to use single file for those not doing there own builds.  See the **scorm.bot.pack.js** which is only the 4 above files merged, minified and packed.
 
 ## QUnit Launchables:
 If your testing a LMS, feel free to edit the imsmanifest.xml to fit your needs.  Change the tests to match your launch parameters or launch data.  These tests are not meant to remain static.  Make it fit your needs.
