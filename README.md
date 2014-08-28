@@ -70,11 +70,11 @@ I also recommend trying out a bookmarklet I made to check the status of a conten
 [SCOverseer](http://www.cybercussion.com/bookmarklets/SCORM/) - see the Bookmarklet button on that page (drag it to your bookmarks bar).  Directions on page.
 
 ## Tips on Best Practices:
-I highly recommend anyone who's working with JavaScript consider the use of merging and minifying or doing further and packing their files.  This is why there is not just a single file, and why I'm not setting this up as a 'release'.  It's left broken up so you can choose what you want and don't want.  There are several ways to accomplish this if your not familiar with it.
+I highly recommend anyone who's working with JavaScript consider the use of merging and minifying or doing further and packing their files.  It's alternatively left broken up so you can choose what you want and don't want, and choose to extend/modify it to fit your needs.  There are several ways to accomplish this if your not familiar with it.
 Merge would be the act of concatenating all your JavaScript files in the order that they are in within your HTML page.
 Minify will remove useless tabbing, white space
-Packing would be the process of shrinking variables, remove line returns and base64ing or obfuscating the code.
-You'll see a 50+% reduction in size, and with gzipping can see 70-80% reduction from the source code.  This is a reduction of HTTP hits and bandwidth.
+Packing would be the process of shrinking variables, remove line returns and base64'ing or obfuscating the code.
+You'll see a 50+% reduction in size, and with gzipping can see 70-80% reduction from the source code.  This is a reduction of HTTP hits and bandwidth.  You may not always be able to rely on gzipping on a LMS deployment.
 Please use JSLint to verify other code in your project will not break as a result of this.  Most common error is missing semi-colons.  Once line returns are removed, this will result in a JavaScript error.
 
 
