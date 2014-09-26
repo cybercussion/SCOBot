@@ -1,18 +1,18 @@
 [![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
 
 ##SCOBot Content support:
-Shareable Content Objects (SCOs) are these little portable webpages that can interact with a Learning Management System (LMS).  SCORM is self, is a specification from ADL (Advanced Distributed Learning), though it based much of its work on IMSGlobal, IEEE, AICC and others.
+Shareable Content Objects (SCOs) are these little portable web pages that can interact with a Learning Management System (LMS).  SCORM is self, is a specification from ADL (Advanced Distributed Learning), though it based much of its work on IMSGlobal, IEEE, AICC and others.
 SCOBot gives you the developer, the ability to drop in some JavaScript, and have the capability to communicate with the LMS.  The communication portion of the SCORM standard allows you to call specific Application Programming Interfaces (APIs) that expect everything in a specific format.  SCOBot actually handles much of the pain and suffering trying to figure this all out.
 I've added Wiki documentation now, so you can read more about the API support in detail.
 Here: https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
 
 Feel free to email or post any issues you run into.  At the same time this has been built and maintained, its getting used, so having a broader scope of deployment feedback is invaluable. 
 
-You may be looking for the LMS Runtime API_1484_11.  This project does not currently expose that, but does have a LMS Mimic or Local API_1484_11 used when no LMS is present. More on that below...
+You may be looking for the LMS Runtime API_1484_11, and this Project does not offer or include that.
 
 ## Goals:
 * **Save** you time trying to support the SCORM Standard.  Yes, its Initialize, Get Value, Set Value, Commit, and Terminate on the surface, but it goes way beyond that.
-* **Educate** - I'm learning, you're learning, we are all learning
+* **Educate** - Examples, concepts, options
 * **Modernize** - No one likes 500 global variable constants coupled with endless other issues associated with un-managed code.
 * **Transparency** - Know why something isn't working, and have logging to back it up.
 * **Test** - Drove the whole project with unit tests against the specification.  Scenarios, make having a complete test impossible.  Which is why there is always room for more testing.
@@ -63,20 +63,8 @@ Diagram (from Brandon Bradley) - http://www.xmind.net/share/brandonbradley/xmind
 HTML, Flash, Unity... you name it.  Presenting your training may require you to construct your own player.  This can mean loading, templatizing, blending views and data.  Building out interactions, layouts etc ... You could be doing this by hand or using a CMS.  
 Packaging and or Zipping - You may find once you have SCOBot, plus your presentation you need to now bundle it.  The files in this project were meant to assist you here getting a full scope of what needs to be done to make that successful.  See the Wiki for more info on zipping/packaging options.
 
-
-Old Example: In action at http://hivelms.com/test.html *see QUnit SCO.
-
 I also recommend trying out a bookmarklet I made to check the status of a content object running on your LMS.
 [SCOverseer](http://www.cybercussion.com/bookmarklets/SCORM/) - see the Bookmarklet button on that page (drag it to your bookmarks bar).  Directions on page.
-
-## Tips on Best Practices:
-I highly recommend anyone who's working with JavaScript consider the use of merging and minifying or doing further and packing their files.  It's alternatively left broken up so you can choose what you want and don't want, and choose to extend/modify it to fit your needs.  There are several ways to accomplish this if your not familiar with it.
-Merge would be the act of concatenating all your JavaScript files in the order that they are in within your HTML page.
-Minify will remove useless tabbing, white space
-Packing would be the process of shrinking variables, remove line returns and base64'ing or obfuscating the code.
-You'll see a 50+% reduction in size, and with gzipping can see 70-80% reduction from the source code.  This is a reduction of HTTP hits and bandwidth.  You may not always be able to rely on gzipping on a LMS deployment.
-Please use JSLint to verify other code in your project will not break as a result of this.  Most common error is missing semi-colons.  Once line returns are removed, this will result in a JavaScript error.
-
 
 Thanks for taking the time to take a look, and thanks to everyone that's assisted with feedback.
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/3b68b70a86b15441e520b43adf85113a "githalytics.com")](http://githalytics.com/cybercussion/SCOBot)
