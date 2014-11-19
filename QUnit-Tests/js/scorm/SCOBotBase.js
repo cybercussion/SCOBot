@@ -54,7 +54,7 @@ function SCOBotBase(options) {
         defaults = {
             version:           "4.0.0",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "10/01/2014 08:29AM",
+            modifiedDate:      "11/19/2014 09:57AM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
