@@ -1138,7 +1138,7 @@ function SCOBotBase(options) {
                     break;
                 }
                 ec = getLastErrorCode();
-                console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>' + s + '>>>>>>>>>>>>>>>>>>>>>>>>');
+                debug('>>>>>>>>>>>>>>>>>>>>>>>>>>' + s + '>>>>>>>>>>>>>>>>>>>>>>>>', 4);
                 // Check for any errors previously
                 if (s && ec === 0) {
                     API.isActive = true;
