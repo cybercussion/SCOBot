@@ -971,7 +971,7 @@ function SCOBot(options) {
             scorm.setvalue('cmi.success_status', 'passed');
         }
         if (scorm.get("completion_status") === 'completed') {
-            scorm.setvalue('cmi.completion_status', 'complete');
+            scorm.setvalue('cmi.completion_status', 'completed');
         }
     }
 
