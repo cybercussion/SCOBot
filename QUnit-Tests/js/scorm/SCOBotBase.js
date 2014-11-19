@@ -52,7 +52,7 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.0.0",
+            version:           "4.0.2",
             createDate:        "04/05/2011 08:56AM",
             modifiedDate:      "11/19/2014 09:57AM",
             debug:             false,
