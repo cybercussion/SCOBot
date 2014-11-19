@@ -907,6 +907,8 @@ function SCOBot(options) {
             if (completionStatus === "not attempted" || completionStatus === "unknown") {
                 settings.completion_status = (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) ? 'completed' : 'incomplete';
                 scorm.setvalue('cmi.completion_status', settings.completion_status);
+            } else {
+                settings.completion_status = completionStatus;
             }
             // Set Success Status
             scorm.debug(settings.prefix + ": Pass/Fail check - Calculated scaled score:" + parseFloat(scoreScaled) + " vs. " + parseFloat(settings.scaled_passing_score), 3);
@@ -968,13 +970,8 @@ function SCOBot(options) {
         if (scorm.get("success_status") === 'passed') {
             scorm.setvalue('cmi.success_status', 'passed');
         }
-        // Ensure if its not completed its incomplete
-        if (scorm.getvalue('cmi.completion_status') !== "completed") {
-            scorm.setvalue('cmi.completion_status', 'incomplete'); //? May not want to do this (fail safe)
-        }
-        // Default to completed if its the default status
-        if (scorm.get("completion_status") === "completed") {
-            scorm.setvalue('cmi.completion_status', 'completed'); //? May not want to do this
+        if (scorm.get("completion_status") === 'completed') {
+            scorm.setvalue('cmi.completion_status', 'complete');
         }
     }
 
@@ -1749,10 +1746,11 @@ function SCOBot(options) {
      */
     this.gradeIt = function () {
         var scoreScaled = 1,
-            scoreRaw = scorm.getvalue('cmi.score.raw'),
-            scoreMin = scorm.getvalue('cmi.score.min'),
-            scoreMax = scorm.getvalue('cmi.score.max'),
-            progressMeasure = scorm.getvalue('cmi.progress_measure');
+            scoreRaw         = scorm.getvalue('cmi.score.raw'),
+            scoreMin         = scorm.getvalue('cmi.score.min'),
+            scoreMax         = scorm.getvalue('cmi.score.max'),
+            progressMeasure  = scorm.getvalue('cmi.progress_measure'),
+            completionStatus = scorm.getvalue('cmi.completion_status');
         // Set Score Scaled
         if ((scoreMax - scoreMin) === 0) {
             // Division By Zero
@@ -1764,8 +1762,12 @@ function SCOBot(options) {
             scorm.setvalue('cmi.score.scaled', trueRound(scoreScaled, 7));
         }
         // Set Completion Status
-        settings.completion_status = (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) ? 'completed' : 'incomplete';
-        scorm.setvalue('cmi.completion_status', settings.completion_status);
+        if (completionStatus === "unknown" || completionStatus === "not attempted") {
+            settings.completion_status = (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) ? 'completed' : 'incomplete';
+            scorm.setvalue('cmi.completion_status', settings.completion_status);
+        } else {
+            settings.completion_status = completionStatus;
+        }
         // Set Success Status
         settings.success_status = (parseFloat(scoreScaled) >= parseFloat(settings.scaled_passing_score)) ? 'passed' : 'failed';
         scorm.setvalue('cmi.success_status', settings.success_status);
