@@ -853,6 +853,7 @@ function SCOBot(options) {
                 //scoreMin = 0,
                 scoreScaled = 1,
                 progressMeasure,
+                completionStatus = scorm.getvalue('cmi.completion_status'),
                 totalObjectivesCompleted = 0,
             //totalKnownObjectives     = parseInt(scorm.getvalue('cmi.objectives._count'), 10),
             //totalKnownInteractions   = parseInt(scorm.getvalue('cmi.interactions._count'), 10),
@@ -902,9 +903,11 @@ function SCOBot(options) {
             // Set Progress Measure
             progressMeasure = (totalObjectivesCompleted / settings.totalObjectives).toString();
             scorm.setvalue('cmi.progress_measure', trueRound(progressMeasure, 7));
-            // Set Completion Status
-            settings.completion_status = (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) ? 'completed' : 'incomplete';
-            scorm.setvalue('cmi.completion_status', settings.completion_status);
+            // Set Completion Status - only if its needed
+            if (completionStatus === "not attempted" || completionStatus === "unknown") {
+                settings.completion_status = (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) ? 'completed' : 'incomplete';
+                scorm.setvalue('cmi.completion_status', settings.completion_status);
+            }
             // Set Success Status
             scorm.debug(settings.prefix + ": Pass/Fail check - Calculated scaled score:" + parseFloat(scoreScaled) + " vs. " + parseFloat(settings.scaled_passing_score), 3);
             settings.success_status = (parseFloat(scoreScaled) >= parseFloat(settings.scaled_passing_score)) ? 'passed' : 'failed';
