@@ -46,9 +46,9 @@ function SCOBot(options) {
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
-            version:              "4.0.0",
+            version:              "4.0.2",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "07/23/2014 10:51PM",
+            modifiedDate:         "11/19/2014 10:03PM",
             prefix:               "SCOBot",
             // SCORM buffers and settings
             launch_data:          {},
@@ -1085,7 +1085,7 @@ function SCOBot(options) {
                     'type': "comments_lms",
                     'data': settings.comments_from_lms
                 });*/
-                $.triggerEvent(self, 'comments_lms', {data: settings.comments_from_lms});
+                Utl.triggerEvent(self, 'comments_lms', {data: settings.comments_from_lms});
             }
             // Check if there is a max_time_allowed
             settings.max_time_allowed = scorm.getvalue('cmi.max_time_allowed');
@@ -1896,15 +1896,6 @@ function SCOBot(options) {
      * At the time, I used window.top to get around this.  Later I started seeing with JQuery
      * different behavior once I incorporated it.  So at this point I'm using window not window.top.
      */
-    /*
-    $(window).bind('load', initSCO);
-    //$(window).bind('beforeunload', exitSCO); // You want to confirm exit?
-    $(window).bind('unload', exitSCO);
-    //$(window.top).bind('unload', exitSCO); // for those ugly situations
-    // Listen for SCORM API Exception
-    $(scorm).on('exception', function (e) {
-        triggerException(e.error);
-    });*/
     Utl.addEvent(window, 'loaded', initSCO);
     Utl.addEvent(window, 'unload', exitSCO);
     Utl.addEvent(scorm, 'exception', function (e) {
