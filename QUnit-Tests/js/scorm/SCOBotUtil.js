@@ -48,37 +48,43 @@
 var SCOBotUtil = function () {
     // Constructor ///////////////
     "use strict";
-    var isReady     = false,
-        types       = ["Boolean", "Number", "String", "Function", "Array", "Date", "RegExp", "Object"],
-        class_types = [],
-        toString    = Object.prototype.toString,
-        hasOwn      = Object.prototype.hasOwnProperty,
+    var version      = "1.0.1",
+        createDate   = "07/23/2013 03:23PM",
+        modifiedDate = "10/01/2014 08:29AM",
+        isReady      = false,
+        types        = ["Boolean", "Number", "String", "Function", "Array", "Date", "RegExp", "Object"],
+        class_types  = [],
+        toString     = Object.prototype.toString,
+        hasOwn       = Object.prototype.hasOwnProperty,
+        h            = 'HTMLEvents',
+        k            = 'KeyboardEvent',
+        m            = 'MouseEvents',
         eventTypes = {
-            load:        'HTMLEvents',
-            unload:      'HTMLEvents',
-            abort:       'HTMLEvents',
-            error:       'HTMLEvents',
-            select:      'HTMLEvents',
-            change:      'HTMLEvents',
-            submit:      'HTMLEvents',
-            reset:       'HTMLEvents',
-            focus:       'HTMLEvents',
-            blur:        'HTMLEvents',
-            resize:      'HTMLEvents',
-            scroll:      'HTMLEvents',
-            input:       'HTMLEvents',
+            load:        h,
+            unload:      h,
+            abort:       h,
+            error:       h,
+            select:      h,
+            change:      h,
+            submit:      h,
+            reset:       h,
+            focus:       h,
+            blur:        h,
+            resize:      h,
+            scroll:      h,
+            input:       h,
 
-            keyup:       'KeyboardEvent',
-            keydown:     'KeyboardEvent',
+            keyup:       k,
+            keydown:     k,
 
-            click:       'MouseEvents',
-            dblclick:    'MouseEvents',
-            mousedown:   'MouseEvents',
-            mouseup:     'MouseEvents',
-            mouseover:   'MouseEvents',
-            mousemove:   'MouseEvents',
-            mouseout:    'MouseEvents',
-            contextmenu: 'MouseEvents'
+            click:       m,
+            dblclick:    m,
+            mousedown:   m,
+            mouseup:     m,
+            mouseover:   m,
+            mousemove:   m,
+            mouseout:    m,
+            contextmenu: m
         },
         defaults = {
             clientX:    0,
@@ -101,7 +107,7 @@ var SCOBotUtil = function () {
             HTMLEvents: function (el, name, event, o) {
                 return event.initEvent(name, o.bubbles, o.cancelable);
             },
-            // Don't need these for SCOBot.
+            // Don't need these for SCOBot, but you may need them for your project.
             /*KeyboardEvent: function (el, name, event, o) {
                 // Use a blank key if not defined and initialize the charCode
                 var key = ('key' in o) ? o.key : "",
@@ -292,40 +298,66 @@ var SCOBotUtil = function () {
          * @param handler
          */
         addEvent = function (target, event, handler) {
-            if (target === window || isElement(target)) {
-                // DOM Object
-                if (target.addEventListener) {
-                    // Standard
-                    if (event === "loaded") {
-                        event = "DOMContentLoaded";
-                    }
-                    target.addEventListener(event, handler, false);
-                } else {
-                    // IE 6/7/8
-                    if (event === "loaded") {
-                        event = "onreadystatechange";
-                        document.attachEvent(event, function () {
-                            if (document.readyState === "complete") {
-                                document.detachEvent("onreadystatechange", target);
-                                isReady = true;
-                                handler();
-                            }
-                        });
-                        // If IE and not an iframe
-                        if (document.documentElement.doScroll && window === window.top) {
-                            checkLoaded(handler);
-                        }
-                    //} else if (event === "unload") {
-                        // We want to ensure we catch IE unload events (still testing)
-                    } else {
-                        target.attachEvent('on' + event, handler);
-                    }
+            if (event.indexOf(' ') >= 0) {
+                // Multi-event - if you are listening to 'setvalue getvalue'
+                var events = event.split(' '),
+                    len    = events.length;
+                while (len--) {
+                    // Add events.
+                    addEvent(target, events[len], handler);
                 }
             } else {
-                // JavaScript Object
-                extend(target, Events); // add capability
-                target.on(event, handler); // add listener
+                if (target === window || isElement(target)) {
+                    // DOM Object
+                    if (target.addEventListener) {
+                        // Standard
+                        if (event === "loaded") {
+                            event = "DOMContentLoaded";
+                        }
+                        target.addEventListener(event, handler, false);
+                    } else {
+                        // IE 6/7/8
+                        if (event === "loaded") {
+                            event = "onreadystatechange";
+                            document.attachEvent(event, function () {
+                                if (document.readyState === "complete") {
+                                    document.detachEvent("onreadystatechange", target);
+                                    isReady = true;
+                                    handler();
+                                }
+                            });
+                            // If IE and not an iframe
+                            if (document.documentElement.doScroll && window === window.top) {
+                                checkLoaded(handler);
+                            }
+                        //} else if (event === "unload") {
+                            // We want to ensure we catch IE unload events (still testing)
+                        } else {
+                            target.attachEvent('on' + event, handler);
+                        }
+                    }
+                } else {
+                    // JavaScript Object
+                    extend(target, Events); // add capability
+                    target.on(event, handler); // add listener
+                }
             }
+        },
+        /**
+         * Calculate Average
+         * @param num_arr
+         * @returns {string}
+         */
+        calcAverage = function (num_arr) {
+            var sum = 0,
+                i = 0,
+                len = num_arr.length;
+            while (i < len) {
+                sum += num_arr[i].lat;
+                i += 1;
+            }
+            sum = sum / len;
+            return sum.toFixed(2);
         },
         /**
          * Trigger Event
@@ -502,6 +534,7 @@ var SCOBotUtil = function () {
         isArray: isArray,
         isFunction: isFunction,
         addEvent: addEvent,
+        calcAverage: calcAverage,
         triggerEvent: triggerEvent,
         Events: Events
     };

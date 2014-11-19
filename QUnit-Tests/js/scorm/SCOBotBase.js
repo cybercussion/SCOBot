@@ -54,7 +54,7 @@ function SCOBotBase(options) {
         defaults = {
             version:           "4.0.0",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "07/23/2014 10:40AM",
+            modifiedDate:      "10/01/2014 08:29AM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -65,7 +65,8 @@ function SCOBotBase(options) {
             standalone:        false,
             completion_status: "unknown", // completed, incomplete, unknown
             time_type:         "GMT",
-            cmi:               null
+            cmi:               null,
+            latency_arr: []
         },
     // Settings merged with defaults and extended options
         settings = Utl.extend(defaults, options),
@@ -621,14 +622,16 @@ function SCOBotBase(options) {
      * @event 'getvalue'
      */
     this.getvalue = function (n) {
-        var v = null, // success
-            lms = API.path, // lms shortcut
-            ec = 0,// error code
-            m  = '', // error message
-            d  = '', // error diagnostic
-            nn = null, // new number
+        var v     = null,       // success
+            lms   = API.path,   // lms shortcut
+            ec    = 0,          // error code
+            m     = '',         // error message
+            d     = '',         // error diagnostic
+            nn    = null,       // new number
             tiers = [],
-            ig = false;// ignore
+            ig    = false,      // ignore
+            start = new Date(), // for latency check
+            end;                // for latency check
         if (API.isActive) {// it has initialized
             // This is switch cased to appropriately translate SCORM 2004 to 1.2 if needed.
             // Handy if you don't want to go through all your content calls...
@@ -798,6 +801,8 @@ function SCOBotBase(options) {
                     'diagnostic': d
                 }
             });
+            end = new Date();
+            settings.latency_arr.push({lat: end - start, v: n}); // latency check.
             if (ec === 0 || ec === 403) {
                 // Clean up differences in LMS responses
                 if (v === 'undefined' || v === null || v === 'null') { // was typeof v
@@ -866,6 +871,9 @@ function SCOBotBase(options) {
                         break;
                     case "cmi.exit":
                         nn = "cmi.core.exit";
+                        if (v === "normal") { // Fix SCORM 1.2 doesn't have 'normal'
+                            v = "";
+                        }
                         API.exit_type = v;
                         break;
                     case "cmi.score.raw":
@@ -880,6 +888,9 @@ function SCOBotBase(options) {
                     case "cmi.success_status":
                     case "cmi.completion_status":
                         nn = "cmi.core.lesson_status";
+                        if (v === "unknown") {
+                            v = "not attempted"; // Fix SCORM 1.2 doesn't have a 'unknown'
+                        }
                         API.data.completion_status = v;
                         // set local status
                         break;
@@ -1074,6 +1085,8 @@ function SCOBotBase(options) {
             ec = 0,
             session_secs,
             saveDate = new Date();
+        // Clear current latency
+        settings.latency_arr = [];
         session_secs = (saveDate.getTime() - settings.startDate.getTime()) / 1000;
         if (API.isActive) {// it has initialized
             debug(settings.prefix + ": Committing data", 3);
@@ -1396,6 +1409,17 @@ function SCOBotBase(options) {
      */
     this.getAPIVersion = function () {
         return API.version;
+    };
+    /**
+     * Check API Latency
+     * Its come to my attention that some LMS systems have abysmal performance.
+     * Due to server round trips vs. cached computer managed instruction (CMI).
+     * Depending on this, you may want to take action.  LMS folk will tell you to decease your SCORM communications.
+     * That's a great idea, why didn't I think of that!
+     * @returns {Number} millisecond lag for getvalue
+     */
+    this.checkLatency = function () {
+        Utl.calcAverage(settings.latency_arr);
     };
     /**
      * Set (Internal API)
