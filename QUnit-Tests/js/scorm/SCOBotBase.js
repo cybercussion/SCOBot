@@ -888,8 +888,8 @@ function SCOBotBase(options) {
                     case "cmi.success_status":
                     case "cmi.completion_status":
                         nn = "cmi.core.lesson_status";
-                        if (v === "unknown") {
-                            v = "not attempted"; // Fix SCORM 1.2 doesn't have a 'unknown'
+                        if (v === "unknown" || v === "not attempted") {
+                            ig = true;
                         }
                         API.data.completion_status = v;
                         // set local status
@@ -973,8 +973,8 @@ function SCOBotBase(options) {
                             case "success_status":
                             case "completion_status":
                                 tiers[3] = 'status'; // consolidate
-                                if (v === "unknown") { // not supported
-                                    v = "not attempted"; // or browsed?
+                                if (v === "unknown" || v === "not attempted") { // not supported
+                                    ig = true;
                                 }
                                 break;
                             case "progress_measure":
