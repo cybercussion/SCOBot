@@ -31,7 +31,7 @@
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotBase, SCOBotUtil
- * @version 4.0.0
+ * @version 4.0.3
  * @param options {Object} override default values
  * @constructor
  */
@@ -46,22 +46,24 @@ function SCOBot(options) {
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
-            version:              "4.0.2",
+            version:              "4.0.3",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "11/19/2014 10:03PM",
+            modifiedDate:         "11/26/2014 5:31PM",
             prefix:               "SCOBot",
             // SCORM buffers and settings
             launch_data:          {},
-            interaction_mode:     "state", // or journaled
-            launch_data_type:     "querystring", // or json
+            interaction_mode:     "state",          // or journaled
+            launch_data_type:     "querystring",    // or json
             initiate_timer:       true,
-            scorm_strict:         true, // You can override this.  Will enforce SPM of SCORM Spec
-            scorm_edition:        "3rd", // or 4th - this is a issue with "editions" of SCORM 2004 that differ
-            success_status:       "unknown", // used as local status * see SCORM_API for override
+            scorm_strict:         true,             // You can override this.  Will enforce SPM of SCORM Spec
+            scorm_edition:        "3rd",            // or 4th - this is a issue with "editions" of SCORM 2004 that differ
+            success_status:       "unknown",        // used as local status * see SCORM_API for override
             scorm_status_persist: "success_status", // could alternatively set it to 'completion_status' (*SCORM 1.2 only)
             location:             "",
-            completion_status:    "", // used as local status * see SCORM_API for override
+            completion_status:    "",               // used as local status * see SCORM_API for override
+            useJSONSuspendData:   true,             // you may manage this yourself, set it to false if you do
             suspend_data:         {pages: []},
+            base64:               false,            // true if you want to encode suspend data and decode on resume.
             mode:                 "",
             completion_threshold: 0,
             scaled_passing_score: 0.7,
@@ -199,9 +201,10 @@ function SCOBot(options) {
      * Cleanse Data
      * This will escape out characters that may of been cross-contaminated from other proprietary sources.
      * These can often result in UTF-8 and other encoding issues and may result in errors.
+     * You may even consider not using cleanseData, and using another utf8-base64 library from the internets.
      */
     function cleanseData(str) {
-        var cleanseExp = /[^\f\r\n\t\v\0\s\S\w\W\d\D\b\\B\\cX\\xhh\\uhhh]/gi; ///(\f\r\n\t\v\0[/b]\s\S\w\W\d\D\b\B\cX\xhh\uhhh)/;
+        var cleanseExp = /[^\f\r\n\t\v\0\s\S\w\W\d\D\b\\B\\cX\\xhh\\uhhh]/gi;
         return str.replace(cleanseExp, '');
     }
 
@@ -819,9 +822,10 @@ function SCOBot(options) {
      * @returns {String} true (success) false (fail)
      */
     function setSuspendData() {
-        var result;
-        // May want to consider updating scoring here at this time
-        result = scorm.setvalue('cmi.suspend_data', cleanseData(JSON.stringify(settings.suspend_data)));
+        var result,
+            cleansedData = cleanseData(JSON.stringify(settings.suspend_data)),
+            data = settings.base64 ? window.btoa(cleansedData) : cleansedData;
+        result = scorm.setvalue('cmi.suspend_data', data);
         if (result === 'true') {
             scorm.debug(settings.prefix + ": Suspend Data saved", 4);
             scorm.debug(settings.suspend_data, 4);
@@ -1032,6 +1036,7 @@ function SCOBot(options) {
             settings.entry = scorm.getvalue('cmi.entry'); // ab-initio, resume or empty
             // Entry Check-up ...
             if (settings.mode === "review" || settings.entry === '' || settings.entry === 'resume') { // Resume, or possible Resume
+                scorm.debug(settings.prefix + ": Resuming...", 4);
                 // Get Bookmark
                 settings.location = scorm.getvalue('cmi.location');
                 /* Suspend Data technically should be a JSON String.  Structured data would be best suited to
@@ -1043,14 +1048,17 @@ function SCOBot(options) {
                  * !IMPORTANT- once you do this, your kinda stuck with it.  SCO's will begin to save suspend data
                  * and if you change mid-stream your going to have to handle the fact you need to reverse support
                  * old saved data.  Don't fall victim to this little gem.
-                 * GOAL: Deal with this in a managed way
+                 * GOAL: Deal with this in a managed way, but allow people to use it without the management.
+                 * 11-26-2014 - Adding base64 Support which you can choose to set to true/false.  Please keep in mind
+                 * that IE 6, 7, 8, 9 may require the use of a polyfill since they don't support window.atob/btoa
                  */
-                settings.suspend_data = (scorm.getvalue('cmi.suspend_data')); // no longer unescaping
+                settings.suspend_data = settings.base64 ? window.atob(scorm.getvalue('cmi.suspend_data')) : scorm.getvalue('cmi.suspend_data'); // no longer unescaping
                 // Quality control - You'd be surprised at the things a LMS responds with
                 if (settings.suspend_data.length > 0 && !isBadValue(settings.suspend_data)) {
                     // Assuming a JSON String
                     scorm.debug(settings.prefix + ": Returning suspend data object from a prior session", 4);
-                    settings.suspend_data = JSON.parse(settings.suspend_data); // Turn this back into a object.
+                    /* you may not be using JSON suspend data, and managing that yourself. */
+                    settings.suspend_data = settings.useJSONSuspendData ? JSON.parse(settings.suspend_data) : settings.suspend_data; // Turn this back into a object.
                     scorm.debug(settings.suspend_data, 4);
                     if (settings.entry === "") {
                         settings.entry = "resume";
@@ -1072,11 +1080,19 @@ function SCOBot(options) {
             // Completion Threshold is read-only so it comes from the CAM (imsmanifest.xml) or you manage it yourself.
             tmpScaledPassingScore = scorm.getvalue('cmi.scaled_passing_score'); // This may be empty, default otherwise
             if (!isBadValue(tmpScaledPassingScore) && tmpScaledPassingScore !== "-1") {
-                settings.scaled_passing_score = tmpScaledPassingScore;
-                // else it defaults to what its set to prior.  i.e. no change.
+                /*
+                 * Sanity check, we may have a LMS that allows the teacher to set a passing score.
+                 * This may or may not actually be what we are expecting (out of spec with SCORM 2004)
+                 * Change 75 to 0.75 just in case.  Possibly a relic from SCORM 1.2.
+                 */
+                if (parseFloat(tmpScaledPassingScore > 1)) {
+                    tmpScaledPassingScore = ((parseFloat(tmpScaledPassingScore) * 10) / 1000).toString();
+                }
+
+                settings.scaled_passing_score = tmpScaledPassingScore; // else it defaults to what its set to prior.  i.e. no change.
             }
             settings.completion_status = scorm.getvalue('cmi.completion_status');
-            settings.success_status = scorm.getvalue('cmi.success_status');
+            settings.success_status    = scorm.getvalue('cmi.success_status');
             // Lets check for Comments from the LMS
             settings.comments_from_lms = getCommentsFromLMS();
             if (settings.comments_from_lms !== 'false') {
@@ -1902,6 +1918,7 @@ function SCOBot(options) {
      * different behavior once I incorporated it.  So at this point I'm using window not window.top.
      */
     Utl.addEvent(window, 'loaded', initSCO);
+    Utl.addEvent(window, 'onbeforeunload', exitSCO); // you may want to prompt
     Utl.addEvent(window, 'unload', exitSCO);
     Utl.addEvent(scorm, 'exception', function (e) {
         triggerException(e.error);

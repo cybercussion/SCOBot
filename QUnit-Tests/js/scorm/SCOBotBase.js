@@ -37,7 +37,7 @@
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @version 4.0.0
+ * @version 4.0.3
  * @param options {Object} override default values
  * @constructor
  */
@@ -52,9 +52,9 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.0.2",
+            version:           "4.0.3",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "11/19/2014 09:57AM",
+            modifiedDate:      "11/26/2014 05:00PM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -118,7 +118,7 @@ function SCOBotBase(options) {
      * Debug
      * Built-In Debug Functionality to output to console (Firebug, Inspector, Dev Tool etc ...)
      * @param msg {String} Debug Message
-     * @param lvl {Integer} 1=Error, 2=Warning, 3=Log, 4=Info
+     * @param lvl {Number} 1=Error, 2=Warning, 3=Log, 4=Info
      */
     function debug(msg, lvl) {
         if (settings.debug) {// default is false
@@ -1375,6 +1375,8 @@ function SCOBotBase(options) {
             API.version = "2004";
             // May or may not be provided (standalone) if not, this is null (DOA)
             API.path = typeof SCOBot_API_1484_11 === 'function' ? new SCOBot_API_1484_11({cmi: settings.cmi}) : null;
+            // API connection is not true for local in this scenario. isConnected() will not work for local in this
+            // situation.
             //$(API.path).on('StoreData', function (e) {
             // Add 'StoreData' listener to rebroadcast
             Utl.addEvent(API.path, 'StoreData', function (e) {
