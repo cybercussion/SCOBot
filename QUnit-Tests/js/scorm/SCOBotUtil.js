@@ -32,12 +32,19 @@
  * If you are using a framework you may have some overlap and may be able to write some hooks into 'like' functionality
  * without needing this whole file.  Option is totally up to you.  Cost is 3.9KB minified and packed (not gzip compressed).
  *
+ * About base64.  Newer browsers support atob and btoa, but IE 6, 7, 8 and 9 won't.
+ * var encodedData = window.btoa("Hello, world"); // encode a string
+ * var decodedData = window.atob(encodedData); // decode the string
+ * So this is a tough call here to write more code to support base64.
+ * If you'd like to support it, consider https://github.com/davidchambers/Base64.js/blob/master/base64.js.
+ * It mostly depends if you want to retain the commands above or use JavaScript based approaches.
+ *
  * https://github.com/cybercussion/SCOBot
  *
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
  * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @version 4.0.0
+ * @version 4.0.3
  * @constructor
  */
 /*!
@@ -48,9 +55,9 @@
 var SCOBotUtil = function () {
     // Constructor ///////////////
     "use strict";
-    var version      = "1.0.1",
+    var version      = "1.0.3",
         createDate   = "07/23/2013 03:23PM",
-        modifiedDate = "10/01/2014 08:29AM",
+        modifiedDate = "11/26/2014 05:00PM",
         isReady      = false,
         types        = ["Boolean", "Number", "String", "Function", "Array", "Date", "RegExp", "Object"],
         class_types  = [],
