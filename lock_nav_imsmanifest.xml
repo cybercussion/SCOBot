@@ -125,17 +125,17 @@
 			<metadata />
 			<!--****** FILES ******-->
 			<file href="qunit_SCORM_API.html" />
-			<file href="js/scorm/Local_API_1484_11.js" />
-			<file href="js/scorm/SCORM_API.js" />
-			<file href="js/test/scorm_api.js" />
+			<file href="js/scorm/SCOBot_API_1484_11.js" />
+			<file href="js/scorm/SCOBotBase.js" />
+			<file href="js/test/scobotbase.js" />
 			<dependency identifierref="common_files" />
 		</resource>
 		<resource identifier="RES-002" type="webcontent" adlcp:scormType="sco" xml:base="QUnit-Tests/" href="qunit_SCOBot.html">
 			<metadata />
 			<!--****** FILES ******-->
 			<file href="qunit_SCOBot.html" />
-			<file href="js/scorm/Local_API_1484_11.js" />
-			<file href="js/scorm/SCORM_API.js" />
+			<file href="js/scorm/SCOBot_API_1484_11.js" />
+			<file href="js/scorm/SCOBotBase.js" />
 			<file href="js/scorm/SCOBot.js" />
 			<file href="js/test/scobot.js" />
 			<dependency identifierref="common_files" />
