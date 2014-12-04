@@ -76,14 +76,40 @@ $.addEvent(SB, 'load', function (e) {
         var date = scorm.isoStringToDate('2012-03-20T17:47:54.0Z'); // PDT
 
         // Due to time zones some quick code to adjust
-        var x = new Date(),
-            PDTOffset  = 420,// -07:00 * 60 (Doesn't solve daylight savings)
-            yourOffset = x.getTimezoneOffset(),
-            newDate = new Date(),
-            offset = 0;
+        Date.prototype.stdTimezoneOffset = function() {
+            var fy=this.getFullYear();
+            if (!Date.prototype.stdTimezoneOffset.cache.hasOwnProperty(fy)) {
 
+                var maxOffset = new Date(fy, 0, 1).getTimezoneOffset();
+                var monthsTestOrder=[6,7,5,8,4,9,3,10,2,11,1];
+
+                for(var mi=0;mi<12;mi++) {
+                    var offset=new Date(fy, monthsTestOrder[mi], 1).getTimezoneOffset();
+                    if (offset!=maxOffset) {
+                        maxOffset=Math.max(maxOffset,offset);
+                        break;
+                    }
+                }
+                Date.prototype.stdTimezoneOffset.cache[fy]=maxOffset;
+            }
+            return Date.prototype.stdTimezoneOffset.cache[fy];
+        };
+
+        Date.prototype.stdTimezoneOffset.cache={};
+
+        Date.prototype.isDST = function() {
+            return this.getTimezoneOffset() < this.stdTimezoneOffset();
+        };
+        var x          = new Date(),
+            PDTOffset  = x.stdTimezoneOffset(), //420,// -07:00 * 60 (Doesn't solve daylight savings)
+            yourOffset = x.getTimezoneOffset(),
+            newDate    = new Date(),
+            offset = 0;
         if (PDTOffset !== yourOffset) {
             offset = yourOffset - PDTOffset;
+            if (x.isDST()) {
+                alert("dst in effect");
+            }
         }
         newDate.setTime(date.getTime() + (offset * 60000)); // great, sets the time, but not the timezone
         // No way I'm aware to tweak the timezone without doing heavier manipulation.
@@ -105,7 +131,7 @@ $.addEvent(SB, 'load', function (e) {
         var date = scorm.isoStringToDate('2012-03-20T10:47:54.0-07:00'); // PDT
         // Due to time zones some quick code to adjust
         var x = new Date(),
-            PDTOffset  = 420,// -07:00 * 60 (Doesn't solve daylight savings)
+            PDTOffset  = x.stdTimezoneOffset(),// -07:00 * 60 (Doesn't solve daylight savings)
             yourOffset = x.getTimezoneOffset(),
             newDate = new Date(),
             offset = 0;
@@ -1278,6 +1304,10 @@ $.addEvent(SB, 'load', function (e) {
     // Optional, comment out if you don't want to terminate.
     test("Terminate SCO", function () {
         SB.debug(">>>>>>>>>> Terminating <<<<<<<<<<<<<");
+        // Validate scoring
+        strictEqual(SB.getvalue('cmi.score.scaled'), '0.7512902', 'Verifying Score Scaled'); // modify this if you adjust scoring
+        strictEqual(SB.getvalue('cmi.success_status'), 'passed', "Verify Success Status");
+        strictEqual(SB.getvalue('cmi.completion_status'), 'incomplete');
         strictEqual(SB.finish(), 'true', "Terminating SCO."); // Comment this out if you want to leave it up.
 
     });
