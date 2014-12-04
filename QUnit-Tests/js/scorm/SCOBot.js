@@ -54,7 +54,7 @@ function SCOBot(options) {
         defaults = {
             version:              "4.0.4",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "12/02/2014 2:48PM",
+            modifiedDate:         "12/04/2014 10:24AM",
             prefix:               "SCOBot",
             // SCOBot default parameters
             launch_data:          {},
@@ -114,10 +114,6 @@ function SCOBot(options) {
         scorm.debug(settings.prefix + ": SCO Loaded from window.onload " + lmsconnected, 4);
         if (lmsconnected) {
             self.start(); // Things you'd do like getting mode, suspend data
-            // Custom Event Trigger load
-            /*$(self).triggerHandler({
-                'type': "load"
-            });*/
             Utl.triggerEvent(self, "load");
         }
         return lmsconnected;
@@ -133,10 +129,6 @@ function SCOBot(options) {
     function exitSCO() {
         scorm.debug("SCO is being asked, *cough* forced to exit ...", 3);
         if (isStarted) {
-            // Custom Event Trigger load
-            /*$(self).triggerHandler({
-                'type': "unload"
-            });*/
             Utl.triggerEvent(self, "unload");
             switch (scorm.get('exit_type')) {
             case "finish":
@@ -174,45 +166,17 @@ function SCOBot(options) {
      * This would be common to a non-compliance in an LMS and loss of student data.
      */
     function triggerException(msg) {
-        /*$(self).triggerHandler({
-            'type':  'exception',
-            'error': msg
-        });*/
         Utl.triggerEvent(self, 'exception', {error: msg});
     }
 
     /**
-     * Is Performing
+     * Is Passed
      * This is based on cmi.success_status
      * @returns {Boolean} based on if this value has been set (true) or (false) if not
      */
     function isPassed() {
         var success = scorm.getvalue('cmi.success_status');
         return !(success !== "passed" && success !== "failed");
-    }
-
-    /**
-     * Verify cmi score scaled
-     * Validates if success_status is passed, and exit_type is normal.  Checks that score.max is 100.
-     * Mainly this is a helper function to catch dev's that forget to set score.
-     * This only works if your default exit type is 'finish' vs. suspend.
-     * Refined in 4.0.4
-     */
-    function verifyScoreScaled() {
-        if (scorm.get('exit_type') === 'finish') {
-            var success = scorm.getvalue('cmi.success_status'),
-                max     = scorm.getvalue('cmi.score.max'),
-                scaled  = scorm.getvalue('cmi.score.scaled');
-            // Quick validation
-            if (success === 'passed') {
-                if (scaled === 'false') {
-                    if (max === '100') {
-                        scorm.setvalue('cmi.score.scaled', '1');
-                        scorm.setvalue('cmi.score.raw', '100');
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -982,24 +946,41 @@ function SCOBot(options) {
 
     /**
      * Update Status
-     * Rolled up success/completion status functionality
-     * This gets tricky with default status, and trying to be somewhat mindful of tampering with the student attempt.
-     * You also don't want to overwrite things that may of been set manually.
+     * This is used as a catch-all in the event your default exit type is 'finish' or is also part of a exit strategy
+     * to make sure completion and success are filled in.  You may not score the student in these situations.
+     * If values are set outside of defaults they are overwritten (ignored).
      */
-    function updateStatus() {
-        verifyScoreScaled(); // helper for default exit type of 'finish'
-        // Default success status?
-        if (scorm.get("success_status") === 'passed') {
-            scorm.setvalue('cmi.success_status', scorm);
-        } else if (!isPassed()) {
-            scorm.setvalue('cmi.success_status', 'unknown'); // can't determine
+    function updateStatus(ending) {
+        var ss = 'cmi.success_status',
+            cs = 'cmi.completion_status',
+            defss = scorm.get('success_status'),
+            defcs = scorm.get('completion_status'),
+            storss = self.getvalue(ss),
+            storcs = self.getvalue(cs),
+            isSuccessSet = false,
+            isCompletionSet = false;
+        if (storss === "passed" || storss === "failed") {
+            isSuccessSet = true;
         }
-        // Default completion status?
-        if (scorm.get("completion_status") === 'completed') {
-            scorm.setvalue('cmi.completion_status', 'completed');
-        } // SCOBot sets this to incomplete right off the bat.
+        if (storcs === "completed" || storcs === "incomplete") {
+            isCompletionSet = true;
+        }
+        if (scorm.get('exit_type') === 'finish' || ending) {
+            if (storss !== defss && !isSuccessSet) {
+                scorm.debug(settings.prefix + ": Overriding default success status to " + defss, 3);
+                self.setvalue(ss, defss);
+            }
+            // Modified to set if completion_status wishes to be persisted.  Otherwise it will not be set.
+            if (scorm.getAPIVersion() === "1.2" && settings.scorm_status_persist === "completion_status" && !isCompletionSet) {
+                self.setvalue(cs, defcs);
+            } else {
+                if (storcs !== defcs && !isCompletionSet) {
+                    scorm.debug(settings.prefix + ": Overriding default completion status to " + defcs, 3);
+                    self.setvalue(cs, defcs);
+                }
+            }
+        }
     }
-
     // End Private ////////////
     ///////////////////////////
     // Public /////////////////
@@ -1816,7 +1797,7 @@ function SCOBot(options) {
             scorm.setvalue('cmi.score.scaled', '1');
             scorm.setvalue('cmi.score.min', '0');
             scorm.setvalue('cmi.score.max', '100');
-            scorm.setvalue('cmi.score.raw', '1');
+            scorm.setvalue('cmi.score.raw', '100');
             scorm.setvalue('cmi.success_status', 'passed');
             scorm.setvalue('cmi.progress_measure', '1');
             return scorm.setvalue('cmi.completion_status', 'completed');
@@ -1843,7 +1824,8 @@ function SCOBot(options) {
         if (isStarted) {
             scorm.debug(settings.prefix + ": I am suspending...", 3);
             scorm.setvalue('cmi.exit', 'suspend');
-            //updateStatus();
+            // This will be resumed later.
+            // updateStatus resevered for 'ending' calculations with default status values.
             isStarted = false;
             return scorm.terminate();
         }
@@ -1858,8 +1840,8 @@ function SCOBot(options) {
         if (isStarted) {
             scorm.debug(settings.prefix + ": I am finishing...", 3);
             scorm.setvalue('cmi.exit', 'normal');
-            //updateStatus();
-            // This is completed per this call.
+            // This is submitted per this call.
+            updateStatus(true);
             isStarted = false;
             return scorm.terminate();
         }
@@ -1874,8 +1856,8 @@ function SCOBot(options) {
         if (isStarted) {
             scorm.debug(settings.prefix + ": I am timing out...", 3);
             scorm.setvalue('cmi.exit', 'time-out');
-            //updateStatus();
-            // This is completed per this call.
+            // This is submitted per this call.
+            updateStatus(true);
             isStarted = false;
             return scorm.terminate();
         }
