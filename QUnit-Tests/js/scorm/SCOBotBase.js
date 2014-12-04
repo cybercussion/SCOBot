@@ -63,7 +63,7 @@ function SCOBotBase(options) {
             success_status:    "unknown", // passed, failed, unknown
             use_standalone:    true,
             standalone:        false,
-            completion_status: "unknown", // completed, incomplete, unknown
+            completion_status: "incomplete", // completed, incomplete, unknown
             time_type:         "GMT",
             cmi:               null,
             latency_arr: []
