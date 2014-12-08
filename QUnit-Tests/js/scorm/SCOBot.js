@@ -169,16 +169,6 @@ function SCOBot(options) {
     }
 
     /**
-     * Is Passed
-     * This is based on cmi.success_status
-     * @returns {Boolean} based on if this value has been set (true) or (false) if not
-     */
-    function isPassed() {
-        var success = scorm.getvalue('cmi.success_status');
-        return !(success !== "passed" && success !== "failed");
-    }
-
-    /**
      * Is Bad Value
      * We get a variety of responses from an LMS
      * @returns {Boolean} true if its bad.
@@ -845,11 +835,12 @@ function SCOBot(options) {
     function checkProgress() {
         if (scorm.isConnectionActive()) {
             var tmpRaw = 0,
-                completionStatus = scorm.getvalue('cmi.completion_status'), // refresh
                 totalObjectivesCompleted = 0,
                 i = 0,
                 count;
-            buffer.score.raw = 0; // reset
+            buffer.completion_status = scorm.getvalue('cmi.completion_status'); // refresh
+            buffer.success_status    = scorm.getvalue('cmi.success_status'); // refresh
+            buffer.score.raw         = 0; // reset
             if (settings.totalInteractions === 0 || settings.totalObjectives === 0) {
                 // This is a non-starter, if the SCO Player doesn't set these we are flying blind
                 scorm.debug(settings.prefix + ": Sorry, I cannot calculate Progress as the totalInteractions and or Objectives are zero", 2);
@@ -1773,16 +1764,15 @@ function SCOBot(options) {
             scorm.setvalue('cmi.score.scaled', trueRound(scoreScaled, 7));
         }
         // Set Completion Status
-        //if (completionStatus === "unknown" || completionStatus === "not attempted") {
-        if (settings.completion_status !== "completed") {
-            settings.completion_status = (parseFloat(progressMeasure) >= parseFloat(settings.completion_threshold)) ? 'completed' : 'incomplete';
-            scorm.setvalue('cmi.completion_status', settings.completion_status);
+        if (buffer.completion_status !== "completed") {
+            buffer.completion_status = (parseFloat(buffer.progress_measure) >= parseFloat(buffer.completion_threshold)) ? 'completed' : 'incomplete';
+            scorm.setvalue('cmi.completion_status', buffer.completion_status);
         }
         // Set Success Status unless the default is passed (not graded typically or just auto scored)
-        if (settings.success_status !== "passed") {
-            settings.success_status = (parseFloat(scoreScaled) >= parseFloat(settings.scaled_passing_score)) ? 'passed' : 'failed';
+        if (buffer.success_status !== "passed") {
+            buffer.success_status = (parseFloat(scoreScaled) >= parseFloat(buffer.scaled_passing_score)) ? 'passed' : 'failed';
         }
-        scorm.setvalue('cmi.success_status', settings.success_status);
+        scorm.setvalue('cmi.success_status', buffer.success_status);
         return 'true';
     };
     /**
