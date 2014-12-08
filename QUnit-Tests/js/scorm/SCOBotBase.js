@@ -52,9 +52,9 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.0.4",
+            version:           "4.0.5",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "12/04/2014 11:16AM",
+            modifiedDate:      "12/08/2014 01:23PM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -1411,6 +1411,14 @@ function SCOBotBase(options) {
      */
     this.getAPIVersion = function () {
         return API.version;
+    };
+    /**
+     * Is Connection Active
+     * Verify connection is initialized.
+     * @returns {Boolean}
+     */
+    this.isConnectionActive = function () {
+        return API.isActive;
     };
     /**
      * Check API Latency

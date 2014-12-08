@@ -52,9 +52,9 @@ function SCOBot(options) {
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
-            version:              "4.0.4",
+            version:              "4.0.5",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "12/04/2014 10:24AM",
+            modifiedDate:         "12/08/2014 01:24PM",
             prefix:               "SCOBot",
             // SCOBot default parameters
             launch_data:          {},
@@ -127,8 +127,8 @@ function SCOBot(options) {
      * @returns {Boolean} true or false if successfully exited
      */
     function exitSCO() {
-        scorm.debug("SCO is being asked, *cough* forced to exit ...", 3);
-        if (isStarted) {
+        scorm.debug(settings.prefix + ": SCO is being unloaded, forcing exit ...", 3);
+        if (scorm.isConnectionActive()) {
             Utl.triggerEvent(self, "unload");
             switch (scorm.get('exit_type')) {
             case "finish":
@@ -145,7 +145,6 @@ function SCOBot(options) {
                 break;
             }
             scorm.debug(settings.prefix + ": SCO is done unloading.", 4);
-            isStarted = false;
         }
         return true;
     }
@@ -844,7 +843,7 @@ function SCOBot(options) {
      * Updated in 4.0.4
      */
     function checkProgress() {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             var tmpRaw = 0,
                 completionStatus = scorm.getvalue('cmi.completion_status'), // refresh
                 totalObjectivesCompleted = 0,
@@ -918,7 +917,7 @@ function SCOBot(options) {
      * @return {*} object or 'false'
      */
     function getCommentsFromLMS() {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             var p1 = "cmi.comments_from_lms.",
                 count = scorm.getvalue(p1 + '_count'),
                 response = [],
@@ -1131,7 +1130,7 @@ function SCOBot(options) {
      * @returns {String} 'true' or 'false'
      */
     this.setTotals = function (data) {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             if (!isBadValue(data.totalInteractions)) {
                 settings.totalInteractions = data.totalInteractions;
             }
@@ -1182,7 +1181,7 @@ function SCOBot(options) {
      * @returns {String} normal, browse, review
      */
     this.getMode = function () {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             return settings.mode;
         }
         return notStartedYet();
@@ -1193,7 +1192,7 @@ function SCOBot(options) {
      * @returns {String} ab-initio, resume , ""
      */
     this.getEntry = function () {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             return settings.entry;
         }
         return notStartedYet();
@@ -1205,7 +1204,7 @@ function SCOBot(options) {
      * returns {String} 'true' or 'false'.
      */
     this.setBookmark = function (v) {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             settings.location = v.toString(); // update local snapshot, ensure string
             return scorm.setvalue('cmi.location', settings.location);
         }
@@ -1217,7 +1216,7 @@ function SCOBot(options) {
      * @returns {String} bookmark
      */
     this.getBookmark = function () {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             return settings.location; // return local snapshot
         }
         return notStartedYet();
@@ -1265,7 +1264,7 @@ function SCOBot(options) {
      * @returns {String}
      */
     this.setSuspendDataByPageID = function (id, title, data) {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             // Suspend data is a array of pages by ID
             var i = 0,
                 len = settings.suspend_data.pages.length;
@@ -1297,7 +1296,7 @@ function SCOBot(options) {
      * @returns {*} object, but false if empty.
      */
     this.getSuspendDataByPageID = function (id) {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             // Suspend data is a array of pages by ID
             var i = 0,
                 len = settings.suspend_data.pages.length;
@@ -1352,7 +1351,7 @@ function SCOBot(options) {
      * @returns {String} 'true' or 'false'
      */
     this.setInteraction = function (data) {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             var version = scorm.getAPIVersion(),
                 n, // Reserved for the count within interactions.n
                 m, // Reserved for the count within interactions.n.objectives.m
@@ -1537,7 +1536,7 @@ function SCOBot(options) {
      * 'false'
      */
     this.getInteraction = function (id) {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             var n, // Interaction count
                 p1 = 'cmi.interactions.', // Reduction of typing
                 m, // objectives count
@@ -1619,7 +1618,7 @@ function SCOBot(options) {
      * @returns {String} 'true' or 'false'
      */
     this.setObjective = function (data) {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             var p1 = 'cmi.objectives.',
                 n = scorm.getObjectiveByID(data.id),
                 result = 'false',
@@ -1699,7 +1698,7 @@ function SCOBot(options) {
      * 'false'
      */
     this.getObjective = function (id) {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             var n = scorm.getObjectiveByID(id),
                 p1 = 'cmi.objectives.';
             if (n === 'false') {
@@ -1732,7 +1731,7 @@ function SCOBot(options) {
      * @return {String}
      */
     this.setCommentFromLearner = function (msg, loc, date) {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             var p1 = "cmi.comments_from_learner.",
                 n = scorm.getvalue(p1 + "_count");
             if (n === 'false') {
@@ -1793,7 +1792,7 @@ function SCOBot(options) {
      * @return {String}
      */
     this.happyEnding = function () {
-        if (isStarted && settings.happyEnding) {
+        if (scorm.isConnectionActive() && settings.happyEnding) {
             scorm.setvalue('cmi.score.scaled', '1');
             scorm.setvalue('cmi.score.min', '0');
             scorm.setvalue('cmi.score.max', '100');
@@ -1810,7 +1809,7 @@ function SCOBot(options) {
      * @returns {String} 'true' or 'false'
      */
     this.commit = function () {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             return scorm.commit('');
         }
         return notStartedYet();
@@ -1821,7 +1820,7 @@ function SCOBot(options) {
      * @returns {String} 'true' or 'false'
      */
     this.suspend = function () {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             scorm.debug(settings.prefix + ": I am suspending...", 3);
             scorm.setvalue('cmi.exit', 'suspend');
             // This will be resumed later.
@@ -1837,7 +1836,7 @@ function SCOBot(options) {
      * @returns {String} 'true' or 'false'
      */
     this.finish = function () {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             scorm.debug(settings.prefix + ": I am finishing...", 3);
             scorm.setvalue('cmi.exit', 'normal');
             // This is submitted per this call.
@@ -1853,7 +1852,7 @@ function SCOBot(options) {
      * @returns {String} 'true' or 'false'
      */
     this.timeout = function () {
-        if (isStarted) {
+        if (scorm.isConnectionActive()) {
             scorm.debug(settings.prefix + ": I am timing out...", 3);
             scorm.setvalue('cmi.exit', 'time-out');
             // This is submitted per this call.
@@ -1870,7 +1869,7 @@ function SCOBot(options) {
     this.isISO8601 = isISO8601;
     /**
      * Get API Version
-     * Hook back to scorm incase your talking to SB exclusively
+     * Hook back to scorm in case your talking to SB exclusively
      * @returns {String} 1.2, 2004
      */
     this.getAPIVersion = scorm.getAPIVersion;
