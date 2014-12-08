@@ -1,5 +1,5 @@
 /*global window, alert, console, HTMLElement, Events */
-/*jslint devel: true, browser: true, regexp: true */
+/*jslint devel: true, browser: true, regexp: true, vars: true, eqeq: true, unparam: true, plusplus: true, nomen: true */
 /**
  * SCOBot Utilities
  * Module pattern utilized.
@@ -55,9 +55,9 @@
 var SCOBotUtil = function () {
     // Constructor ///////////////
     "use strict";
-    var version      = "1.0.3",
+    var version      = "1.0.4",
         createDate   = "07/23/2013 03:23PM",
-        modifiedDate = "11/26/2014 05:00PM",
+        modifiedDate = "12/8/2014 02:16PM",
         isReady      = false,
         types        = ["Boolean", "Number", "String", "Function", "Array", "Date", "RegExp", "Object"],
         class_types  = [],
@@ -285,9 +285,9 @@ var SCOBotUtil = function () {
         extend = function (o) {
             var i = 1,
                 args = arguments,
-                len = args.length,
+                olen = args.length,
                 key;
-            while (i < len) {
+            while (i < olen) {
                 for (key in args[i]) {
                     if (args[i].hasOwnProperty(key)) {
                         args[0][key] = args[i][key];
@@ -308,10 +308,10 @@ var SCOBotUtil = function () {
             if (event.indexOf(' ') >= 0) {
                 // Multi-event - if you are listening to 'setvalue getvalue'
                 var events = event.split(' '),
-                    len    = events.length;
-                while (len--) {
+                    elen   = events.length;
+                while (elen--) {
                     // Add events.
-                    addEvent(target, events[len], handler);
+                    addEvent(target, events[elen], handler);
                 }
             } else {
                 if (target === window || isElement(target)) {
@@ -358,8 +358,8 @@ var SCOBotUtil = function () {
         calcAverage = function (num_arr) {
             var sum = 0,
                 i = 0,
-                len = num_arr.length;
-            while (i < len) {
+                nlen = num_arr.length;
+            while (i < nlen) {
                 sum += num_arr[i].lat;
                 i += 1;
             }
@@ -375,36 +375,38 @@ var SCOBotUtil = function () {
         triggerEvent = function (target, name, options) {
             var doc = document,
                 event,
-                type,
+                etype,
                 attr;
             options = options || {};
             for (attr in defaults) {
-                if (!options.hasOwnProperty(attr)) {
-                    options[attr] = defaults[attr];
+                if (defaults.hasOwnProperty(attr)) {
+                    if (!options.hasOwnProperty(attr)) {
+                        options[attr] = defaults[attr];
+                    }
                 }
             }
             // Check DOM Element
             if (isWindow(target) || isElement(target)) {
                 if (doc.createEvent) {
                     // Standard
-                    type = eventTypes[name] || 'CustomEvent';
-                    event = doc.createEvent(type);
-                    initializers[type](target, name, event, options);
+                    etype = eventTypes[name] || 'CustomEvent';
+                    event = doc.createEvent(etype);
+                    initializers[etype](target, name, event, options);
                     try {
                         target.dispatchEvent(event);
-                    } catch (e) {
+                    } catch (ignore) {
                         // doesn't exist
                     }
                 } else {
                     // IE
                     event = doc.createEventObject();
-                    target.fireEvent('on' + type, event);
+                    target.fireEvent('on' + etype, event);
                 }
             } else {
                 // JavaScript Object
                 try {
                     target.trigger(name, options);
-                } catch (ee) {
+                } catch (ignore) {
                     // nothing listening
                 }
             }
@@ -419,28 +421,58 @@ var SCOBotUtil = function () {
                 a3 = args[2],
                 al = args.length;
             switch (al) {
-            case 0: while (++i < l) (ev = events[i]).callback.call(ev.ctx); return;
-            case 1: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1); return;
-            case 2: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1, a2); return;
-            case 3: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1, a2, a3); return;
-            default: while (++i < l) (ev = events[i]).callback.apply(ev.ctx, args); return;
+            case 0:
+                while (++i < l) {
+                    ev = events[i];
+                    ev.callback.call(ev.ctx);
+                }
+                return;
+            case 1:
+                while (++i < l) {
+                    ev = events[i];
+                    ev.callback.call(ev.ctx, a1);
+                }
+                return;
+            case 2:
+                while (++i < l) {
+                    ev = events[i];
+                    ev.callback.call(ev.ctx, a1, a2);
+                }
+                return;
+            case 3:
+                while (++i < l) {
+                    ev = events[i];
+                    ev.callback.call(ev.ctx, a1, a2, a3);
+                }
+                return;
+            default:
+                while (++i < l) {
+                    ev = events[i];
+                    ev.callback.apply(ev.ctx, args);
+                }
+                return;
             }
         },
         eventsApi = function (obj, action, name, rest) {
+            var key,
+                i,
+                l;
             if (!name) {
                 return true;
             }
             // Handle event maps.
             if (typeof name === 'object') {
-                for (var key in name) {
-                    obj[action].apply(obj, [key, name[key]].concat(rest));
+                for (key in name) {
+                    if (name.hasOwnProperty(key)) {
+                        obj[action].apply(obj, [key, name[key]].concat(rest));
+                    }
                 }
                 return false;
             }
             // Handle space separated event names.
             if (eventSplitter.test(name)) {
                 var names = name.split(eventSplitter);
-                for (var i = 0, l = names.length; i < l; i++) {
+                for (i = 0, l = names.length; i < l; i++) {
                     obj[action].apply(obj, [names[i]].concat(rest));
                 }
                 return false;
