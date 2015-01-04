@@ -42,14 +42,14 @@
  * https://github.com/cybercussion/SCOBot
  *
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
- * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
+ * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @version 4.0.5
  * @constructor
  */
 /*!
- * SCOBot Utility, Updated July 23rd, 2014
- * Copyright (c) 2009-2013, Cybercussion Interactive LLC. All rights reserved.
+ * SCOBot Utility, Updated Jan 3rd, 2015
+ * Copyright (c) 2009-2015, Cybercussion Interactive LLC. All rights reserved.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 var SCOBotUtil = function () {
@@ -57,7 +57,7 @@ var SCOBotUtil = function () {
     "use strict";
     var version      = "1.0.4",
         createDate   = "07/23/2013 03:23PM",
-        modifiedDate = "12/8/2014 02:16PM",
+        modifiedDate = "01/03/2015 14:12PM",
         isReady      = false,
         types        = ["Boolean", "Number", "String", "Function", "Array", "Date", "RegExp", "Object"],
         class_types  = [],
