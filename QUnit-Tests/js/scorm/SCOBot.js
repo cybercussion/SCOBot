@@ -34,7 +34,7 @@
  * @event exception, load, unload, message, continue, comments_lms
  *
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
- * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
+ * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotBase, SCOBotUtil
  * @version 4.0.4
@@ -42,8 +42,8 @@
  * @constructor
  */
 /*!
- * SCOBot, Updated July 23rd, 2014
- * Copyright (c) 2009-2014, Cybercussion Interactive LLC. All rights reserved.
+ * SCOBot, Updated jan 3rd, 2015
+ * Copyright (c) 2009-2015, Cybercussion Interactive LLC. All rights reserved.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 function SCOBot(options) {
@@ -54,7 +54,7 @@ function SCOBot(options) {
         defaults = {
             version:              "4.0.5",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "12/08/2014 01:24PM",
+            modifiedDate:         "01/03/2014 14:12PM",
             prefix:               "SCOBot",
             // SCOBot default parameters
             launch_data:          {},
@@ -361,7 +361,7 @@ function SCOBot(options) {
                 scorm.debug(settings.prefix + ": Developer, you're not passing a array type for sequencing/choice.  I got " + typeof value + " instead\n" + JSON.stringify(value), 1);
                 value = '';
             }
-            /* falls through */
+        /* falls through */
         case 'sequencing':
             // 2004 a[,]b and in 1.2 this was a alpha numeric string: Diagnosis SCORM 2004 format is fine.
             if (Utl.isArray(value)) {

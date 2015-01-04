@@ -35,15 +35,15 @@
  * @event debug, getvalue, setvalue, exception, terminated, StoreData
  *
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
- * @license Copyright (c) 2009-2014, Cybercussion Interactive LLC
+ * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @version 4.0.3
  * @param options {Object} override default values
  * @constructor
  */
 /*!
- * SCOBotBase, Updated July 23rd, 2014
- * Copyright (c) 2009-2014, Cybercussion Interactive LLC.
+ * SCOBotBase, Updated Jan 3rd, 2015
+ * Copyright (c) 2009-2015, Cybercussion Interactive LLC.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 function SCOBotBase(options) {
@@ -54,7 +54,7 @@ function SCOBotBase(options) {
         defaults = {
             version:           "4.0.5",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "12/08/2014 01:23PM",
+            modifiedDate:      "01/03/2015 14:12PM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -152,7 +152,7 @@ function SCOBotBase(options) {
         if (lvl < 3 && settings.throw_alerts) {
             alert(msg);
         }
-        return false;
+        return true; // altered Jan 3rd, 2015 - this conflicted with debugging off on setObjective for QUnit test
     }
 
     /**
