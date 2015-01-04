@@ -21,7 +21,7 @@
  * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotUtil, SCOBotBase
- * @version 4.0.0
+ * @version 4.0.5
  * @param options {Object} override default values
  * @constructor
  */
