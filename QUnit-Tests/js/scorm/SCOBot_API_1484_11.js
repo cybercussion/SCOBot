@@ -2,11 +2,10 @@
 /*jslint devel: true, browser: true, nomen: true */
 /**
  * SCOBot API_1484_11
- * Mimics LMS Connectivity in Local Mode i.e. standalone functionality and is not meant to be confused with a actual
- * LMS Runtime Environment.  It does not include all the rich error management and is meant to be a light weight way
- * to continue to work offline hoping saving you several round trips packaging and uploading your content to an LMS.
- * By no means if everything is great here, does it mean it will be great on the LMS.  Learning Management Systems have
- * mixed or partial implementations which need to be tested.
+ * Mimics LMS Connectivity in Local Mode i.e. standalone functionality, and is not meant to be confused with a actual
+ * LMS Runtime Environment.  It does not include all the rich error management and is meant to be a light weight way to
+ * continue to work offline to help saving you several round trips packaging and uploading your content to an LMS.
+ * For a production Runtime, please see https://cybercussion.com
  *
  * jQuery dependency removed, and now utilizes SCOBotUtil.
  *
@@ -587,10 +586,10 @@ function SCOBot_API_1484_11(options) {
                 setData(k.substr(4, k.length), v, cmi);
                 break;
             case "ssp":
-                // Still to do (build off cmi work)
+                // Unless local storage was used, persisting would be difficult.
                 break;
             case "adl":
-                // Still to do (build off cmi work)
+                // Since you don't effectively have a TOC navigation would be difficult.
                 break;
             }
             return "true";
@@ -623,7 +622,7 @@ function SCOBot_API_1484_11(options) {
      */
     this.Terminate = function () {
         // Could do things here like a LMS
-        //self.Commit();
+        //self.Commit(); // Force commit?
         settings.terminated = 1;
         settings.initialized = 0;
         return 'true';
