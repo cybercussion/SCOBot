@@ -42,7 +42,7 @@
  * @constructor
  */
 /*!
- * SCOBot, Updated jan 3rd, 2015
+ * SCOBot, Updated Feb 27th, 2015
  * Copyright (c) 2009-2015, Cybercussion Interactive LLC. All rights reserved.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
