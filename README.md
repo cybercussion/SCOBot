@@ -1,9 +1,9 @@
 [![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
 ## What's all this jazz?
-SCORM is a Shareable Content Object Reference Model specification (whitepaper standard).  This was made available in 2001, updated in 2004 and patched as recent as 2009.
+SCORM is a Shareable Content Object Reference Model specification (white paper standard).  This was made available in 2001, updated in 2004 and patched as recent as 2009.
 Learning Management Systems commonly support SCORM 1.2 and 2004.  This provides the mechanism for packaging, and communicating with the LMS.  SCORM 2004 included the ability to add sequencing information into the packaging process.  All the files includes offer a full range of what makes up that packaging portion of the standard.
-It is possible to move all these XSD/DTD files into another folder so they are not such a eye-sore, but utilize caution when doing that.  The main focus of this project though is the JavaScript contained within QUnit-Tests/js/scorm.  The rest is all the other necessary 'fluff' of the specification.
-All that said, dig deeper on the wiki.  I know, I know - a open source project with a wiki... wha?.
+It is possible to move all these XSD/DTD files into another folder so they are not such a eye-sore, but utilize caution when doing that.  The main focus of this project is the JavaScript contained within QUnit-Tests/js/scorm.  The rest is all the other necessary 'fluff' of the specification.
+All that said, dig deeper on the wiki.  I know, I know - a open source project with a wiki... wha?.  Canned training can really suck. This gives you the ability to drop in SCOBot, interact with the API to get your custom content out the door.
 
 ##SCOBot Content support:
 https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
