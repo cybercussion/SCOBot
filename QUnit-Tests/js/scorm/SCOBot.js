@@ -37,7 +37,7 @@
  * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotBase, SCOBotUtil
- * @version 4.0.4
+ * @version 4.0.6
  * @param options {Object} override default values
  * @constructor
  */
@@ -52,9 +52,9 @@ function SCOBot(options) {
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
-            version:              "4.0.5",
+            version:              "4.0.6",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "01/03/2015 14:12PM",
+            modifiedDate:         "02/27/2015 13:38PM",
             prefix:               "SCOBot",
             // SCOBot default parameters
             launch_data:          {},
@@ -184,7 +184,7 @@ function SCOBot(options) {
      * You may even consider not using cleanseData, and using another utf8-base64 library from the internets.
      */
     function cleanseData(str) {
-        var cleanseExp = /[^\f\r\n\t\v\0\s\S\w\W\d\D\b\\B\\cX\\xhh\\uhhh]/gi;
+        var cleanseExp = /[^\f\r\n\t\v\0\s\S\w\W\d\D\b\\B\\cX\\xhh\\uhhh]/gi; // input.replace(/\s/g, '')
         return str.replace(cleanseExp, '');
     }
 
@@ -804,7 +804,7 @@ function SCOBot(options) {
     function setSuspendData() {
         var result,
             cleansedData = cleanseData(JSON.stringify(settings.suspend_data)),
-            data = settings.base64 ? window.btoa(cleansedData) : cleansedData;
+            data = settings.base64 ? window.btoa(encodeURIComponent(cleansedData)) : encodeURIComponent(cleansedData);
         result = scorm.setvalue('cmi.suspend_data', data);
         if (result === 'true') {
             scorm.debug(settings.prefix + ": Suspend Data saved", 4);
@@ -1044,7 +1044,7 @@ function SCOBot(options) {
                  * 11-26-2014 - Adding base64 Support which you can choose to set to true/false.  Please keep in mind
                  * that IE 6, 7, 8, 9 may require the use of a polyfill since they don't support window.atob/btoa
                  */
-                settings.suspend_data = settings.base64 ? window.atob(scorm.getvalue('cmi.suspend_data')) : scorm.getvalue('cmi.suspend_data'); // no longer unescaping
+                settings.suspend_data = settings.base64 ? decodeURIComponent(window.atob(scorm.getvalue('cmi.suspend_data'))) : decodeURIComponent(scorm.getvalue('cmi.suspend_data')); // no longer unescaping
                 // Quality control - You'd be surprised at the things a LMS responds with
                 if (settings.suspend_data.length > 0 && !isBadValue(settings.suspend_data)) {
                     // Assuming a JSON String
