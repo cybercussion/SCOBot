@@ -8,7 +8,7 @@ All that said, dig deeper on the wiki.  I know, I know - a open source project w
 ##SCOBot Content support:
 https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
 
-Feel free to email or post any issues you run into.
+Feel free to [email](https://cybercussion.com/#!contact) or post any issues you run into.  
 
 You may be looking for the LMS Runtime API_1484_11, and this Project does not offer or include that.  The light mimic that is included IS NOT a runtime.  Its just the bare essentials to let this run on itself in a offline capability.
 The low-latency Runtime is available on https://cybercussion.com (Free for students) but licenced commercially.
