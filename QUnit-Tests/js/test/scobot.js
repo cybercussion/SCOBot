@@ -23,8 +23,9 @@ var $     = SCOBotUtil,
         success_status: 'unknown'       // edit
     }),
     SB = new SCOBot({
-        interaction_mode: 'state',      // edit
-        launch_data_type: 'querystring' // edit
+        interaction_mode: 'journaled',      // edit
+        launch_data_type: 'querystring',    // edit
+        base64:           true              // edit
     }),
     entry = 'ab-initio',
     version = '1.0',
