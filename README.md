@@ -1,14 +1,17 @@
 [![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
+## What's all this jazz?
+SCORM is a Shareable Content Object Reference Model specification (whitepaper standard).  This was made available in 2001, updated in 2004 and patched as recent as 2009.
+Learning Management Systems commonly support SCORM 1.2 and 2004.  This provides the mechanism for packaging, and communicating with the LMS.  SCORM 2004 included the ability to add sequencing information into the packaging process.  All the files includes offer a full range of what makes up that packaging portion of the standard.
+It is possible to move all these XSD/DTD files into another folder so they are not such a eye-sore, but utilize caution when doing that.  The main focus of this project though is the JavaScript contained within QUnit-Tests/js/scorm.  The rest is all the other necessary 'fluff' of the specification.
+All that said, dig deeper on the wiki.  I know, I know - a open source project with a wiki... wha?.
 
 ##SCOBot Content support:
-Shareable Content Objects (SCOs) are these little portable web pages that can interact with a Learning Management System (LMS).  SCORM is self, is a specification from ADL (Advanced Distributed Learning), though it based much of its work on IMSGlobal, IEEE, AICC and others.
-SCOBot gives you the developer, the ability to drop in some JavaScript, and have the capability to communicate with the LMS.  The communication portion of the SCORM standard allows you to call specific Application Programming Interfaces (APIs) that expect everything in a specific format.  SCOBot actually handles much of the pain and suffering trying to figure this all out.
-I've added Wiki documentation now, so you can read more about the API support in detail.
-Here: https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
+https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
 
 Feel free to email or post any issues you run into.  At the same time this has been built and maintained, its getting used, so having a broader scope of deployment feedback is invaluable. 
 
-You may be looking for the LMS Runtime API_1484_11, and this Project does not offer or include that.
+You may be looking for the LMS Runtime API_1484_11, and this Project does not offer or include that.  The light mimic that is included IS NOT a runtime.  Its just the bare essentials to let this run on itself in a offline capability.
+The low-latency Runtime is available on https://cybercussion.com (Free for students) but licenced commercially.
 
 ## Goals:
 * **Save** you time trying to support the SCORM Standard.  Yes, its Initialize, Get Value, Set Value, Commit, and Terminate on the surface, but it goes way beyond that.
@@ -21,7 +24,8 @@ You may be looking for the LMS Runtime API_1484_11, and this Project does not of
 I've kept this project split up into 4 logical portions, leaving room for anyone to add or subtract from the complete package. The main focal point would be 'QUnit-Tests/js/scorm/', as the surrounding files are simply supporting files like JQuery, QUnit, and further README files.  I've also added all the files that go into a Content Aggregation Model.  This is a package used to export your content to a learning management server.
 The portions of this project is split into the following sections:
 
-### Now no longer requires JQuery in v4.x.x.?  So where's the code?
+### Now no longer requires jQuery in v4.x.x.?  So where's the code?
+I know not everyone is using jQuery and we needed to be sensitive to that.  Turns out this project was only using about 9KB (actual) of jQuery. (Migration covered on Wiki)
 
 #### Utilities
 * **QUnit-Tests/js/scorm/SCOBotUtil.js** (Required in a deployment)-
@@ -67,4 +71,3 @@ I also recommend trying out a bookmarklet I made to check the status of a conten
 [SCOverseer](http://www.cybercussion.com/bookmarklets/SCORM/) - see the Bookmarklet button on that page (drag it to your bookmarks bar).  Directions on page.
 
 Thanks for taking the time to take a look, and thanks to everyone that's assisted with feedback.
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/3b68b70a86b15441e520b43adf85113a "githalytics.com")](http://githalytics.com/cybercussion/SCOBot)
