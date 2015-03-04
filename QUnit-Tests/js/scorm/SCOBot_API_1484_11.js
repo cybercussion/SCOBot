@@ -36,7 +36,7 @@ function SCOBot_API_1484_11(options) {
         defaults = {
             version:     "4.0.5",
             createdate:  "07/17/2010 08:15AM",
-            moddate:     "01/03/2015 14:12PM",
+            moddate:     "03/04/2015 10:31PM",
             prefix:      "SCOBot_API_1484_11",
             errorCode:   0,
             diagnostic:  '',
@@ -240,8 +240,7 @@ function SCOBot_API_1484_11(options) {
             if (obj[v]) {
                 return String(getData(ka.join("."), obj[v])); // just in case its undefined
             }
-            throwUnimplemented(key);
-            return 'false';
+            return throwUnimplemented(key);
             //join the remaining parts back up with dots, and recursively set data on our new "base" obj
         }
     }
