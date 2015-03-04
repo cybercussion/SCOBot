@@ -20,7 +20,7 @@
  * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotUtil, SCOBotBase
- * @version 4.0.5
+ * @version 4.0.6
  * @param options {Object} override default values
  * @constructor
  */
@@ -34,7 +34,7 @@ function SCOBot_API_1484_11(options) {
     "use strict";
     var Utl      = SCOBotUtil,
         defaults = {
-            version:     "4.0.5",
+            version:     "4.0.6",
             createdate:  "07/17/2010 08:15AM",
             moddate:     "03/04/2015 10:31PM",
             prefix:      "SCOBot_API_1484_11",
@@ -42,6 +42,7 @@ function SCOBot_API_1484_11(options) {
             diagnostic:  '',
             initialized: 0,
             terminated:  0,
+            // CMI is the Computer Managed Instruction object (the student attempt).  Edit these values as you see fit.
             CMI:         {
                 _version:              "Local 1.0",
                 comments_from_learner: {
@@ -94,7 +95,7 @@ function SCOBot_API_1484_11(options) {
                 total_time:            "PT0H0M0S"
             }
         },
-    // Settings merged with defaults and extended options */
+        // Settings merged with defaults and extended options */
         settings = Utl.extend(defaults, options),
         cmi = {},
         /**
