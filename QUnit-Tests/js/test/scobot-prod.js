@@ -77,28 +77,32 @@ $.addEvent(SB, 'load', function (e) {
         var date = scorm.isoStringToDate('2012-03-20T17:47:54.0Z'); // PDT
 
         // Due to time zones some quick code to adjust
-        Date.prototype.stdTimezoneOffset = function() {
-            var fy=this.getFullYear();
+        Date.prototype.stdTimezoneOffset = function () {
+            var fy = this.getFullYear(),
+                maxOffset,
+                monthsTestOrder,
+                mi,
+                offset;
             if (!Date.prototype.stdTimezoneOffset.cache.hasOwnProperty(fy)) {
 
-                var maxOffset = new Date(fy, 0, 1).getTimezoneOffset();
-                var monthsTestOrder=[6,7,5,8,4,9,3,10,2,11,1];
+                maxOffset = new Date(fy, 0, 1).getTimezoneOffset();
+                monthsTestOrder = [6, 7, 5, 8, 4, 9, 3, 10, 2, 11, 1];
 
-                for(var mi=0;mi<12;mi++) {
-                    var offset=new Date(fy, monthsTestOrder[mi], 1).getTimezoneOffset();
-                    if (offset!=maxOffset) {
-                        maxOffset=Math.max(maxOffset,offset);
+                for (mi = 0; mi < 12; mi += 1) {
+                    offset = new Date(fy, monthsTestOrder[mi], 1).getTimezoneOffset();
+                    if (offset !== maxOffset) {
+                        maxOffset = Math.max(maxOffset, offset);
                         break;
                     }
                 }
-                Date.prototype.stdTimezoneOffset.cache[fy]=maxOffset;
+                Date.prototype.stdTimezoneOffset.cache[fy] = maxOffset;
             }
             return Date.prototype.stdTimezoneOffset.cache[fy];
         };
 
-        Date.prototype.stdTimezoneOffset.cache={};
+        Date.prototype.stdTimezoneOffset.cache = {};
 
-        Date.prototype.isDST = function() {
+        Date.prototype.isDST = function () {
             return this.getTimezoneOffset() < this.stdTimezoneOffset();
         };
         var x          = new Date(),
@@ -109,10 +113,11 @@ $.addEvent(SB, 'load', function (e) {
         if (PDTOffset !== yourOffset) {
             offset = yourOffset - PDTOffset;
             if (x.isDST()) {
-                alert("dst in effect");
+                scorm.debug("Daylight Savings Time in effect - offset: " + offset, 4);
             }
         }
-        newDate.setTime(date.getTime() + (offset * 60000)); // great, sets the time, but not the timezone
+        //newDate.setTime(date.getTime() + (offset * 60000)); // great, sets the time, but not the timezone
+        newDate.setTime(date.getTime());
         // No way I'm aware to tweak the timezone without doing heavier manipulation.
         strictEqual(newDate.toString().split("GMT")[0] + "GMT-0700 (PDT)", 'Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)', 'Checking ISO8601 UTC String to Date equals - Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)');
     });
@@ -140,7 +145,8 @@ $.addEvent(SB, 'load', function (e) {
         if (PDTOffset !== yourOffset) {
             offset = yourOffset - PDTOffset;
         }
-        newDate.setTime(date.getTime() + (offset * 60000)); // great, sets the time, but not the timezone
+        //newDate.setTime(date.getTime() + (offset * 60000)); // great, sets the time, but not the timezone
+        newDate.setTime(date.getTime());
         // No way I'm aware to tweak the timezone without doing heavier manipulation.
         strictEqual(newDate.toString().split("GMT")[0] + "GMT-0700 (PDT)", 'Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)', 'Checking ISO8601 String to Date equals - Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)');
     });
