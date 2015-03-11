@@ -109,10 +109,11 @@ $.addEvent(SB, 'load', function (e) {
         if (PDTOffset !== yourOffset) {
             offset = yourOffset - PDTOffset;
             if (x.isDST()) {
-                alert("dst in effect");
+                scorm.debug("Daylight Savings Time in effect - offset: " + offset, 4);
             }
         }
-        newDate.setTime(date.getTime() + (offset * 60000)); // great, sets the time, but not the timezone
+        //newDate.setTime(date.getTime() - (offset * 60000)); // great, sets the time, but not the timezone
+        newDate.setTime(date.getTime()); // great, sets the time, but not the timezone
         // No way I'm aware to tweak the timezone without doing heavier manipulation.
         strictEqual(newDate.toString().split("GMT")[0] + "GMT-0700 (PDT)", 'Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)', 'Checking ISO8601 UTC String to Date equals - Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)');
     });
@@ -140,7 +141,8 @@ $.addEvent(SB, 'load', function (e) {
         if (PDTOffset !== yourOffset) {
             offset = yourOffset - PDTOffset;
         }
-        newDate.setTime(date.getTime() + (offset * 60000)); // great, sets the time, but not the timezone
+        //newDate.setTime(date.getTime() + (offset * 60000)); // great, sets the time, but not the timezone
+        newDate.setTime(date.getTime());
         // No way I'm aware to tweak the timezone without doing heavier manipulation.
         strictEqual(newDate.toString().split("GMT")[0] + "GMT-0700 (PDT)", 'Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)', 'Checking ISO8601 String to Date equals - Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)');
     });

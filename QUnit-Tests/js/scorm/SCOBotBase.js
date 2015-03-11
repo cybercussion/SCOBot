@@ -15,7 +15,7 @@
  *
  * Recommend a minify/merge before pushing to a production environment. (JSMin, YUI Compressor, Dojo Shrinksafe etc ...)
  *
- * jQuery dependency removed, and not utilizes SCOBotUtil.
+ * jQuery dependency removed, and now utilizes SCOBotUtil.
  *
  * @usage
  * var scorm = new SCOBotBase({
@@ -37,7 +37,7 @@
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
  * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @version 4.0.5
+ * @version 4.0.7
  * @param options {Object} override default values
  * @constructor
  */
@@ -52,9 +52,9 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.0.5",
+            version:           "4.0.7",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "01/03/2015 14:12PM",
+            modifiedDate:      "03/11/2015 16:25PM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -64,7 +64,7 @@ function SCOBotBase(options) {
             use_standalone:    true,
             standalone:        false,
             completion_status: "incomplete", // completed, incomplete, unknown
-            time_type:         "GMT",
+            time_type:         "UTC",
             cmi:               null,
             latency_arr: []
         },
@@ -125,7 +125,7 @@ function SCOBotBase(options) {
             if (!window.console) {// IE 7 probably 6 was throwing a error if 'console undefined'
                 window.console = {};
                 window.console.info = noconsole;
-                window.console.log = noconsole;
+                window.console.log  = noconsole;
                 window.console.warn = noconsole;
                 window.console.error = noconsole;
                 window.console.trace = noconsole;
@@ -319,7 +319,7 @@ function SCOBotBase(options) {
         // 1 hour = 360000 centiseconds
         // 1 minute = 6000 centiseconds
         var aV = [0, 0, 0, 0, 0, 0],
-            bErr = !!((str.indexOf("P") !== 0)),
+            bErr = (str.indexOf("P") !== 0),
             bTFound = false,
             aT = ["Y", "M", "D", "H", "M", "S"],
             p = 0,
@@ -384,8 +384,7 @@ function SCOBotBase(options) {
      * @returns {number} total milliseconds
      */
     function scorm12toMS(n) {
-        var t_arr = [];
-        t_arr = n.split(":");
+        var t_arr = n.split(":");
         return Math.round(t_arr[0] * 3600000) + (t_arr[1] * 60000) + (t_arr[2] * 1000);
     }
 
