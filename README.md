@@ -5,7 +5,7 @@ SCORM requires all communication occur with JavaScript.
 Along with the content interface APIs it includes a light offline or non-LMS mimc of the LMS Runtime.  This enables you to see tracing of the LMS communication if it was present.  This may save you time debugging issues.
 
 ### What does this solve?
-Many examples online are somewhat limited.  This project made a effort to better support Objectives, and Interaction capabilities is friendly easy to use APIs.
+Many examples online are somewhat limited.  This project made a effort to better support Objectives, and Interaction capabilities with friendly easy to use APIs.
 Much of the timestamps, durations, and SCORM formatted responses needed a single point of management vs. having it scattered throughout a project.  The specifications range in the hundreds of not thousands of pages of reading, parsing and interpreting which also leads to months of lost development.
 
 ## SCOBot Content support:
