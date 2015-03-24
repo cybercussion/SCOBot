@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
 ## About
-SCOBot includes the SCORM 2004 Content Interface with capabilities to rollback to SCORM 1.2.  It also includes QUnit tests, SCORM 2004 XSD/DTDs, Flash AS3 Class libraries to interface the JavaScript portions of the project.
+SCOBot includes the SCORM 2004 Content Interface with capabilities to rollback to SCORM 1.2.  This interacts with the LMS Runtime API.  It also includes QUnit tests, SCORM 2004 XSD/DTDs, Flash AS3 Class libraries to interface the JavaScript portions of the project.
 SCORM requires all communication occur with JavaScript.  Along with the content interface APIs it includes a light offline or non-LMS mimc of the LMS Runtime.
 
 ### What does this solve?
