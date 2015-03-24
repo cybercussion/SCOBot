@@ -31,7 +31,7 @@ I know not everyone is using jQuery, and we needed to be sensitive to that.  Tur
 
 #### Utilities
 * **QUnit-Tests/js/scorm/SCOBotUtil.js** (Required in a deployment)-
-Utilitiy funcitons replacing lost functionality used by jQuery in 3.x.x and prior.
+Utility functions replacing lost functionality used by jQuery in 3.x.x and prior.
 Includes an event system for JavaScript.  Wiki covers the audit.  Now removed '$' so if you are using jQuery, you don't have to worry about conflicts.  Minified this was a hit for 3.8KB vs 95KB of jQuery.
 
 #### Base Functionality
