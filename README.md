@@ -1,11 +1,13 @@
 [![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
-## What's all this jazz?
-SCORM is a Shareable Content Object Reference Model specification (white paper standard).  This was made available in 2001, updated in 2004 and patched as recent as 2009.
-Learning Management Systems commonly support SCORM 1.2 and 2004.  This provides the mechanism for packaging, and communicating with the LMS.  SCORM 2004 included the ability to add sequencing information into the packaging process.  All the files includes offer a full range of what makes up that packaging portion of the standard.
-It is possible to move all these XSD/DTD files into another folder so they are not such a eye-sore, but utilize caution when doing that.  The main focus of this project is the JavaScript contained within QUnit-Tests/js/scorm.  The rest is all the other necessary 'fluff' of the specification.
-All that said, dig deeper on the wiki.  I know, I know - a open source project with a wiki... wha?.  Canned training can really suck. This gives you the ability to drop in SCOBot, interact with the API to get your custom content out the door.
+## About
+SCOBot includes the SCORM 2004 Content Interface with capabilities to rollback to SCORM 1.2.  It also includes QUnit tests, SCORM 2004 XSD/DTDs, Flash AS3 Class libraries to interface the JavaScript portions of the project.
+SCORM requires all communication occur with JavaScript.  Along with the content interface APIs it includes a light offline or non-LMS mimc of the LMS Runtime.
 
-##SCOBot Content support:
+### What does this this solve?
+Many examples online are somewhat limited.  This project made a effort to better support Objectives, and Interaction capabilities is friendly easy to use APIs.
+Much of the timestamps, durations, and SCORM formatted responses needed a single point of management vs. having it scattered throughout a project.  The specifications range in the hundreds of not thousands of pages of reading, parsing and interpreting which also leads to months of lost development.
+
+## SCOBot Content support:
 https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
 
 Feel free to [email](https://cybercussion.com/#!contact) or post any issues you run into.  
@@ -25,7 +27,7 @@ I've kept this project split up into 4 logical portions, leaving room for anyone
 The portions of this project is split into the following sections:
 
 ### Now no longer requires jQuery in v4.x.x.?  So where's the code?
-I know not everyone is using jQuery and we needed to be sensitive to that.  Turns out this project was only using about 9KB (actual) of jQuery. (Migration covered on Wiki)
+I know not everyone is using jQuery, and we needed to be sensitive to that.  Turns out this project was only using about 9KB (actual) of jQuery. (Migration covered on Wiki)
 
 #### Utilities
 * **QUnit-Tests/js/scorm/SCOBotUtil.js** (Required in a deployment)-
