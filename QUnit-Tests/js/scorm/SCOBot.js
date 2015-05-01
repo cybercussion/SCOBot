@@ -54,7 +54,7 @@ function SCOBot(options) {
         defaults = {
             version:              "4.0.7",
             createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "03/11/2015 16:25PM",
+            modifiedDate:         "05/01/2015 16:19PM",
             prefix:               "SCOBot",
             // SCOBot default parameters
             launch_data:          {},
