@@ -54,7 +54,7 @@ function SCOBotBase(options) {
         defaults = {
             version:           "4.0.7",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "03/11/2015 16:25PM",
+            modifiedDate:      "05/01/2015 16:19PM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -846,7 +846,7 @@ function SCOBotBase(options) {
             switch (API.version) {
             case "1.2":
                 API.mode = API.mode === "" ? lms.LMSGetValue('cmi.core.lesson_mode') : API.mode;
-                if (API.mode === "normal") {
+                //if (API.mode === "normal") { It was determined that the specification did not enforce or signify a platform behavior like with SCORM 2004
                     switch (n) {
                     case "cmi.score.scaled":
                     case "cmi.progress_measure":
@@ -972,8 +972,8 @@ function SCOBotBase(options) {
                             case "success_status":
                             case "completion_status":
                                 tiers[3] = 'status'; // consolidate
-                                if (v === "unknown" || v === "not attempted") { // not supported
-                                    ig = true;
+                                if (v === "unknown") { // not supported, fix - not attempted is allowed.
+                                    v = "not attempted"; // convert
                                 }
                                 break;
                             case "progress_measure":
@@ -1003,10 +1003,10 @@ function SCOBotBase(options) {
                         return 'false';
                     }
                     s = lms.LMSSetValue(nn, v); //makeBoolean(lms.LMSSetValue(nn, v));
-                } else {
-                    debug(settings.prefix + ": Warning, you are not in normal mode.  Ignoring 'set' requests.", 2);
-                    return 'false';
-                }
+                //} else {
+                //    debug(settings.prefix + ": Warning, you are not in normal mode.  Ignoring 'set' requests.", 2);
+                //    return 'false';
+                //}
                 break;
             case "2004":
                 API.mode = API.mode === "" ? lms.GetValue('cmi.mode') : API.mode;
