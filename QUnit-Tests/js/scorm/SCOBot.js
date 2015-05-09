@@ -11,7 +11,7 @@
  * Please see the wiki below for more information about going commando, and or utilizing the rest of the library.
  * https://github.com/cybercussion/SCOBot
  *
- * jQuery dependency removed, and not utilizes SCOBotUtil.
+ * jQuery dependency removed, and now utilizes SCOBotUtil.
  *
  * Recommend a minify/merge before pushing to a production environment. (JSMin, YUI Compressor, Dojo Shrinksafe etc ...)
  *
