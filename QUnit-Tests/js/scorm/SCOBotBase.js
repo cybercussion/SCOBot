@@ -846,7 +846,7 @@ function SCOBotBase(options) {
             switch (API.version) {
             case "1.2":
                 API.mode = API.mode === "" ? lms.LMSGetValue('cmi.core.lesson_mode') : API.mode;
-                //if (API.mode === "normal") { It was determined that the specification did not enforce or signify a platform behavior like with SCORM 2004
+                //if (API.mode === "normal") { It was determined that the specification did not enforce a platform behavior like with SCORM 2004
                     switch (n) {
                     case "cmi.score.scaled":
                     case "cmi.progress_measure":
