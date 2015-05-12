@@ -1,34 +1,38 @@
 [![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
 ## About
-SCOBot includes the SCORM 2004 Content Interface with capabilities to rollback to SCORM 1.2.  This interacts with the LMS Runtime API.  It also includes QUnit tests, SCORM 2004 XSD/DTDs, Flash AS3 Class libraries to interface the JavaScript portions of the project.
-SCORM requires all communication occur with JavaScript.  
-Along with the content interface APIs it includes a light offline or non-LMS mimc of the LMS Runtime.  This enables you to see tracing of the LMS communication if it was present.  This may save you time debugging issues.
+SCOBot includes the SCORM 2004 Content Interface with capabilities to rollback to SCORM 1.2.  This interacts with the LMS Runtime API.  It also includes QUnit tests, SCORM 2004 XSD/DTDs, Flash AS3 Class libraries to interface the JavaScript portions of the project.  SCORM enables communication, packaging and sequencing possibilities when deploying e-learning content across different Learning Management Systems. 
+SCORM requires all communication occur with JavaScript. So if you are building an application in another programming language, you'll need to consider other options to communicate with the LMS. 
+Along with the SCOBot content APIs it includes a light offline or non-LMS mimc of the LMS Runtime.  This enables you to see tracing of the LMS communication if it was present.  This may save you time debugging issues.
+Simply put, this includes all the logic SCORM didn't bake into the communication API, so your not wasting time writing more code.
 
 ### What does this solve?
 Many examples online are somewhat limited.  This project made a effort to better support Objectives, and Interaction capabilities with friendly easy to use APIs.
 Much of the timestamps, durations, and SCORM formatted responses needed a single point of management vs. having it scattered throughout a project.  The specifications range in the hundreds of not thousands of pages of reading, parsing and interpreting which also leads to months of lost development.
+Differing opinions commonly occur after reading the specifications (either 1.2 or 2004).  How you treat the data your trying to store, and whether or not it 'fits' within the SCORM spec.  This project makes a attempt to lay out options and document the quirks more thoroughly.   
 
 ## SCOBot Content support:
 https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
 
 Feel free to [email](https://cybercussion.com/#!contact) or post any issues you run into.  
 
-You may be looking for the LMS Runtime API_1484_11, and this Project does not offer or include that.  The light mimic that is included IS NOT a runtime.  Its just the bare essentials to let this run on itself in a offline capability.
-The low-latency Runtime is available on https://cybercussion.com (Free for students) but licenced commercially.
+## Whats the difference between a Runtime API and this project?
+You may be looking for the LMS Runtime called 'API_1484_11', and this Project does not offer or include that.  The light mimic that is included IS NOT a runtime.  It is just the bare essentials to let this run on itself in a offline capability.
+The low-latency Runtime is available on https://cybercussion.com (Free for students) but licenced commercially.  The Runtime was developed in tandem with the SCOBot Content API project.  It includes all the rule sets associated with the SCORM Communication which is responsible for controlling read/write access, character limits, states, and status settings.
 
 ## Goals:
 * **Save** you time trying to support the SCORM Standard.  Yes, its Initialize, Get Value, Set Value, Commit, and Terminate on the surface, but it goes way beyond that.
-* **Educate** - Examples, concepts, options
+* **Educate** - Documentation, examples, concepts, options
 * **Modernize** - No one likes 500 global variable constants coupled with endless other issues associated with un-managed code.
 * **Transparency** - Know why something isn't working, and have logging to back it up.
-* **Test** - Drove the whole project with unit tests against the specification.  Scenarios, make having a complete test impossible.  Which is why there is always room for more testing.
+* **Test** - Drove the whole project with unit tests against the specification.  Scenarios, make having a complete test impossible.  Which is why there is always room for writing more tests.
+
+### Now no longer requires jQuery in v4.x.x.? 
+Not everyone is using jQuery, and we needed to be sensitive to that.  Turns out this project was only using about 9KB (actual) of jQuery. (Migration covered on Wiki)
+So if your using another framework, library or otherwise, this limitation was removed.
 
 ## About the Project:
 I've kept this project split up into 4 logical portions, leaving room for anyone to add or subtract from the complete package. The main focal point would be 'QUnit-Tests/js/scorm/', as the surrounding files are simply supporting files like JQuery, QUnit, and further README files.  I've also added all the files that go into a Content Aggregation Model.  This is a package used to export your content to a learning management server.
 The portions of this project is split into the following sections:
-
-### Now no longer requires jQuery in v4.x.x.?  So where's the code?
-I know not everyone is using jQuery, and we needed to be sensitive to that.  Turns out this project was only using about 9KB (actual) of jQuery. (Migration covered on Wiki)
 
 #### Utilities
 * **QUnit-Tests/js/scorm/SCOBotUtil.js** (Required in a deployment)-
@@ -50,6 +54,7 @@ This is the LMS mimic capability for local testing (non-LMS).  May save you some
 * Also have now added a minified, or packed version of all 4 of these files in a 39KB easy to use single file for those not doing there own builds.  See the **scorm.bot.pack.js** which is only the 4 above files merged, minified and packed.
 
 ## QUnit Launchables:
+For more on Qunits visit - https://qunitjs.com
 If your testing a LMS, feel free to edit the imsmanifest.xml to fit your needs.  Change the tests to match your launch parameters or launch data.  These tests are not meant to remain static.  Make it fit your needs.
 * **qunit_SCOBotBase.html** - This will run a series of 90+ tests against SCORM which include some local debug, gets and sets as well as classic Initialize, GetValue, SetValue, Commit and Terminate.  Even some illegal calls.  This whole package is great to run on a LMS to view if the LMS is compliant with SCORM.
 The test for this is found at 'js/test/scobotbase.js'.
