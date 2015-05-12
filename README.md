@@ -54,7 +54,7 @@ This is the LMS mimic capability for local testing (non-LMS).  May save you some
 * Also have now added a minified, or packed version of all 4 of these files in a 39KB easy to use single file for those not doing there own builds.  See the **scorm.bot.pack.js** which is only the 4 above files merged, minified and packed.
 
 ## QUnit Launchables:
-For more on Qunits visit - https://qunitjs.com
+For more on Qunits visit - https://qunitjs.com.
 If your testing a LMS, feel free to edit the imsmanifest.xml to fit your needs.  Change the tests to match your launch parameters or launch data.  These tests are not meant to remain static.  Make it fit your needs.
 * **qunit_SCOBotBase.html** - This will run a series of 90+ tests against SCORM which include some local debug, gets and sets as well as classic Initialize, GetValue, SetValue, Commit and Terminate.  Even some illegal calls.  This whole package is great to run on a LMS to view if the LMS is compliant with SCORM.
 The test for this is found at 'js/test/scobotbase.js'.
