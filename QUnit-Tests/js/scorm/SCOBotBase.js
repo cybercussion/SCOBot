@@ -37,7 +37,7 @@
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
  * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @version 4.0.7
+ * @version 4.0.8
  * @param options {Object} override default values
  * @constructor
  */
@@ -52,9 +52,9 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.0.7",
+            version:           "4.0.8",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "05/01/2015 16:19PM",
+            modifiedDate:      "05/21/2015 11:30AM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -1010,7 +1010,7 @@ function SCOBotBase(options) {
                 break;
             case "2004":
                 API.mode = API.mode === "" ? lms.GetValue('cmi.mode') : API.mode;
-                if (API.mode === "normal") {
+                //if (API.mode === "normal") { // Whether or not an LMS persists any of the data sent by the SCO, while in a mode of review or browse, is outside the scope of the SCORM.
                     switch (n) {
                     case "cmi.location":
                         if (v.length > 1000) {
@@ -1039,9 +1039,8 @@ function SCOBotBase(options) {
                         break;
                     }
                     s = lms.SetValue(n, v); //makeBoolean(lms.SetValue(n, v));
-                } else {
-                    debug(settings.prefix + ": Warning, you are not in normal mode.  Ignoring 'set' requests.", 2);
-                    return 'false';
+                if (API.mode !== "normal") {
+                    debug(settings.prefix + ": Warning, you are not in normal mode.  The LMS may ignore 'SetValue' requests.", 2);
                 }
                 break;
             default:
