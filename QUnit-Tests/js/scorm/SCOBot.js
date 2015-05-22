@@ -115,9 +115,11 @@ function SCOBot(options) {
     function initSCO() {
         lmsconnected = scorm.initialize();
         scorm.debug(settings.prefix + ": SCO Loaded from window.onload " + lmsconnected, 4);
-        if (lmsconnected) {
+        if (lmsconnected === 'true') {
             self.start(); // Things you'd do like getting mode, suspend data
             Utl.triggerEvent(self, "load");
+        } else {
+            scorm.debug(settings.prefix + "Sorry, I could not locate an LMS Runtime API.");
         }
         return lmsconnected;
     }
