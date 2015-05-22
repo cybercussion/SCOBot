@@ -37,7 +37,7 @@
  * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotBase, SCOBotUtil
- * @version 4.0.7
+ * @version 4.0.9
  * @param options {Object} override default values
  * @constructor
  */
@@ -52,30 +52,31 @@ function SCOBot(options) {
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
-            version:              "4.0.7",
-            createDate:           "04/07/2011 09:33AM",
-            modifiedDate:         "05/01/2015 16:19PM",
-            prefix:               "SCOBot",
+            version:                "4.0.9",
+            createDate:             "04/07/2011 09:33AM",
+            modifiedDate:           "05/22/2015 10:33PM",
+            prefix:                 "SCOBot",
             // SCOBot default parameters
-            launch_data:          {},
-            interaction_mode:     "state",          // or journaled
-            launch_data_type:     "querystring",    // or json
-            initiate_timer:       true,
-            scorm_strict:         true,             // You can override this.  Will enforce SPM of SCORM Spec
-            scorm_edition:        "3rd",            // or 4th - this is a issue with "editions" of SCORM 2004 that differ
-            scorm_status_persist: "success_status", // could alternatively set it to 'completion_status' (*SCORM 1.2 only)
-            location:             "",
-            useJSONSuspendData:   true,             // you may manage this yourself, set it to false if you do
-            suspend_data:         {pages: []},
-            base64:               false,            // true if you want to encode suspend data and decode on resume.
-            happyEnding:          true,             // Disable if you manage scoring, and don't want to expose the API call
-            mode:                 "",
-            scaled_passing_score: 0.7,              // Override for default unless imsmanifest has value
-            completion_threshold: 0,                // Override for default unless imsmanifest has value
-            max_time_allowed:     '',
-            totalInteractions:    0,
-            totalObjectives:      0,
-            startTime:            0
+            launch_data:            {},
+            interaction_mode:       "state",          // or journaled
+            launch_data_type:       "querystring",    // or json
+            initiate_timer:         true,
+            scorm_strict:           true,             // You can override this.  Will enforce SPM of SCORM Spec
+            scorm_edition:          "3rd",            // or 4th - this is a issue with "editions" of SCORM 2004 that differ
+            scorm_status_persist:   "success_status", // could alternatively set it to 'completion_status' (*SCORM 1.2 only)
+            useJSONSuspendData:     true,             // you may manage this yourself, set it to false if you do
+            suspend_data:           {pages: []},      // May be replaced by LMS value on resume
+            base64:                 false,            // true if you want to encode suspend data and decode on resume.
+            happyEnding:            true,             // Disable if you manage scoring, and don't want to expose the API call
+            doNotStatusUntilFinish: false,            // Hot fix: Some platforms if graded will launch you in review mode, even though your exit is suspend. See buffer below.
+            location:               "",               // will be replaced by LMS value
+            mode:                   "",               // will be replaced by LMS value
+            scaled_passing_score:   0.7,              // Override for default unless imsmanifest (LMS) has value
+            completion_threshold:   0,                // Override for default unless imsmanifest (LMS) has value
+            max_time_allowed:       '',               // will be replaced by LMS value
+            totalInteractions:      0,                // See setTotals below
+            totalObjectives:        0,
+            startTime:              0
         },
         // Settings merged with defaults and extended options
         settings     = Utl.extend(defaults, options),
@@ -84,18 +85,20 @@ function SCOBot(options) {
             success_status      : '',
             completion_status   : '',
             completion_threshold: settings.completion_threshold, // cache
-            progress_measure    : 0,
+            progress_measure    : '0',
             scaled_passing_score: settings.scaled_passing_score, // cache
             score               : {
-                scaled: 0,
-                raw   : 0,
-                min   : 0,
-                max   : 0
+                scaled: '0',
+                raw   : '0',
+                min   : '0',
+                max   : '0'
             }
         },
         lmsconnected = false,
         isError      = false,
         isStarted    = false,
+        happyEndingRequest = false,                   // if you enable happyEnding, and call it, it will take precedence.
+        SCOBotManagedStatus = false,                  // if you setTotals, SCOBot will manage the status.
         badValues    = '|null|undefined|false|NaN|| |',
         error        = scorm.get('error'), // no sense retyping this
         self         = this; // Hook
@@ -840,7 +843,7 @@ function SCOBot(options) {
                 count;
             buffer.completion_status = scorm.getvalue('cmi.completion_status'); // refresh
             buffer.success_status    = scorm.getvalue('cmi.success_status'); // refresh
-            buffer.score.raw         = 0; // reset
+            buffer.score.raw         = 0; // reset to number for calculation
             if (settings.totalInteractions === 0 || settings.totalObjectives === 0) {
                 // This is a non-starter, if the SCO Player doesn't set these we are flying blind
                 scorm.debug(settings.prefix + ": Sorry, I cannot calculate Progress as the totalInteractions and or Objectives are zero", 2);
@@ -869,27 +872,34 @@ function SCOBot(options) {
                 }
             }
             // Set Score Raw
-            scorm.debug(settings.prefix + " Setting score " + scorm.setvalue('cmi.score.raw', buffer.score.raw.toString()));
+            // Convert buffer.score.raw to string
+            buffer.score.raw = '' + buffer.score.raw; // reset to string for consistency
             // Set Score Scaled ///////////////////////
-            if ((buffer.score.max - buffer.score.min) === 0) {
+            if ((parseFloat(buffer.score.max) - parseFloat(buffer.score.min)) === 0) {
                 // Division By Zero
                 scorm.debug(settings.prefix + ": Division by Zero for scoreMax - scoreMin " + buffer.score.max, 2);
-                scorm.setvalue('cmi.score.scaled', '1'); // default
+                buffer.score.scaled = '1'; // buffer it
             } else {
-                buffer.score.scaled = ((buffer.score.raw - buffer.score.min) / (buffer.score.max - buffer.score.min)).toString();
+                buffer.score.scaled = '' + trueRound(((buffer.score.raw - buffer.score.min) / (buffer.score.max - buffer.score.min)), 7);
                 scorm.debug(settings.prefix + ": Score Scaled = " + buffer.score.scaled, 3);
-                scorm.setvalue('cmi.score.scaled', trueRound(buffer.score.scaled, 7));
             }
             // Set Progress Measure ///////////////////
-            buffer.progress_measure = (totalObjectivesCompleted / settings.totalObjectives).toString();
-            scorm.setvalue('cmi.progress_measure', trueRound(buffer.progress_measure, 7));
+            buffer.progress_measure = '' + trueRound((totalObjectivesCompleted / settings.totalObjectives), 7);
             // Set Completion Status
             buffer.completion_status = (parseFloat(buffer.progress_measure) >= parseFloat(buffer.completion_threshold)) ? 'completed' : 'incomplete';
-            scorm.setvalue('cmi.completion_status', buffer.completion_status);
+
             // Set Success Status /////////////////////
             scorm.debug(settings.prefix + ": Pass/Fail check - Calculated scaled score:" + parseFloat(buffer.score.scaled) + " vs. " + parseFloat(buffer.scaled_passing_score), 3);
             buffer.success_status = (parseFloat(buffer.score.scaled) >= parseFloat(buffer.scaled_passing_score)) ? 'passed' : 'failed';
-            scorm.setvalue('cmi.success_status', buffer.success_status);
+
+            if (!settings.doNotStatusUntilFinish) {
+                scorm.debug(settings.prefix + " Setting score immediately...", 4);
+                scorm.setvalue('cmi.score.raw', buffer.score.raw);
+                scorm.setvalue('cmi.score.scaled', buffer.score.scaled); // default score for division by zero
+                scorm.setvalue('cmi.progress_measure', buffer.progress_measure);
+                scorm.setvalue('cmi.completion_status', buffer.completion_status);
+                scorm.setvalue('cmi.success_status', buffer.success_status);
+            }
             // Cleaning this up since these values were just set, no reason to recall
             return {
                 score_scaled:      buffer.score.scaled,     //scorm.getvalue('cmi.score.scaled'),
@@ -941,32 +951,45 @@ function SCOBot(options) {
      * If values are set outside of defaults they are overwritten (ignored).
      */
     function updateStatus(ending) {
-        var ss = 'cmi.success_status',
-            cs = 'cmi.completion_status',
-            defss = scorm.get('success_status'),
-            defcs = scorm.get('completion_status'),
-            storss = self.getvalue(ss),
-            storcs = self.getvalue(cs),
-            isSuccessSet = false,
-            isCompletionSet = false;
-        if (storss === "passed" || storss === "failed") {
-            isSuccessSet = true;
-        }
-        if (storcs === "completed" || storcs === "incomplete") {
-            isCompletionSet = true;
-        }
-        if (scorm.get('exit_type') === 'finish' || ending) {
-            if (storss !== defss && !isSuccessSet) {
-                scorm.debug(settings.prefix + ": Overriding default success status to " + defss, 3);
-                self.setvalue(ss, defss);
+        if (ending && SCOBotManagedStatus) {
+            scorm.debug(settings.prefix + ": I am finishing... storing score on finish? " + settings.doNotStatusUntilFinish, 3);
+            if (settings.doNotStatusUntilFinish) {
+
+                scorm.setvalue('cmi.score.raw', buffer.score.raw);
+                scorm.setvalue('cmi.score.scaled', buffer.score.scaled); // default score for division by zero
+                scorm.setvalue('cmi.progress_measure', buffer.progress_measure);
+                scorm.setvalue('cmi.completion_status', buffer.completion_status);
+                return scorm.setvalue('cmi.success_status', buffer.success_status);
             }
-            // Modified to set if completion_status wishes to be persisted.  Otherwise it will not be set.
-            if (scorm.getAPIVersion() === "1.2" && settings.scorm_status_persist === "completion_status" && !isCompletionSet) {
-                self.setvalue(cs, defcs);
-            } else {
-                if (storcs !== defcs && !isCompletionSet) {
-                    scorm.debug(settings.prefix + ": Overriding default completion status to " + defcs, 3);
+        }
+        if (!happyEndingRequest) {
+            var ss = 'cmi.success_status',
+                cs = 'cmi.completion_status',
+                defss = scorm.get('success_status'),
+                defcs = scorm.get('completion_status'),
+                storss = self.getvalue(ss),
+                storcs = self.getvalue(cs),
+                isSuccessSet = false,
+                isCompletionSet = false;
+            if (storss === "passed" || storss === "failed") {
+                isSuccessSet = true;
+            }
+            if (storcs === "completed" || storcs === "incomplete") {
+                isCompletionSet = true;
+            }
+            if (scorm.get('exit_type') === 'finish' || ending) {
+                if (storss !== defss && !isSuccessSet) {
+                    scorm.debug(settings.prefix + ": Overriding default success status to " + defss, 3);
+                    self.setvalue(ss, defss);
+                }
+                // Modified to set if completion_status wishes to be persisted.  Otherwise it will not be set.
+                if (scorm.getAPIVersion() === "1.2" && settings.scorm_status_persist === "completion_status" && !isCompletionSet) {
                     self.setvalue(cs, defcs);
+                } else {
+                    if (storcs !== defcs && !isCompletionSet) {
+                        scorm.debug(settings.prefix + ": Overriding default completion status to " + defcs, 3);
+                        self.setvalue(cs, defcs);
+                    }
                 }
             }
         }
@@ -1121,6 +1144,7 @@ function SCOBot(options) {
      * @returns {String} 'true' or 'false'
      */
     this.setTotals = function (data) {
+        SCOBotManagedStatus = true;
         if (scorm.isConnectionActive()) {
             if (!isBadValue(data.totalInteractions)) {
                 settings.totalInteractions = data.totalInteractions;
@@ -1782,7 +1806,10 @@ function SCOBot(options) {
      * @return {String}
      */
     this.happyEnding = function () {
-        if (scorm.isConnectionActive() && settings.happyEnding) {
+        var activeConn = scorm.isConnectionActive();
+        SCOBotManagedStatus = false;
+        if (activeConn && settings.happyEnding && !settings.doNotStatusUntilFinish) {
+            happyEndingRequest = true;
             scorm.setvalue('cmi.score.scaled', '1');
             scorm.setvalue('cmi.score.min', '0');
             scorm.setvalue('cmi.score.max', '100');
@@ -1790,6 +1817,18 @@ function SCOBot(options) {
             scorm.setvalue('cmi.success_status', 'passed');
             scorm.setvalue('cmi.progress_measure', '1');
             return scorm.setvalue('cmi.completion_status', 'completed');
+        }
+        if (activeConn && settings.happyEnding && settings.doNotStatusUntilFinish) {
+            happyEndingRequest = true;
+            // Not ok
+            buffer.score.scaled      = '1';
+            buffer.score.raw         = '100';
+            buffer.success_status    = 'passed';
+            buffer.completion_status = 'completed';
+            buffer.progress_measure  = '1';
+            // ok
+            scorm.setvalue('cmi.score.min', '0');
+            return scorm.setvalue('cmi.score.max', '100');
         }
         return notStartedYet();
     };
@@ -1827,9 +1866,8 @@ function SCOBot(options) {
      */
     this.finish = function () {
         if (scorm.isConnectionActive()) {
-            scorm.debug(settings.prefix + ": I am finishing...", 3);
             scorm.setvalue('cmi.exit', 'normal');
-            // This is submitted per this call.
+            // This is done/submitted per this call.  An attempt ending method.
             updateStatus(true);
             isStarted = false;
             return scorm.terminate();
@@ -1845,7 +1883,7 @@ function SCOBot(options) {
         if (scorm.isConnectionActive()) {
             scorm.debug(settings.prefix + ": I am timing out...", 3);
             scorm.setvalue('cmi.exit', 'time-out');
-            // This is submitted per this call.
+            // This is done/submitted per this call.  An attempt ending method.
             updateStatus(true);
             isStarted = false;
             return scorm.terminate();
@@ -1913,7 +1951,4 @@ function SCOBot(options) {
     Utl.addEvent(scorm, 'exception', function (e) {
         triggerException(e.error);
     });
-    this.func = function () {
-        
-    };
 }

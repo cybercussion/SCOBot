@@ -1307,10 +1307,13 @@ $.addEvent(SB, 'load', function (e) {
     // Optional, comment out if you don't want to terminate.
     test("Terminate SCO", function () {
         SB.debug(">>>>>>>>>> Terminating <<<<<<<<<<<<<");
-        // Validate scoring
-        strictEqual(SB.getvalue('cmi.score.scaled'), '0.7512902', 'Verifying Score Scaled'); // modify this if you adjust scoring
-        strictEqual(SB.getvalue('cmi.success_status'), 'passed', "Verify Success Status");
-        strictEqual(SB.getvalue('cmi.completion_status'), 'incomplete');
+        // Validate scoring .. keep in mind if you use the SCOBot doNotStatusUntilFinish this will fail...
+        if (!SB.get('doNotStatusUntilFinish')) {
+            strictEqual(SB.getvalue('cmi.score.scaled'), '0.7512902', 'Verifying Score Scaled'); // modify this if you adjust scoring
+            strictEqual(SB.getvalue('cmi.success_status'), 'passed', "Verify Success Status");
+            strictEqual(SB.getvalue('cmi.completion_status'), 'incomplete');
+        }
+        // Sorry cannot interact further to check scoring since finish is a terminating method. Check your logs or LMS status to verify.
         strictEqual(SB.finish(), 'true', "Terminating SCO."); // Comment this out if you want to leave it up.
 
     });
