@@ -37,7 +37,7 @@
  * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotBase, SCOBotUtil
- * @version 4.0.9
+ * @version 4.1.0
  * @param options {Object} override default values
  * @constructor
  */
@@ -52,9 +52,9 @@ function SCOBot(options) {
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
-            version:                "4.0.10",
+            version:                "4.1.0",
             createDate:             "04/07/2011 09:33AM",
-            modifiedDate:           "05/22/2015 03:26PM",
+            modifiedDate:           "05/22/2015 05:17PM",
             prefix:                 "SCOBot",
             // SCOBot default parameters
             launch_data:            {},
@@ -106,6 +106,24 @@ function SCOBot(options) {
     ///////////////////////////
     // Private ////////////////
     /**
+     * Trigger Warning (internal to this API)
+     * Throws a console log when a SCORM API Error occurs
+     * @returns {Boolean}
+     */
+    function triggerWarning(n) {
+        scorm.debug(error[n], 2);
+        return true;
+    }
+
+    /**
+     * Trigger Exception
+     * Throws an event the player can listen to in order to handle an exception.
+     * This would be common to a non-compliance in an LMS and loss of student data.
+     */
+    function triggerException(msg) {
+        Utl.triggerEvent(self, 'exception', {error: msg});
+    }
+    /**
      * Initialize SCO
      * This is commonly done on load of the web page.
      * Default behavior
@@ -119,7 +137,9 @@ function SCOBot(options) {
             self.start(); // Things you'd do like getting mode, suspend data
             Utl.triggerEvent(self, "load");
         } else {
-            scorm.debug(settings.prefix + "Sorry, I could not locate an LMS Runtime API.");
+            var msg = "Sorry, unable to initialize the SCORM Runtime API. Returned: " + lmsconnected;
+            scorm.debug(settings.prefix + msg);
+            triggerException(msg);
         }
         return lmsconnected;
     }
@@ -152,25 +172,6 @@ function SCOBot(options) {
             scorm.debug(settings.prefix + ": SCO is done unloading.", 4);
         }
         return true;
-    }
-
-    /**
-     * Trigger Warning (internal to this API)
-     * Throws a console log when a SCORM API Error occurs
-     * @returns {Boolean}
-     */
-    function triggerWarning(n) {
-        scorm.debug(error[n], 2);
-        return true;
-    }
-
-    /**
-     * Trigger Exception
-     * Throws an event the player can listen to in order to handle an exception.
-     * This would be common to a non-compliance in an LMS and loss of student data.
-     */
-    function triggerException(msg) {
-        Utl.triggerEvent(self, 'exception', {error: msg});
     }
 
     /**
