@@ -10,10 +10,13 @@ Many examples online are somewhat limited.  This project made a effort to better
 Much of the timestamps, durations, and SCORM formatted responses needed a single point of management vs. having it scattered throughout a project.  The specifications range in the hundreds of not thousands of pages of reading, parsing and interpreting which also leads to months of lost development.
 Differing opinions commonly occur after reading the specifications (either 1.2 or 2004).  How you treat the data your trying to store, and whether or not it 'fits' within the SCORM spec.  This project makes a attempt to lay out options and document the quirks more thoroughly.   
 
+## General Help
+
 ## SCOBot Content support:
 https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
-
 Feel free to [email](https://cybercussion.com/#!contact) or post any issues you run into.  
+If you have a project that needs consultation, or assistance don't hesitate to make contact.
+
 
 ## Whats the difference between a Runtime API and this project?
 You may be looking for the LMS Runtime called 'API_1484_11', and this Project does not offer or include that.  The light mimic that is included IS NOT a runtime.  It is just the bare essentials to let this run on itself in a offline capability.
