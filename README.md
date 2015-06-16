@@ -12,7 +12,7 @@ Differing opinions commonly occur after reading the specifications (either 1.2 o
 
 ## General Help
 
-## SCOBot Content support:
+### SCOBot Content support:
 https://github.com/cybercussion/SCOBot/wiki - Please refer to this for much more detailed information.
 Feel free to [email](https://cybercussion.com/#!contact) or post any issues you run into.  
 If you have a project that needs consultation, or assistance don't hesitate to make contact.
