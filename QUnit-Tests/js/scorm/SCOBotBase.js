@@ -157,36 +157,6 @@ function SCOBotBase(options) {
     }
 
     /**
-     * Find API
-     * API_1484_11 or API for SCORM 2004 or 1.2
-     * @param win {object} Window level
-     */
-    function findAPI(win) {
-        if (settings.preferred_API === "findAPI") {
-            var attempts = 0, limit = 500;
-            while ((!win.API && !win.API_1484_11) && (win.parent) && (win.parent !== win) && (attempts <= limit)) {
-                attempts += 1;
-                win = win.parent;
-            }
-            if (win.API_1484_11) {//SCORM 2004-specific API.
-                API.version = "2004";
-                //Set version
-                API.path = win.API_1484_11;
-            } else if (win.API) {//SCORM 1.2-specific API
-                API.version = "1.2";
-                //Set version
-                API.path = win.API;
-            } else {
-                return false;
-            }
-            return true;
-        } else if (settings.preferred_API === "findSCORM12") {
-            return findSCORM12(win);
-        }
-        return findSCORM2004(win);
-    }
-
-    /**
      * Find SCORM 2004
      * API_1484_11
      * @param win {object} Window level
@@ -228,6 +198,37 @@ function SCOBotBase(options) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Find API
+     * API_1484_11 or API for SCORM 2004 or 1.2
+     * @param win {object} Window level
+     */
+    function findAPI(win) {
+        if (settings.preferred_API === "findAPI") { // search SCORM2004, then 1.2
+            var attempts = 0, limit = 500;
+            while ((!win.API && !win.API_1484_11) && (win.parent) && (win.parent !== win) && (attempts <= limit)) {
+                attempts += 1;
+                win = win.parent;
+            }
+            if (win.API_1484_11) {//SCORM 2004-specific API.
+                API.version = "2004";
+                //Set version
+                API.path = win.API_1484_11;
+            } else if (win.API) {//SCORM 1.2-specific API
+                API.version = "1.2";
+                //Set version
+                API.path = win.API;
+            } else {
+                return false;
+            }
+            return true;
+        }
+        if (settings.preferred_API === "findSCORM12") { // Specifically 1.2
+            return findSCORM12(win);
+        }
+        return findSCORM2004(win); // 2004
     }
 
     // SCORM Time centric to SCORM 2004 and 1.2 Compatibility
