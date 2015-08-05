@@ -1786,7 +1786,7 @@ function SCOBot(options) {
             scorm.debug(settings.prefix + ": Division by Zero for scoreMax - scoreMin " + scoreMax, 2);
             scorm.setvalue('cmi.score.scaled', scoreScaled);
         } else {
-            scoreScaled = ((scoreRaw - scoreMin) / (scoreMax - scoreMin)).toString();
+            scoreScaled = '' + ((scoreRaw - scoreMin) / (scoreMax - scoreMin));
             scorm.debug(settings.prefix + ": Score Scaled = " + scoreScaled, 3);
             scorm.setvalue('cmi.score.scaled', trueRound(scoreScaled, 7));
         }
