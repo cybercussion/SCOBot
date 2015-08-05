@@ -37,12 +37,12 @@
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
  * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @version 4.0.8
+ * @version 4.0.9
  * @param options {Object} override default values
  * @constructor
  */
 /*!
- * SCOBotBase, Updated Jan 3rd, 2015
+ * SCOBotBase, Updated Aug 4th, 2015
  * Copyright (c) 2009-2015, Cybercussion Interactive LLC.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
@@ -52,19 +52,20 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.0.8",
+            version:           "4.0.9",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "05/21/2015 11:30AM",
+            modifiedDate:      "08/04/2015 11:30AM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
+            preferred_API:     "findAPI",    // findAPI, findSCORM12, findSCORM2004
             prefix:            "SCOBotBase",
-            exit_type:         "suspend", // suspend, finish, or "" (undetermined)
-            success_status:    "unknown", // passed, failed, unknown
-            use_standalone:    true,
-            standalone:        false,
-            completion_status: "incomplete", // completed, incomplete, unknown
-            time_type:         "UTC",
+            exit_type:         "suspend",    // suspend, finish, or "" (undetermined)
+            success_status:    "unknown",    // passed, failed, unknown
+            use_standalone:    true,         // false if you don't want it to fail over locally
+            standalone:        false,        // flag
+            completion_status: "incomplete", // default completed, incomplete, unknown
+            time_type:         "UTC",        // See GMT (pre 1972) vs UTC (post 1972) Time http://www.timeanddate.com/time/gmt-utc-time.html
             cmi:               null,
             latency_arr: []
         },
@@ -172,6 +173,50 @@ function SCOBotBase(options) {
             //Set version
             API.path = win.API_1484_11;
         } else if (win.API) {//SCORM 1.2-specific API
+            API.version = "1.2";
+            //Set version
+            API.path = win.API;
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Find SCORM 2004
+     * API_1484_11
+     * @param win {object} Window level
+     */
+    function findSCORM2004(win) {
+        var attempts = 0,
+            limit = 500;
+        while ((!win.API_1484_11) && (win.parent) && (win.parent !== win) && (attempts <= limit)) {
+            attempts += 1;
+            win = win.parent;
+        }
+        if (win.API_1484_11) {//SCORM 2004-specific API.
+            API.version = "2004";
+            //Set version
+            API.path = win.API_1484_11;
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Find SCORM12
+     * API
+     * @param win {object} Window level
+     */
+    function findSCORM12(win) {
+        var attempts = 0,
+            limit = 500;
+        while ((!win.API) && (win.parent) && (win.parent !== win) && (attempts <= limit)) {
+            attempts += 1;
+            win = win.parent;
+        }
+        if (win.API) {//SCORM 1.2-specific API
             API.version = "1.2";
             //Set version
             API.path = win.API;
@@ -1346,7 +1391,7 @@ function SCOBotBase(options) {
         try {
             win = window.parent;
             if (win && win !== window) {
-                findAPI(window.parent);
+                this[defaults.preferred_API](window.parent);
             }
         } catch (e) {/* Cross Domain issue */
             debug(settings.prefix + " Possible Cross-domain issue/local mode (ignore).", 2);
@@ -1355,7 +1400,7 @@ function SCOBotBase(options) {
         if (!API.path) {
             try {
                 win = window.top.opener;
-                findAPI(win);
+                this[defaults.preferred_API](win);
             } catch (ee) {/* Cross domain issue */
                 debug(settings.prefix + " Possible Cross-domain issue/local mode (ignore).", 2);
                 //debug(ee, 1);
