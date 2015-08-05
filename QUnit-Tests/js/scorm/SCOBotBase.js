@@ -162,24 +162,28 @@ function SCOBotBase(options) {
      * @param win {object} Window level
      */
     function findAPI(win) {
-        var attempts = 0,
-            limit = 500;
-        while ((!win.API && !win.API_1484_11) && (win.parent) && (win.parent !== win) && (attempts <= limit)) {
-            attempts += 1;
-            win = win.parent;
+        if (settings.preferred_API === "findAPI") {
+            var attempts = 0, limit = 500;
+            while ((!win.API && !win.API_1484_11) && (win.parent) && (win.parent !== win) && (attempts <= limit)) {
+                attempts += 1;
+                win = win.parent;
+            }
+            if (win.API_1484_11) {//SCORM 2004-specific API.
+                API.version = "2004";
+                //Set version
+                API.path = win.API_1484_11;
+            } else if (win.API) {//SCORM 1.2-specific API
+                API.version = "1.2";
+                //Set version
+                API.path = win.API;
+            } else {
+                return false;
+            }
+            return true;
+        } else if (settings.preferred_API === "findSCORM12") {
+            return findSCORM12(win);
         }
-        if (win.API_1484_11) {//SCORM 2004-specific API.
-            API.version = "2004";
-            //Set version
-            API.path = win.API_1484_11;
-        } else if (win.API) {//SCORM 1.2-specific API
-            API.version = "1.2";
-            //Set version
-            API.path = win.API;
-        } else {
-            return false;
-        }
-        return true;
+        return findSCORM2004(win);
     }
 
     /**
@@ -1391,7 +1395,7 @@ function SCOBotBase(options) {
         try {
             win = window.parent;
             if (win && win !== window) {
-                this[defaults.preferred_API](window.parent);
+                findAPI(window.parent);
             }
         } catch (e) {/* Cross Domain issue */
             debug(settings.prefix + " Possible Cross-domain issue/local mode (ignore).", 2);
@@ -1400,7 +1404,7 @@ function SCOBotBase(options) {
         if (!API.path) {
             try {
                 win = window.top.opener;
-                this[defaults.preferred_API](win);
+                findAPI(win);
             } catch (ee) {/* Cross domain issue */
                 debug(settings.prefix + " Possible Cross-domain issue/local mode (ignore).", 2);
                 //debug(ee, 1);
