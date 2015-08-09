@@ -169,8 +169,7 @@ function SCOBotBase(options) {
             win = win.parent;
         }
         if (win.API_1484_11) {//SCORM 2004-specific API.
-            API.version = "2004";
-            //Set version
+            API.version = "2004"; //Set version
             API.path = win.API_1484_11;
         } else {
             return false;
@@ -191,8 +190,7 @@ function SCOBotBase(options) {
             win = win.parent;
         }
         if (win.API) {//SCORM 1.2-specific API
-            API.version = "1.2";
-            //Set version
+            API.version = "1.2";  //Set version
             API.path = win.API;
         } else {
             return false;
