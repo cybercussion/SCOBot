@@ -30,8 +30,8 @@ QUnit-Tests/js/scorm/
 These can be used to aid in the creation of custom shareable content objects.  Further documentation on how to implement SCOBot in your project can be found within the Wiki.
 
 ## Further Reading:
-See the Wiki link on github for more detailed info.  
-Diagram (from Brandon Bradley) - http://www.xmind.net/share/brandonbradley/xmind-421310/
+See the Wiki link on github for more detailed info.  The SCOBot Documentation will dig into all the technical aspects of not only the integration, but pre-flight things to think about.
+Configuration is normally half the battle of a successful deployment, and should be considered before (not after) you start your project.
 
 ## What else do you need?
 A Player/Presentation layer was not included with this project.  Commonly in the past developers used iframes, or framesets to display a series of HTML page in a sequence.  They also used other technologies like Flash.  A more modern HTML approach now would be to lead content via AJAX.
