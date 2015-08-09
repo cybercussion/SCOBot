@@ -38,7 +38,7 @@ A Player/Presentation layer was not included with this project.  Commonly in the
 Presenting your training may require you to construct your own player.  This can mean loading, templatizing, blending views and data.  Building out interactions, layouts etc ... You could be doing this by hand or using a CMS.  
 Packaging and or Zipping - You may find once you have SCOBot, plus your presentation you need to now bundle it.  The files in this project were meant to assist you here getting a full scope of what needs to be done to make that successful.  See the Wiki for more info on zipping/packaging options.
 
-I also recommend trying out a bookmarklet I made to check the status of a content object running on your LMS.
+## Debugging / Transparency
 [SCOverseer](http://www.cybercussion.com/bookmarklets/SCORM/) - see the Bookmarklet button on that page (drag it to your bookmarks bar).  Directions on page.
 
 Thanks for taking the time to take a look, and thanks to everyone that's assisted with feedback.
