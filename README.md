@@ -3,6 +3,8 @@
 This project was created to enhance developers capabilities interfacing e-learning standards for SCORM 1.2 and SCORM 2004.
 It's a combination of all the missing API support provided by the Learning Management System Runtime.  SCORM itself started off as a packaging and communication standard.  Later in 2004 this included sequencing and navigation to manage your table of contents.
 
+![Documentation](http://cybercussion.com/css/img/oriented.png) 
+
 ## Quick note about Packaging
 There are a lot of base files that make up the packaging standard.  These schemas and document type definitions are all based on the XML structures used by the packaging format.
 These are optional files used to support the IMS Manifest used to describe your content object(s).  This enables a Learning Management System to import your content, and have some level of a one to many relationship.
