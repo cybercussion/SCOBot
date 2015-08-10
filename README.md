@@ -5,6 +5,9 @@ It's a combination of all the missing API support provided by the Learning Manag
 
 ![Documentation](http://cybercussion.com/css/img/oriented.jpg) 
 
+This project started off strictly as a SCORM 2004 project, but later rolled in a fail over to SCORM 1.2.  This enabled you to speak SCORM 2004 throughout your project vs. trying to manage multiple deployment configurations.
+So if you run on a platform that does not use SCORM 2004, but uses SCORM 1.2 the content API will translate the requests for you.
+
 ## Quick note about Packaging
 There are a lot of base files that make up the packaging standard.  These schemas and document type definitions are all based on the XML structures used by the packaging format.
 These are optional files used to support the IMS Manifest used to describe your content object(s).  This enables a Learning Management System to import your content, and have some level of a one to many relationship.
