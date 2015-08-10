@@ -17,7 +17,7 @@ It's a combination of all the missing API support provided by the Learning Manag
 ![Documentation](http://cybercussion.com/css/img/oriented.jpg) 
 
 Location of the Runtime API occurs quickly.  This traverses the Document Object Model seeking out the Runtime API.  Once connected, SCORM communication will initialize.
-SCOBot will translate API calls to SCORM 1.2 if the portal does not support SCORM 2004.  This allows you to speak one language throughout your project, but be aware there are some limitations on this compatibility due to differences between the specifications.
+SCOBot will translate API calls to SCORM 1.2 if the portal does not support SCORM 2004.  This allows you to speak one language throughout your project, but be aware there are some limitations on the compatibility due to differences between the specifications.
 
 ## Quick note about Packaging
 There are a lot of base files that make up the packaging standard.  These schemas and document type definitions are all based on the XML structures used by the packaging format.
