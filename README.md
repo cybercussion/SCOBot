@@ -5,8 +5,7 @@ It's a combination of all the missing API support provided by the Learning Manag
 
 ![Documentation](http://cybercussion.com/css/img/oriented.jpg) 
 
-This project started off strictly as a SCORM 2004 project, but later rolled in a fail over to SCORM 1.2.  This enabled you to speak SCORM 2004 throughout your project vs. trying to manage multiple deployment configurations.
-So if you run on a platform that does not use SCORM 2004, but uses SCORM 1.2 the content API will translate the requests for you.
+SCOBot will translate API calls to SCORM 1.2 if the portal does not support SCORM 2004.  This allows you to speak one language throughout your project, but be aware there are some limitations on this compatibility due to differences between the specifications.
 
 ## Quick note about Packaging
 There are a lot of base files that make up the packaging standard.  These schemas and document type definitions are all based on the XML structures used by the packaging format.
