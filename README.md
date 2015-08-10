@@ -8,7 +8,7 @@
 * Seeking a managed, modern, transparent, test driven approach to JavaScript.
 
 Wiki has been updated with technical, non-technical information so you can obtain a more well-rounded view of e-learning as a whole.  The audience is commonly broad, with varying skill sets and backgrounds.
-SCORM is one of the more popular e-learning standards.  Since SCORM is predominantly a JavaScript communication standard coupled with packaging and sequencing it can get complicated in a hurry.
+SCORM is one of the more popular e-learning standards.  Since SCORM is predominantly a JavaScript communication standard coupled with packaging and sequencing - it can get complicated in a hurry.
 After you understand the underlying components that make up the communication, packaging, and sequencing you'll find its pretty much like building a website, and reporting what the user is doing through an API.
 
 ## SCORM Support for Content
