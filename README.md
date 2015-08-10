@@ -1,10 +1,12 @@
 [![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
+
 ## SCORM Support for Content
 This project was created to enhance developers capabilities interfacing e-learning standards for SCORM 1.2 and SCORM 2004.
 It's a combination of all the missing API support provided by the Learning Management System Runtime.  SCORM itself started off as a packaging and communication standard.  Later in 2004 this included sequencing and navigation to manage your table of contents.
 
 ![Documentation](http://cybercussion.com/css/img/oriented.jpg) 
 
+Location of the Runtime API occurs quickly.  This traverses the Document Object Model seeking out the Runtime API.  Once connected, SCORM communication will initialize.
 SCOBot will translate API calls to SCORM 1.2 if the portal does not support SCORM 2004.  This allows you to speak one language throughout your project, but be aware there are some limitations on this compatibility due to differences between the specifications.
 
 ## Quick note about Packaging
@@ -31,7 +33,7 @@ QUnit-Tests/js/scorm.bot.pack.js
 >Developer Source Code -
 QUnit-Tests/js/scorm/
 
-These can be used to aid in the creation of custom shareable content objects, or even adding SCORM support to a page that previously didn't have it.  Further documentation on how to implement SCOBot in your project can be found within the Wiki.
+These can be used to aid in the creation of custom shareable content objects, or even adding SCORM support to a page that previously didn't have it.  Further documentation on how to implement and configure SCOBot in your project can be found within the Wiki.
 
 ## Further Reading:
 See the Wiki link on github for more detailed info.  The SCOBot Documentation will dig into all the technical aspects of not only the integration, but pre-flight things to think about.
