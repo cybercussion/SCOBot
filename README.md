@@ -48,7 +48,7 @@ QUnit-Tests/js/scorm/
 These can be used to aid in the creation of custom shareable content objects, or even adding SCORM support to a page that previously didn't have it.  Further documentation on how to implement and configure SCOBot in your project can be found within the Wiki.
 
 ## Further Reading:
-See the Wiki link on github for more detailed info.  The SCOBot Documentation will dig into all the technical aspects of not only the integration, but pre-flight things to think about.
+The [SCOBot Documentation](https://github.com/cybercussion/SCOBot/wiki/SCORM-SCOBot-Documentation) will dig into all the technical aspects of not only the integration, but pre-flight things to think about.
 Configuration is normally half the battle of a successful deployment, and should be considered before (not after) you start your project.
 
 ## What else do you need?
