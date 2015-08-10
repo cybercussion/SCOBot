@@ -1,10 +1,10 @@
 [![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
 ## Why would I use this?
 
-*You are looking to add SCORM support to existing content that needs to report scoring, status and or completion.
-*You are designing custom e-learning content and wish to add SCORM Support.
-*You are testing or troubleshooting a LMS Platforms SCORM compatibility.
-*Furthering your familiarization with SCORM and its possibilities.
+* You are looking to add SCORM support to existing content that needs to report scoring, status and or completion.
+* You are designing custom e-learning content and wish to add SCORM Support.
+* You are testing or troubleshooting a LMS Platforms SCORM compatibility.
+* Furthering your familiarization with SCORM and its possibilities.
 
 ## SCORM Support for Content
 This project was created to enhance developers capabilities interfacing e-learning standards for SCORM 1.2 and SCORM 2004.
