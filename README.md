@@ -5,11 +5,11 @@
 * You are designing custom e-learning content and wish to add SCORM Support.
 * You are testing or troubleshooting a LMS Platforms SCORM compatibility.
 * Furthering your familiarization with SCORM and its possibilities.
+* Seeking a managed, modern, transparent, test driven approach to JavaScript.
 
 ## SCORM Support for Content
-This project was created to enhance developers capabilities interfacing e-learning standards for SCORM 1.2 and SCORM 2004.
+This project was created to enhance developers capabilities interfacing e-learning standards for SCORM 1.2 and SCORM 2004.  Over the last 5+ years of development, there has been no end to the amount of use cases and scenarios.  Feedback from platform deployments ( new and legacy ) have been rolled into to the source code. 
 It's a combination of all the missing API support provided by the Learning Management System Runtime.  SCORM itself started off as a packaging and communication standard.  Later in 2004 this included sequencing and navigation to manage your table of contents.
-
 ![Documentation](http://cybercussion.com/css/img/oriented.jpg) 
 
 Location of the Runtime API occurs quickly.  This traverses the Document Object Model seeking out the Runtime API.  Once connected, SCORM communication will initialize.
