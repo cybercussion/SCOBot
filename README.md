@@ -7,6 +7,10 @@
 * Furthering your familiarization with SCORM and its possibilities.
 * Seeking a managed, modern, transparent, test driven approach to JavaScript.
 
+Wiki has been updated with technical, non-technical information so you can obtain a more well-rounded view of e-learning as a whole.  The audience is commonly broad, with varying skill sets and backgrounds.
+SCORM is one of the more popular e-learning standards.  Since SCORM is predominantly a JavaScript communication standard coupled with packaging and sequencing it can get complicated in a hurry.
+After you understand the underlying components that make up the communication, packaging, and sequencing you'll find its pretty much like building a website, and reporting what the user is doing through an API.
+
 ## SCORM Support for Content
 This project was created to enhance developers capabilities interfacing e-learning standards for SCORM 1.2 and SCORM 2004.  Over the last 5+ years of development, there has been no end to the amount of use cases and scenarios.  Feedback from platform deployments ( new and legacy ) have been rolled into to the source code. 
 It's a combination of all the missing API support provided by the Learning Management System Runtime.  SCORM itself started off as a packaging and communication standard.  Later in 2004 this included sequencing and navigation to manage your table of contents.
