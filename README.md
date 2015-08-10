@@ -35,6 +35,8 @@ Its very important to understand SCORM should be treated much like loading any o
 
 ## QUnit Tests
 These have been included to help in the development of the API.  Part way thru the design it was determined they could also test a Learning Management Systems compatibility with SCORM.  All too often there have been platforms that water down their SCORM support or took shortcuts that aren't apparent until you blast them with a compressed 15 minute session.  You can utilize these QUnit tests to find out if your LMS is in good standing or has some issues that need to be addressed.  One popular issue is a non-cached API.  This means the LMS is attempting to make a round-trip to the server per request.  This roughly simulates a Denial Of Service (DOS) attack, and can cripple the user experience.
+Those unfamiliar with the concept of Test Driven Development, can visit [QUnitJS.com](https:/qunitjs.com) for more information.
+This is a relatively simple way to build out designed tests to ensure your logic in your entire project is functioning with good and bad data.
 
 ## SCOBot JavaScript
 >Single file script - 
