@@ -36,11 +36,11 @@ Its very important to understand SCORM should be treated much like loading any o
 ## QUnit Tests
 These have been included to help in the development of the API.  Part way thru the design it was determined they could also test a Learning Management Systems compatibility with SCORM.  All too often there have been platforms that water down their SCORM support or took shortcuts that aren't apparent until you blast them with a compressed 15 minute session.  You can utilize these QUnit tests to find out if your LMS is in good standing or has some issues that need to be addressed.  One popular issue is a non-cached API.  This means the LMS is attempting to make a round-trip to the server per request.  This roughly simulates a Denial Of Service (DOS) attack, and can cripple the user experience.
 Those unfamiliar with the concept of Test Driven Development, can visit [QUnitJS.com](https:/qunitjs.com) for more information.
-This is a relatively simple way to build out designed tests to ensure your logic in your entire project is functioning with good and bad data.
+This is a relatively simple way to build out designed tests to ensure logic in your entire project is functioning with good and bad data.
 
 ## SCOBot JavaScript
 >Single file script - 
-QUnit-Tests/js/scorm.bot.pack.js 
+QUnit-Tests/js/scorm.bot.pack.js files merged, minified, packed
 
 >Developer Source Code -
 QUnit-Tests/js/scorm/
@@ -52,6 +52,7 @@ See the Wiki link on github for more detailed info.  The SCOBot Documentation wi
 Configuration is normally half the battle of a successful deployment, and should be considered before (not after) you start your project.
 
 ## What else do you need?
+![Player](http://cybercussion.com/css/img/SCOBotPlayer.jpg) 
 A Player/Presentation layer was not included with this project.  Commonly in the past developers used iframes, or framesets to display a series of HTML page in a sequence.  They also used other technologies like Flash.  A more modern HTML approach now would be to lead content via AJAX.
 Presenting your training may require you to construct your own player.  This can mean loading, templatizing, blending views and data.  Building out interactions, layouts etc ... You could be doing this by hand or using a CMS.  
 Packaging and or Zipping - You may find once you have SCOBot, plus your presentation you need to now bundle it.  The files in this project were meant to assist you here getting a full scope of what needs to be done to make that successful.  See the Wiki for more info on zipping/packaging options.
