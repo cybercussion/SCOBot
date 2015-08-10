@@ -57,6 +57,19 @@ A Player/Presentation layer was not included with this project.  Commonly in the
 Presenting your training may require you to construct your own player.  This can mean loading, templatizing, blending views and data.  Building out interactions, layouts etc ... You could be doing this by hand or using a CMS.  
 Packaging and or Zipping - You may find once you have SCOBot, plus your presentation you need to now bundle it.  The files in this project were meant to assist you here getting a full scope of what needs to be done to make that successful.  See the Wiki for more info on zipping/packaging options.
 
+
+## The Student Attempt and Concepts
+SCORM has a CMI (Computer Managed Instruction) Object which contains data-points for things like completion, success, scoring, location, interactions and objectives.  The Runtime API provides access to this data by controlling read, write as well as limits on states, character counts etc.  SCOBot rolls in all these rules in order to make your implementation have a higher rate of success.
+The base requirement of a Shareable Content Object is that it initialize and terminate.  Popular issues that come up even in enterprise  training are things like -
+
+* Content doesn't terminate due to a exit event issue, or authoring oversight.
+* Content never ends the attempt, and is stuck in 'suspend' mode forever.
+* Redirects (like a language selector) within the content could break LMS functionality.
+* LMS launches content in review mode after you report a score and suspend for later.
+* The list can go on and on...
+
+As a content developer, these problems can compromise tens of thousands of your training materials.  This also commonly forces you to redeploy your content and even go as far as having to cache-bust your SCOs so the student can see the updates.  Just like any website, you can have browser compatibility, security changes and feature support that pop up over the life cycle of your project(s).
+
 ## Debugging / Transparency
 [SCOverseer](http://www.cybercussion.com/bookmarklets/SCORM/) - see the Bookmarklet button on that page (drag it to your bookmarks bar).  Directions on page.
 
