@@ -52,7 +52,7 @@ See the Wiki link on github for more detailed info.  The SCOBot Documentation wi
 Configuration is normally half the battle of a successful deployment, and should be considered before (not after) you start your project.
 
 ## What else do you need?
-![Player](http://cybercussion.com/css/img/SCOBotPlayer.jpg) 
+![Player](http://cybercussion.com/css/img/SCOBotPlayer.png) 
 A Player/Presentation layer was not included with this project.  Commonly in the past developers used iframes, or framesets to display a series of HTML page in a sequence.  They also used other technologies like Flash.  A more modern HTML approach now would be to lead content via AJAX.
 Presenting your training may require you to construct your own player.  This can mean loading, templatizing, blending views and data.  Building out interactions, layouts etc ... You could be doing this by hand or using a CMS.  
 Packaging and or Zipping - You may find once you have SCOBot, plus your presentation you need to now bundle it.  The files in this project were meant to assist you here getting a full scope of what needs to be done to make that successful.  See the Wiki for more info on zipping/packaging options.
