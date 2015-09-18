@@ -16,6 +16,16 @@
 	<metadata>
 		<schema>ADL SCORM</schema>
 		<schemaversion>2004 3rd Edition</schemaversion>
+		<lom xsi:schemaLocation="http://ltsc.ieee.org/xsd/LOM lom.xsd" xmlns="http://ltsc.ieee.org/xsd/LOM">
+			<lom:general>
+				<lom:title>
+					<lom:string language="en">Sample Lesson</lom:string>
+				</lom:title>
+				<lom:description>
+					<lom:string language="en">This is a series of Unit tests for SCORM and SCOBot Content API.</lom:string>
+				</lom:description>
+			</lom:general>
+		</lom>
 	</metadata>
 	<organizations default="ORG-001">
 		<organization identifier="ORG-001" adlseq:objectivesGlobalToSystem="true">
