@@ -326,7 +326,7 @@ function SCOBot_API_1484_11(options) {
         // See note above about read-only
         var tiers = key.split('.'),
             v = tiers[tiers.length - 1]; // last value
-        if (tiers[0] === 'adl' && tiers[4] === 'id') {
+        if (tiers[2] === "request_valid" || tiers[4] === 'id') {
             return true;
         }
         if (tiers[1] === 'comments_from_lms') {// entirely read only
@@ -683,7 +683,8 @@ function SCOBot_API_1484_11(options) {
         //$(self).triggerHandler({
         Utl.triggerEvent(self, 'StoreData', {
             name: 'StoreData',
-            runtimedata: cmi
+            runtimedata: cmi,
+            sequence: adl
         });
         return 'true';
     };
