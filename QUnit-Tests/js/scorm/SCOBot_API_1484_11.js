@@ -647,7 +647,7 @@ function SCOBot_API_1484_11(options) {
                     }
                     break;
                 case "adl.nav.request_valid.continue":
-                case "adl.nav.request.valid.previous":
+                case "adl.nav.request_valid.previous":
                     settings.errorCode = "404";
                     settings.diagnostic = "The requested namespace is read-only.";
                     return 'false';
