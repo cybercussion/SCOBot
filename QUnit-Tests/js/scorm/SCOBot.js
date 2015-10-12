@@ -31,18 +31,24 @@
  * anything to say about it.  This does however leave the the power back on the LMS with a simple report.  But, it
  * requires some data forensics to determine if cheating occurred.  More on this via the Wiki.
  *
+ * Sequencing
+ * SCORM Navigation is entirely based on the learner.  Most LMS systems will leave your content hanging after it
+ * Terminates.  SCORM 2004 added Sequencing and Navigation which opened up more options for dictating how your SCO
+ * behaves after Terminate is fired. The default behavior is _none_, however if you seek more information about the
+ * other possibilities you can locate a SCORM_SeqNav.pdf from ADL in Table 5.6.6a for more detailed info.
+ *
  * @event exception, load, unload, message, continue, comments_lms
  *
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
  * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotBase, SCOBotUtil
- * @version 4.1.0
+ * @version 4.1.1
  * @param options {Object} override default values
  * @constructor
  */
 /*!
- * SCOBot, Updated Feb 27th, 2015
+ * SCOBot, Updated Oct 11th, 2015
  * Copyright (c) 2009-2015, Cybercussion Interactive LLC. All rights reserved.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
@@ -52,9 +58,9 @@ function SCOBot(options) {
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
-            version:                "4.1.0",
+            version:                "4.1.1",
             createDate:             "04/07/2011 09:33AM",
-            modifiedDate:           "05/22/2015 05:17PM",
+            modifiedDate:           "10/11/2015 05:04PM",
             prefix:                 "SCOBot",
             // SCOBot default parameters
             launch_data:            {},
@@ -68,7 +74,12 @@ function SCOBot(options) {
             suspend_data:           {pages: []},      // May be replaced by LMS value on resume
             base64:                 false,            // true if you want to encode suspend data and decode on resume.
             happyEnding:            true,             // Disable if you manage scoring, and don't want to expose the API call
-            doNotStatusUntilFinish: false,            // Hot fix: Some platforms if graded will launch you in review mode, even though your exit is suspend. See buffer below.
+            doNotStatusUntilFinish: false,            // Hot fix: Some platforms(if graded) will launch you in review mode, even though your exit is suspend. See buffer below.
+            sequencing: {
+                nav: {
+                    request: '_none_'                   // continue, previous, choice, exit, exitAll, abandon, abandonAll, suspendAll, and _none_.  choice allows {target=<STRING>} like “{target=intro}choice” where STRING is the identifierref from the manifest.  This would act like a 'jump' navigation capability.  This is executed by the LMS on Terminate.  You could pass capabilities also thru launch data or parameters to convey options for the SCO to calculate. _none_ is default.
+                }
+            },
             location:               "",               // will be replaced by LMS value
             mode:                   "",               // will be replaced by LMS value
             scaled_passing_score:   0.7,              // Override for default unless imsmanifest (LMS) has value
@@ -1869,6 +1880,11 @@ function SCOBot(options) {
      */
     this.finish = function () {
         if (scorm.isConnectionActive()) {
+            // Check sequence
+            if (settings.sequencing.nav.request !== "_none_") { // don't bother unless its different
+                scorm.setvalue('adl.nav.request', settings.sequencing.nav.request);
+            }
+            // Exit
             scorm.setvalue('cmi.exit', 'normal');
             // This is done/submitted per this call.  An attempt ending method.
             updateStatus(true);

@@ -37,12 +37,12 @@
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
  * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @version 4.0.9
+ * @version 4.1.1
  * @param options {Object} override default values
  * @constructor
  */
 /*!
- * SCOBotBase, Updated Aug 4th, 2015
+ * SCOBotBase, Updated Oct 11th, 2015
  * Copyright (c) 2009-2015, Cybercussion Interactive LLC.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
@@ -52,9 +52,9 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.0.9",
+            version:           "4.1.1",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "08/04/2015 11:30AM",
+            modifiedDate:      "10/11/2015 05:33AM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -896,9 +896,13 @@ function SCOBotBase(options) {
                 API.mode = API.mode === "" ? lms.LMSGetValue('cmi.core.lesson_mode') : API.mode;
                 //if (API.mode === "normal") { It was determined that the specification did not enforce a platform behavior like with SCORM 2004
                     switch (n) {
+                    case "adl.nav.request":
+                    case "adl.nav.request_valid.continue":
+                    case "adl.nav.request_valid.previous":
+                    case "adl.nav.request_valid.choice":
+                    // Ignore all ADL requests
                     case "cmi.score.scaled":
                     case "cmi.progress_measure":
-
                         ig = true;
                         break;
                     case "cmi.comments_from_learner.comment":

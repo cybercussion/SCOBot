@@ -34,9 +34,9 @@ function SCOBot_API_1484_11(options) {
     "use strict";
     var Utl      = SCOBotUtil,
         defaults = {
-            version:     "4.0.6",
+            version:     "4.1.1",
             createdate:  "07/17/2010 08:15AM",
-            moddate:     "03/04/2015 10:31PM",
+            moddate:     "10/11/2015 06:27PM",
             prefix:      "SCOBot_API_1484_11",
             errorCode:   0,
             diagnostic:  '',
@@ -93,11 +93,22 @@ function SCOBot_API_1484_11(options) {
                 suspend_data:          "",
                 time_limit_action:     "", // exit, no message or continue, message etc ...
                 total_time:            "PT0H0M0S"
+            },
+            ADL: {
+                nav: {
+                    request: "_none_",
+                    request_valid: {
+                        choice: {},
+                        continue: "false",
+                        previous: "false"
+                    }
+                }
             }
         },
         // Settings merged with defaults and extended options */
         settings = Utl.extend(defaults, options),
         cmi = {},
+        adl = {},
         /**
          * Completion Status's that are allowed
          */
@@ -279,6 +290,31 @@ function SCOBot_API_1484_11(options) {
     }
 
     /**
+     * ADL Get Value (Private)
+     * This covers the ADL Sequence and Navigation object present in SCORM 2004
+     * @param key {String}
+     * @returns {String}
+     */
+    function adlGetValue(key) {
+        var r = "false";
+        // Stop a jump navigation request since there is no navigation in this scenario.
+        if (key.indexOf('adl.nav.request_valid.choice') >= 0) {
+            settings.errorCode = 301;
+            scorm.debug(settings.prefix + "Sorry, targeted 'choice' requests not allowed by this API since there is no navigation.", 2);
+        } else {
+            r = getData(key.substr(4, key.length), adl);
+            // Filter
+            if (r === 'undefined') {
+                settings.errorCode = 401;
+                settings.diagnostic = "Sorry, there was a undefined response from " + key;
+                r = "false";
+            }
+            scorm.debug(settings.prefix + ": GetValue " + key + " = " + r, 4);
+        }
+        return r;
+    }
+
+    /**
      * Is Read Only?
      * I've placed several of the read-only items in a delimited string.  This is used to compare
      * the key, to known read-only values to keep you from changing something your not supposed to.
@@ -377,6 +413,11 @@ function SCOBot_API_1484_11(options) {
         } else {
             cmi = settings.CMI;
         }
+        if (settings.adl !== null) {
+            adl = settings.adl;
+        } else {
+            adl = settings.ADL;
+        }
         // Clean CMI Object
         settings.initialized = 1;
         settings.terminated = 0;
@@ -408,7 +449,7 @@ function SCOBot_API_1484_11(options) {
 
                 break;
             case "adl":
-
+                r = adlGetValue(k);
                 break;
             }
             return r;
