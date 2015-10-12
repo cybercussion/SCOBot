@@ -127,7 +127,8 @@ function SCOBot_API_1484_11(options) {
          */
         write_only = "|exit|session_time|",
         exit = "|time-out|suspend|logout|normal||",
-        errors = {
+        nav_states = "|_none_|continue|previous|choice|exit|exitAll|abandon|abandonAll|suspendAll",
+        errors     = {
             0:   "No error",
             101: "General exception",
             102: "General Initialization Failure",
@@ -630,7 +631,36 @@ function SCOBot_API_1484_11(options) {
                 // Unless local storage was used, persisting would be difficult.
                 break;
             case "adl":
-                // Since you don't effectively have a TOC navigation would be difficult.
+                // This value is dynamic since it commonly includes a {target=STRING}
+                if (key.indexOf('adl.nav.request_valid.choice') >= 0) {
+                    settings.errorCode = "404";
+                    settings.diagnostic = "The requested namespace is read-only.";
+                    return 'false';
+                }
+                // Check the rest
+                switch (key) {
+                case "adl.nav.request":
+                    if (nav_states.indexOf('|' + v + '|') === -1) {
+                        settings.errorCode = "406";
+                        settings.diagnostic = "The requested namespace value did not match any allowed states.";
+                        return 'false';
+                    }
+                    break;
+                case "adl.nav.request_valid.continue":
+                case "adl.nav.request.valid.previous":
+                    settings.errorCode = "404";
+                    settings.diagnostic = "The requested namespace is read-only.";
+                    return 'false';
+                default:
+                    // Further evaluation?
+                    if (tiers[1] !== "nav") {
+                        settings.errorCode = "351";
+                        settings.diagnostic = "The requested namespace does not exist.";
+                        return 'false';
+                    }
+                    break;
+                }
+                setData(k.substr(4, k.length), v, adl);
                 break;
             }
             return "true";
