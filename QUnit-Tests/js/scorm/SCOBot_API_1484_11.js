@@ -42,6 +42,8 @@ function SCOBot_API_1484_11(options) {
             diagnostic:  '',
             initialized: 0,
             terminated:  0,
+            cmi: null,
+            adl: null,
             // CMI is the Computer Managed Instruction object (the student attempt).  Edit these values as you see fit.
             CMI:         {
                 _version:              "Local 1.0",
@@ -284,9 +286,9 @@ function SCOBot_API_1484_11(options) {
                 settings.diagnostic = "Sorry, there was a undefined response from " + key;
                 r = "false";
             }
-            scorm.debug(settings.prefix + ": GetValue " + key + " = " + r, 4);
             break;
         }
+        scorm.debug(settings.prefix + ": GetValue " + key + " = " + r, 4);
         return r;
     }
 
@@ -297,12 +299,14 @@ function SCOBot_API_1484_11(options) {
      * @returns {String}
      */
     function adlGetValue(key) {
+        console.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         var r = "false";
         // Stop a jump navigation request since there is no navigation in this scenario.
         if (key.indexOf('adl.nav.request_valid.choice') >= 0) {
             settings.errorCode = 301;
             scorm.debug(settings.prefix + "Sorry, targeted 'choice' requests not allowed by this API since there is no navigation.", 2);
         } else {
+            console.log(adl);
             r = getData(key.substr(4, key.length), adl);
             // Filter
             if (r === 'undefined') {
@@ -310,8 +314,8 @@ function SCOBot_API_1484_11(options) {
                 settings.diagnostic = "Sorry, there was a undefined response from " + key;
                 r = "false";
             }
-            scorm.debug(settings.prefix + ": GetValue " + key + " = " + r, 4);
         }
+        scorm.debug(settings.prefix + ": GetValue " + key + " = " + r, 4);
         return r;
     }
 
@@ -419,6 +423,7 @@ function SCOBot_API_1484_11(options) {
         if (settings.adl !== null) {
             adl = settings.adl;
         } else {
+            console.log("SETTING ADL TO ADL");
             adl = settings.ADL;
         }
         // Clean CMI Object
