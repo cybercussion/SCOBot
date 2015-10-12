@@ -408,12 +408,14 @@ function SCOBot_API_1484_11(options) {
      */
     this.Initialize = function () {
         scorm.debug(settings.prefix + ":  Initializing...", 3);
+        // Computer Managed Instruction
         if (settings.cmi !== null) {
             cmi = settings.cmi;
             checkExitType();
         } else {
             cmi = settings.CMI;
         }
+        // ADL - Sequence and Navigation
         if (settings.adl !== null) {
             adl = settings.adl;
         } else {
@@ -477,6 +479,7 @@ function SCOBot_API_1484_11(options) {
             if (isReadOnly(k)) {
                 scorm.debug(settings.prefix + ": This " + k + " is read only", 4);
                 settings.errorCode = 404;
+                settings.diagnostic = "This namespace is read-only.";
                 return "false";
             }
             tiers = k.split(".");
@@ -646,6 +649,7 @@ function SCOBot_API_1484_11(options) {
                         return 'false';
                     }
                     break;
+                // This should get caught by isReadOnly above
                 case "adl.nav.request_valid.continue":
                 case "adl.nav.request_valid.previous":
                     settings.errorCode = "404";
