@@ -221,7 +221,7 @@ test("Happy Ending", function () {
     SB.happyEnding();
     // Verify Happy ending values
     strictEqual(scorm.getvalue('cmi.score.scaled'), '1', "Checking to make sure score.scaled is 1");
-    strictEqual(scorm.getvalue('cmi.score.raw'), '1', "Checking to make sure score.raw is 1");
+    strictEqual(scorm.getvalue('cmi.score.raw'), '100', "Checking to make sure score.raw is 100");
     strictEqual(scorm.getvalue('cmi.success_status'), 'passed', "Checking to make sure success_status is passed.");
     strictEqual(scorm.getvalue('cmi.completion_status'), 'completed', "Checking to make sure completion_status is completed.");
 });
