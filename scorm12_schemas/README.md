@@ -9,3 +9,6 @@ There are subtle differences in the manifest files between SCORM 1.2 and 2004.
 2. resource: 1.2 - scormtype vs 2004 scormType
 3. Sequence and Navigation i.e. imsss:sequencing, SCORM 2004 Only
 4. Noted XSDs work against SCORM 1.2 or SCORM 2004 for validation
+
+Please remember most of the SCORM 1.2 specification namespace support on a learning platform is optional.
+Mileage will vary depending on support.
