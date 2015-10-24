@@ -5,7 +5,7 @@
  * Mimics LMS Connectivity in Local Mode i.e. standalone functionality, and is not meant to be confused with a actual
  * LMS Runtime Environment.  It does not include all the rich error management and is meant to be a light weight way to
  * continue to work offline to help saving you several round trips packaging and uploading your content to an LMS.
- * For a production Runtime, please see https://cybercussion.com
+ * For a production Runtime, please see https://cybercussion.com/#!SCOBOT2004RTE
  *
  * jQuery dependency removed, and now utilizes SCOBotUtil.
  *
@@ -100,7 +100,7 @@ function SCOBot_API_1484_11(options) {
                 nav: {
                     request: "_none_",
                     request_valid: {
-                        choice: {},
+                        choice  : {}, // "{target=<STRING>} - keep in mind you have no lesson structure in standalone mode"
                         continue: "false",
                         previous: "false"
                     }
