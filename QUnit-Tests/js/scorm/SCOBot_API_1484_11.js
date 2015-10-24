@@ -20,7 +20,7 @@
  * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotUtil, SCOBotBase
- * @version 4.0.6
+ * @version 4.1.2
  * @param options {Object} override default values
  * @constructor
  */
@@ -34,9 +34,9 @@ function SCOBot_API_1484_11(options) {
     "use strict";
     var Utl      = SCOBotUtil,
         defaults = {
-            version:     "4.1.1",
+            version:     "4.1.2",
             createdate:  "07/17/2010 08:15AM",
-            moddate:     "10/11/2015 06:27PM",
+            moddate:     "10/24/2015 11:26AM",
             prefix:      "SCOBot_API_1484_11",
             errorCode:   0,
             diagnostic:  '',
