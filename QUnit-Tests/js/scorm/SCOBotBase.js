@@ -52,9 +52,9 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.1.2",
+            version:           "4.1.3",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "10/24/2015 05:33AM",
+            modifiedDate:      "01/01/2016 08:30PM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -125,9 +125,9 @@ function SCOBotBase(options) {
         if (settings.debug) {// default is false
             if (!window.console) {// IE 7 probably 6 was throwing a error if 'console undefined'
                 window.console = {};
-                window.console.info = noconsole;
-                window.console.log  = noconsole;
-                window.console.warn = noconsole;
+                window.console.info  = noconsole;
+                window.console.log   = noconsole;
+                window.console.warn  = noconsole;
                 window.console.error = noconsole;
                 window.console.trace = noconsole;
             }
