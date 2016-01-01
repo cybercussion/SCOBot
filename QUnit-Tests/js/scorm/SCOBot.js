@@ -58,9 +58,9 @@ function SCOBot(options) {
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
-            version:                "4.1.1",
+            version:                "4.1.2",
             createDate:             "04/07/2011 09:33AM",
-            modifiedDate:           "10/11/2015 05:04PM",
+            modifiedDate:           "10/24/2015 05:04PM",
             prefix:                 "SCOBot",
             // SCOBot default parameters
             launch_data:            {},
