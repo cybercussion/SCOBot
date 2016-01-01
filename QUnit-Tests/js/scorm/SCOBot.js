@@ -105,7 +105,7 @@ function SCOBot(options) {
                 max   : '0'
             }
         },
-        lmsconnected = false,
+        lmsconnected = 'false',
         isError      = false,
         isStarted    = false,
         happyEndingRequest = false,                   // if you enable happyEnding, and call it, it will take precedence.
@@ -279,7 +279,7 @@ function SCOBot(options) {
      * @returns {Number}
      */
     function findResponseType(type, str) {
-        var reg = 0;
+        var reg;
         switch (type) {
         case "order_matters":
             reg = /^\{order_matters=.*?\}/;
@@ -594,8 +594,8 @@ function SCOBot(options) {
                 str = arr.join("[:]");
             } else {
                 // Verify number to save some time.
-                str = parseFloat(value);
-                if (str === "NaN") {
+                //str = parseFloat(value);
+                if (isNaN(value)) {
                     scorm.debug(settings.prefix + ": Developer, your not passing a number for a numeric interaction.  I got " + value + " instead", 1);
                 }
                 str += ''; // String
