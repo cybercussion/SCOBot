@@ -52,9 +52,9 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.1.1",
+            version:           "4.1.2",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "10/11/2015 05:33AM",
+            modifiedDate:      "10/24/2015 05:33AM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -849,7 +849,7 @@ function SCOBotBase(options) {
                 }
             });
             end = new Date();
-            settings.latency_arr.push({lat: end - start, v: n}); // latency check.
+            settings.latency_arr.push({lat: Number(end) - Number(start), v: n}); // latency check.
             if (ec === 0 || ec === 403) {
                 // Clean up differences in LMS responses
                 if (v === 'undefined' || v === null || v === 'null') { // was typeof v
