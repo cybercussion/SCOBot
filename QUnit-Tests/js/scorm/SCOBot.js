@@ -58,9 +58,9 @@ function SCOBot(options) {
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
-            version:                "4.1.2",
+            version:                "4.1.3",
             createDate:             "04/07/2011 09:33AM",
-            modifiedDate:           "10/24/2015 05:04PM",
+            modifiedDate:           "01/01/2016 08:30PM",
             prefix:                 "SCOBot",
             // SCOBot default parameters
             launch_data:            {},
@@ -588,7 +588,7 @@ function SCOBot(options) {
          */
         case 'numeric':
             if (typeof value === "number") {
-                str = value.toString();
+                str = '' +value;
             } else if (Utl.isPlainObject(value)) {
                 arr = [trueRound(value.min, 7), trueRound(value.max, 7)];
                 str = arr.join("[:]");
@@ -598,7 +598,7 @@ function SCOBot(options) {
                 if (isNaN(value)) {
                     scorm.debug(settings.prefix + ": Developer, your not passing a number for a numeric interaction.  I got " + value + " instead", 1);
                 }
-                str += ''; // String
+                str = value;
             }
             return str;
             /*
@@ -613,7 +613,7 @@ function SCOBot(options) {
              */
         case 'other':
             // Anything up to 4000 characters
-            return value.toString(); // Do nothing, but ensure string
+            return '' + value; // Do nothing, but ensure string
         default:
             // Invalid
             scorm.debug(settings.prefix + ": Sorry, invalid interaction type detected for " + type + " on " + value, 1);
@@ -1115,7 +1115,7 @@ function SCOBot(options) {
                  * Change 75 to 0.75 just in case.  Possibly a relic from SCORM 1.2.
                  */
                 if (parseFloat(tmpScaledPassingScore > 1)) {
-                    buffer.scaled_passing_score = ((parseFloat(tmpScaledPassingScore) * 10) / 1000).toString();
+                    buffer.scaled_passing_score = '' + ((parseFloat(tmpScaledPassingScore) * 10) / 1000);
                 }
                 settings.scaled_passing_score = buffer.scaled_passing_score; // Override from imsmanifest.xml
             }
@@ -1168,11 +1168,11 @@ function SCOBot(options) {
             }
             if (!isBadValue(data.scoreMin)) {
                 buffer.score.min = trueRound(data.scoreMin, 7);
-                scorm.setvalue('cmi.score.min', buffer.score.min.toString());
+                scorm.setvalue('cmi.score.min', '' + buffer.score.min);
             }
             if (!isBadValue(data.scoreMax)) {
                 buffer.score.max = trueRound(data.scoreMax, 7);
-                scorm.setvalue('cmi.score.max', buffer.score.max.toString());
+                scorm.setvalue('cmi.score.max', '' + buffer.score.max);
             }
             return 'true';
         }
@@ -1234,7 +1234,7 @@ function SCOBot(options) {
      */
     this.setBookmark = function (v) {
         if (scorm.isConnectionActive()) {
-            settings.location = v.toString(); // update local snapshot, ensure string
+            settings.location = '' + v; // update local snapshot, ensure string
             return scorm.setvalue('cmi.location', settings.location);
         }
         return notStartedYet();
@@ -1670,7 +1670,7 @@ function SCOBot(options) {
             p1 += n + '.';
             if (f) {
                 if (!isBadValue(data.id)) {
-                    sv(p1 + 'id', data.id.toString());
+                    sv(p1 + 'id', '' + data.id);
                 } else { // Show stopper
                     scorm.debug(settings.prefix + ": You did not pass an objective ID!!  What I did get below:", 1);
                     for (key in data) {

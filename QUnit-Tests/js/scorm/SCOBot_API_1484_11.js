@@ -34,9 +34,9 @@ function SCOBot_API_1484_11(options) {
     "use strict";
     var Utl      = SCOBotUtil,
         defaults = {
-            version:     "4.1.2",
+            version:     "4.1.3",
             createdate:  "07/17/2010 08:15AM",
-            moddate:     "10/24/2015 11:26AM",
+            moddate:     "01/01/2016 08:30PM",
             prefix:      "SCOBot_API_1484_11",
             errorCode:   0,
             diagnostic:  '',
@@ -299,14 +299,12 @@ function SCOBot_API_1484_11(options) {
      * @returns {String}
      */
     function adlGetValue(key) {
-        console.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         var r = "false";
         // Stop a jump navigation request since there is no navigation in this scenario.
         if (key.indexOf('adl.nav.request_valid.choice') >= 0) {
             settings.errorCode = 301;
             scorm.debug(settings.prefix + "Sorry, targeted 'choice' requests not allowed by this API since there is no navigation.", 2);
         } else {
-            console.log(adl);
             r = getData(key.substr(4, key.length), adl);
             // Filter
             if (r === 'undefined') {
@@ -423,7 +421,6 @@ function SCOBot_API_1484_11(options) {
         if (settings.adl !== null) {
             adl = settings.adl;
         } else {
-            console.log("SETTING ADL TO ADL");
             adl = settings.ADL;
         }
         // Clean CMI Object
