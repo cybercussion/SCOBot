@@ -139,10 +139,10 @@ function SCOBot(options) {
      * This is commonly done on load of the web page.
      * Default behavior
      * @event load
-     * @returns {Boolean} true or false if established LMS connection
+     * @returns {String} 'true' or 'false' if established LMS connection
      */
     function initSCO() {
-        lmsconnected = scorm.initialize();
+        lmsconnected = scorm.initialize(); // returns string
         scorm.debug(settings.prefix + ": SCO Loaded from window.onload " + lmsconnected, 4);
         if (lmsconnected === 'true') {
             self.start(); // Things you'd do like getting mode, suspend data
@@ -946,8 +946,8 @@ function SCOBot(options) {
             //for (i = 0; i <= count; i += 1) {
             while (i <= count) {
                 p1 += i + '.';
-                obj.comment = scorm.getvalue(p1 + 'comment');
-                obj.location = scorm.getvalue(p1 + 'location');
+                obj.comment   = scorm.getvalue(p1 + 'comment');
+                obj.location  = scorm.getvalue(p1 + 'location');
                 obj.timestamp = scorm.getvalue(p1 + 'timestamp');
                 response.push(obj);
                 obj = {};
