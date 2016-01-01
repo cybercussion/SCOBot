@@ -42,14 +42,14 @@
  * https://github.com/cybercussion/SCOBot
  *
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
- * @license Copyright (c) 2009-2015, Cybercussion Interactive LLC
+ * @license Copyright (c) 2009-2016, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @version 4.0.5
  * @constructor
  */
 /*!
- * SCOBot Utility, Updated Jan 3rd, 2015
- * Copyright (c) 2009-2015, Cybercussion Interactive LLC. All rights reserved.
+ * SCOBot Utility, Updated Jan 3rd, 2016
+ * Copyright (c) 2009-2016, Cybercussion Interactive LLC. All rights reserved.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 var SCOBotUtil = function () {
