@@ -6,9 +6,10 @@ API's and features have been built and tested.  More tests can always be written
 ## Communication, Packaging, Sequencing (SCORM 2004 only)
 Main project (JavaScript) files are located in QUnit-Tests/js/scorm.
 Surrounding files are related to the Packaging portion of SCORM 2004, and SCORM 1.2 schemas are also available in the scorm12_schemas folder.
-Do you have to create a CAM/PIF package - no.  Most platforms support also support manual transfers or content repositories.
+Do you have to create a CAM/PIF package? - no.  Most platforms support also support manual transfers or content repositories.
 However, most the time the imsmanifest.xml serves as a matter of record, and the surrounding optional XSD's assist in the validation of that XML file.
 Normally these files must be in the root of the zip.  Some platforms will complain if they are not.
+Please also consider the use of CDNs, S3, etc... when applicable; to limit your content bandwidth and forcing the user to re-download shared assets.
 
 ## Why would I use this?
 
