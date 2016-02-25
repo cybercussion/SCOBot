@@ -1028,7 +1028,8 @@ function SCOBot(options) {
     this.start = function () {
         var tmpLaunchData = '',
             tmpCompletionThreshold = '',
-            tmpScaledPassingScore = '';
+            tmpScaledPassingScore = '',
+            objectiveCountCheck;
         //queryStringExp = /\\?([^?=&]+)(=([^&#]*))?/gi;
         scorm.debug(settings.prefix + ": I am starting...", 3);
         if (!isStarted) {
@@ -1100,6 +1101,11 @@ function SCOBot(options) {
                 // First time
                 scorm.debug(settings.prefix + ": First time running this SCO based on LMS entry value.", 4);
                 scorm.debug(settings.prefix + ": Creating new suspend data object", 4);
+                // SCOBot: Consider warning the developer of a Platform that already has a objective present.
+                objectiveCountCheck = parseInt(scorm.getvalue('cmi.objectives._count'), 10);
+                if (objectiveCountCheck > 0 ) {
+                    scorm.debug(settings.prefix + ": Warning, there are/is " + objectiveCountCheck + " objective(s) already present in this attempt!", 2);
+                }
             }
             // Scaled Passing Score
             tmpCompletionThreshold = scorm.getvalue('cmi.completion_threshold'); // Snapshot Completion Threshold

@@ -1130,11 +1130,15 @@ function SCOBotBase(options) {
      * @returns {String} 'true' or 'false'
      */
     this.commit = function () {
-        var s = 'false',
-            lms = API.path,
-            ec = 0,
+        var s        = 'false',
+            lms      = API.path,
+            ec       = 0,
             session_secs,
-            saveDate = new Date();
+            saveDate = new Date(),
+            lat      = self.checkLatency(),
+            speed    = lat > 0.40 ? "slow" : "fast";
+        // Write out existing LMS latency
+        debug(settings.prefix + " Tip: Current LMS Latency is " + lat + "ms which is " + speed + ".");
         // Clear current latency
         settings.latency_arr = [];
         session_secs = (saveDate.getTime() - settings.startDate.getTime()) / 1000;
