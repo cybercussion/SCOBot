@@ -1190,7 +1190,11 @@ function SCOBot(options) {
      */
     this.startTimer = function () {
         var time = scorm.ISODurationToCentisec(settings.max_time_allowed) * 10;
-        setTimeout(timesUp, time);
+        if (time === 0) {
+            scorm.debug(settings.prefix + "Recieved a zero duration.  Ignoring.", 2);
+        } else {
+            setTimeout(timesUp, time);
+        }
     };
     /**
      * Debug
