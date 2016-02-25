@@ -408,7 +408,7 @@ function SCOBotBase(options) {
                 }
                 i += 1;
             }
-            bErr = !!(((!bErr) && (len !== 0)));
+            bErr = !((!bErr) && (len !== 0)); // Fix 2/2016
         }
         if (bErr) {
             return 0;
