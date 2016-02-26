@@ -349,6 +349,13 @@ test("initialize", function () {
                 } else {
                     strictEqual(getvalue('cmi.interactions._count'), getvalue('cmi.interactions._count'), "Getting Objective Count, expecting " + getvalue('cmi.interactions._count'));
                 }
+
+                test("ISO Duration", function() {
+                    // Adding test to make sure ISODurationToCentisecs works properly.
+                    var time = scorm.ISODurationToCentisec("PT10S") * 10;
+                    strictEqual(time, 10000, "Checking ISODurationToCentisecs");
+                });
+
                 // Wrap up scoring
                 test("setvalue", function () {
                     strictEqual(setvalue('cmi.score.raw', "1"), 'true', 'Setting cmi.score.raw to 1');

@@ -188,6 +188,9 @@ $.addEvent(SB, 'load', function (e) {
     test("Max Time Allowed", function () {
         var max_time_allowed = SB.getvalue('cmi.max_time_allowed');
         strictEqual(max_time_allowed, '', "Checking max time allowed ('')");
+        // Adding test to make sure ISODurationToCentisecs works properly.
+        var time = scorm.ISODurationToCentisec("PT10S") * 10;
+        strictEqual(time, 10000, "Checking ISODurationToCentisecs");
         // Note, if you update the CAM to pass imsss:attemptAbsoluteDurationLimit please update this test!
     });
 
