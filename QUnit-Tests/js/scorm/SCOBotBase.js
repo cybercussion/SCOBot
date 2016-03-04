@@ -37,7 +37,7 @@
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
  * @license Copyright (c) 2009-2016, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @version 4.1.3
+ * @version 4.1.5
  * @param options {Object} override default values
  * @constructor
  */
@@ -52,9 +52,9 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.1.3",
+            version:           "4.1.5",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "01/01/2016 08:30PM",
+            modifiedDate:      "03/04/2016 12:24AM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -1444,11 +1444,20 @@ function SCOBotBase(options) {
     /**
      * Get Last Error (Internal API)
      * Converts error integer to Message String
-     * @param n {String} name
-     * @returns value {String}
+     * @returns {object}
+     * {
+     *   code: {number},
+     *   msg: {string},
+     *   diag: {string}
+     * }
      */
-    this.getLastError = function (n) {
-        return error[n];
+    this.getLastError = function () {
+        var ec = getLastErrorCode();
+        return {
+            code: ec,
+            msg: getLastErrorMessage(ec),
+            diag:getDiagnostic(ec)
+        };
     };
     /**
      * Is LMS Connected
