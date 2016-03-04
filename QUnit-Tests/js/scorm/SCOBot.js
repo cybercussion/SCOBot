@@ -43,7 +43,7 @@
  * @license Copyright (c) 2009-2016, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotBase, SCOBotUtil
- * @version 4.1.3
+ * @version 4.1.5
  * @param options {Object} override default values
  * @constructor
  */
@@ -58,9 +58,9 @@ function SCOBot(options) {
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
-            version:                "4.1.3",
+            version:                "4.1.5",
             createDate:             "04/07/2011 09:33AM",
-            modifiedDate:           "01/01/2016 08:30PM",
+            modifiedDate:           "03/04/2016 12:23AM",
             prefix:                 "SCOBot",
             // SCOBot default parameters
             launch_data:            {},
