@@ -38,10 +38,18 @@ var $     = SCOBotUtil,
 $.addEvent(scorm, "setvalue", function (e) {
     "use strict";
     setvalue_calls += 1;
+    // Hook for trapping SCORM errors.
+    if (e.error.code !== 0) {
+        SB.debug(e.n + " "  + e.v + "\n" + e.error.code + "\n" + e.error.message + "\n" + e.error.diagnostic, 1);
+    }
 });
 $.addEvent(scorm, "getvalue", function (e) {
     "use strict";
     getvalue_calls += 1;
+    // Hook for trapping SCORM errors.
+    if (e.error.code !== 0) {
+        SB.debug(e.n + "\n" + e.error.code + "\n" + e.error.message + "\n" + e.error.diagnostic, 1);
+    }
 });
 $.addEvent(scorm, "StoreData", function (e) {
     "use strict";
@@ -177,12 +185,20 @@ $.addEvent(SB, 'load', function (e) {
     test("Bookmarking", function () {
         if (local) {
             // There would be no bookmark unless one was manually set
+            // This means a request to get Bookmark is cached by SCOBot.  This test will work
+            // with the SCOBotBase (scorm namespace) to directly verify the error code gets set.
+            strictEqual(scorm.getvalue('cmi.location'), '', "Get empty Boomkark");
+            strictEqual(scorm.getLastError().code, 403); // should be value not initialized
+
             strictEqual(SB.setBookmark(2), 'true', 'Setting Bookmark to 2');
             strictEqual(SB.getBookmark(), '2', 'Getting Bookmark, should be 2');
         } else {
             if (SB.getEntry() === "resume") {
                 strictEqual(SB.getBookmark(), '2', 'Getting Bookmark, should be 2');
             } else {
+                strictEqual(scorm.getvalue('cmi.location'), '', "Get empty Boomkark");
+                strictEqual(scorm.getLastError().code, 403); // should be value not initialized
+
                 strictEqual(SB.setBookmark(2), 'true', 'Setting Bookmark to 2');
                 strictEqual(SB.getBookmark(), '2', 'Getting Bookmark, should be 2');
             }
