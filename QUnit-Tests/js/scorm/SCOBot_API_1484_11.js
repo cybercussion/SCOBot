@@ -20,7 +20,7 @@
  * @license Copyright (c) 2009-2016, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotUtil, SCOBotBase
- * @version 4.1.3
+ * @version 4.1.5
  * @param options {Object} override default values
  * @constructor
  */
@@ -34,9 +34,9 @@ function SCOBot_API_1484_11(options) {
     "use strict";
     var Utl      = SCOBotUtil,
         defaults = {
-            version:     "4.1.3",
+            version:     "4.1.5",
             createdate:  "07/17/2010 08:15AM",
-            moddate:     "01/01/2016 08:30PM",
+            moddate:     "03/04/2016 12:24PM",
             prefix:      "SCOBot_API_1484_11",
             errorCode:   0,
             diagnostic:  '',
@@ -456,6 +456,10 @@ function SCOBot_API_1484_11(options) {
             case "adl":
                 r = adlGetValue(k);
                 break;
+            }
+            // Responding with 403 if empty
+            if (r === "") {
+                settings.errorCode = 403;
             }
             return r;
         }
