@@ -1,4 +1,4 @@
-![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
+[![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
 ![logo](https://content.cybercussion.com/css/img/cybercussion_logo_black_sm.png)
 ## Project Status: Maintenace mode
 API's and features have been built and tested.  More tests can always be written based on scenarios.  If you encounter anything please open an issue.
