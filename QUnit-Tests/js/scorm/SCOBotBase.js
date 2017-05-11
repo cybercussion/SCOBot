@@ -35,15 +35,15 @@
  * @event debug, getvalue, setvalue, exception, terminated, StoreData
  *
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
- * @license Copyright (c) 2009-2016, Cybercussion Interactive LLC
+ * @license Copyright (c) 2009-2017, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @version 4.1.5
+ * @version 4.1.6
  * @param options {Object} override default values
  * @constructor
  */
 /*!
  * SCOBotBase, Updated Jan 1st, 2016
- * Copyright (c) 2009-2016, Cybercussion Interactive LLC.
+ * Copyright (c) 2009-2017, Cybercussion Interactive LLC.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 function SCOBotBase(options) {
@@ -52,7 +52,7 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.1.5",
+            version:           "4.1.6",
             createDate:        "04/05/2011 08:56AM",
             modifiedDate:      "03/04/2016 12:24AM",
             debug:             false,
@@ -1138,7 +1138,7 @@ function SCOBotBase(options) {
             lat      = self.checkLatency(),
             speed    = lat > 0.40 ? "slow" : "fast";
         // Write out existing LMS latency
-        debug(settings.prefix + " Tip: Current LMS Latency is " + lat + "ms which is " + speed + ".");
+        debug(settings.prefix + " Tip: Current LMS Latency is " + lat + "ms which is " + speed + ".", 3);
         // Clear current latency
         settings.latency_arr = [];
         session_secs = (saveDate.getTime() - settings.startDate.getTime()) / 1000;

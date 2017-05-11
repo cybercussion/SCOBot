@@ -17,16 +17,16 @@
  * @event StoreData
  *
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
- * @license Copyright (c) 2009-2016, Cybercussion Interactive LLC
+ * @license Copyright (c) 2009-2017, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotUtil, SCOBotBase
- * @version 4.1.5
+ * @version 4.1.6
  * @param options {Object} override default values
  * @constructor
  */
 /*!
  * Local_API_1484_11, Updated January 1st, 2016
- * Copyright (c) 2009-2016, Cybercussion Interactive LLC.
+ * Copyright (c) 2009-2017, Cybercussion Interactive LLC.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 function SCOBot_API_1484_11(options) {
@@ -34,7 +34,7 @@ function SCOBot_API_1484_11(options) {
     "use strict";
     var Utl      = SCOBotUtil,
         defaults = {
-            version:     "4.1.5",
+            version:     "4.1.6",
             createdate:  "07/17/2010 08:15AM",
             moddate:     "03/04/2016 12:24PM",
             prefix:      "SCOBot_API_1484_11",
