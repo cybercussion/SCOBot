@@ -1,5 +1,5 @@
 /*global $, SCOBotUtil, scorm, window */
-/*jslint browser: true, devel: true, indent: 4 regexp: true*/
+/*jslint browser: true, devel: true, indent: 4, regexp: true*/
 /**
  * SCOBot
  * This only works with the SCOBotBase and will not work standalone.  It will not work standalone (without a LMS)
@@ -37,19 +37,19 @@
  * behaves after Terminate is fired. The default behavior is _none_, however if you seek more information about the
  * other possibilities you can locate a SCORM_SeqNav.pdf from ADL in Table 5.6.6a for more detailed info.
  *
- * @event exception, load, unload, message, continue, comments_lms
+ * @event exception, load, unload, message, continue, comments_lms, resume
  *
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
- * @license Copyright (c) 2009-2016, Cybercussion Interactive LLC
+ * @license Copyright (c) 2009-2017, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @requires SCOBotBase, SCOBotUtil
- * @version 4.1.5
+ * @version 4.1.6
  * @param options {Object} override default values
  * @constructor
  */
 /*!
- * SCOBot, Updated Jan 1st, 2016
- * Copyright (c) 2009-2016, Cybercussion Interactive LLC. All rights reserved.
+ * SCOBotBase, Updated Jan 1st, 2016
+ * Copyright (c) 2009-2017, Cybercussion Interactive LLC. All rights reserved.
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 function SCOBot(options) {
@@ -58,9 +58,9 @@ function SCOBot(options) {
     /** @default version, createDate, modifiedDate, prefix, launch_data, interaction_mode, success_status, location, completion_status, suspend_data, mode, scaled_passing_score, totalInteractions, totalObjectives, startTime */
     var Utl      = SCOBotUtil, // Hook for jQuery 'like' functionality
         defaults = {
-            version:                "4.1.5",
+            version:                "4.1.6",
             createDate:             "04/07/2011 09:33AM",
-            modifiedDate:           "03/04/2016 12:23AM",
+            modifiedDate:           "05/10/2017 05:03PM",
             prefix:                 "SCOBot",
             // SCOBot default parameters
             launch_data:            {},
@@ -84,7 +84,7 @@ function SCOBot(options) {
             mode:                   "",               // will be replaced by LMS value
             scaled_passing_score:   0.7,              // Override for default unless imsmanifest (LMS) has value
             completion_threshold:   0,                // Override for default unless imsmanifest (LMS) has value
-            max_time_allowed:       '',               // will be replaced by LMS value
+            max_time_allowed:       "",               // will be replaced by LMS value
             totalInteractions:      0,                // See setTotals below
             totalObjectives:        0,
             startTime:              0
@@ -93,25 +93,25 @@ function SCOBot(options) {
         settings     = Utl.extend(defaults, options),
         // 4.0.4 Status/State Buffer Private now to prevent direct tampering
         buffer       = {
-            success_status      : '',
-            completion_status   : '',
+            success_status      : "",
+            completion_status   : "",
             completion_threshold: settings.completion_threshold, // cache
-            progress_measure    : '0',
+            progress_measure    : "0",
             scaled_passing_score: settings.scaled_passing_score, // cache
             score               : {
-                scaled: '0',
-                raw   : '0',
-                min   : '0',
-                max   : '0'
+                scaled: "0",
+                raw   : "0",
+                min   : "0",
+                max   : "0"
             }
         },
-        lmsconnected = 'false',
+        lmsconnected = "false",
         isError      = false,
         isStarted    = false,
         happyEndingRequest = false,                   // if you enable happyEnding, and call it, it will take precedence.
         SCOBotManagedStatus = false,                  // if you setTotals, SCOBot will manage the status.
-        badValues    = '|null|undefined|false|NaN|| |',
-        error        = scorm.get('error'), // no sense retyping this
+        badValues    = "|null|undefined|false|NaN|| |",
+        error        = scorm.get("error"), // no sense retyping this
         self         = this; // Hook
     // End Constructor ////////
     ///////////////////////////
@@ -125,14 +125,13 @@ function SCOBot(options) {
         scorm.debug(error[n], 2);
         return true;
     }
-
     /**
      * Trigger Exception
      * Throws an event the player can listen to in order to handle an exception.
      * This would be common to a non-compliance in an LMS and loss of student data.
      */
     function triggerException(msg) {
-        Utl.triggerEvent(self, 'exception', {error: msg});
+        Utl.triggerEvent(self, "exception", {error: msg});
     }
     /**
      * Initialize SCO
@@ -144,7 +143,7 @@ function SCOBot(options) {
     function initSCO() {
         lmsconnected = scorm.initialize(); // returns string
         scorm.debug(settings.prefix + ": SCO Loaded from window.onload " + lmsconnected, 4);
-        if (lmsconnected === 'true') {
+        if (lmsconnected === "true") {
             self.start(); // Things you'd do like getting mode, suspend data
             Utl.triggerEvent(self, "load");
         } else {
@@ -166,7 +165,7 @@ function SCOBot(options) {
         scorm.debug(settings.prefix + ": SCO is being unloaded, forcing exit ...", 3);
         if (scorm.isConnectionActive()) {
             Utl.triggerEvent(self, "unload");
-            switch (scorm.get('exit_type')) {
+            switch (scorm.get("exit_type")) {
             case "finish":
                 self.finish();
                 break;
@@ -216,7 +215,7 @@ function SCOBot(options) {
      */
     function isISO8601(v) {
         var iso8601Exp;
-        switch (scorm.get('time_type')) {
+        switch (scorm.get("time_type")) {
         case "UTC": // AT GMT
             iso8601Exp = /^(\d{4})-0?(\d+)-0?(\d+)[T ]0?(\d+):0?(\d+):0?(\d+)(?:\.(\d+))(|Z)$/;
             break;
@@ -248,7 +247,7 @@ function SCOBot(options) {
      */
     function notStartedYet() {
         scorm.debug(settings.prefix + ": You didn't call 'start()' yet, or you already terminated, ignoring.", 2);
-        return 'false';
+        return "false";
     }
 
     /**
@@ -588,7 +587,7 @@ function SCOBot(options) {
          */
         case 'numeric':
             if (typeof value === "number") {
-                str = '' +value;
+                str = '' + value;
             } else if (Utl.isPlainObject(value)) {
                 arr = [trueRound(value.min, 7), trueRound(value.max, 7)];
                 str = arr.join("[:]");
@@ -1089,7 +1088,9 @@ function SCOBot(options) {
                     scorm.debug(settings.prefix + ": Returning suspend data object from a prior session", 4);
                     /* you may not be using JSON suspend data, and managing that yourself. */
                     settings.suspend_data = settings.useJSONSuspendData ? JSON.parse(settings.suspend_data) : settings.suspend_data; // Turn this back into a object.
+                    // 5/10/17 - event to trigger option for handling prior suspend data (Yes/No)
                     scorm.debug(settings.suspend_data, 4);
+                    Utl.triggerEvent(self, 'resume', {suspend_data: settings.suspend_data}); // You would need to pop a modal dialog if you want to reset suspend data if the user says no.
                     if (settings.entry === "") {
                         settings.entry = "resume";
                     } // most definitely its a resume if there is suspend data.
