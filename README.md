@@ -1,3 +1,4 @@
+# SCORM Content API Support
 [![Build Status](https://travis-ci.org/cybercussion/SCOBot.png?branch=master)](https://travis-ci.org/cybercussion/SCOBot)
 
 ![logo](https://content.cybercussion.com/css/img/cybercussion_logo_black_sm.png)
