@@ -14,11 +14,12 @@
  * jQuery requirement lifted in 4.0.0
  */
 QUnit.config.reorder = false;
-var $     = SCOBotUtil,
+var desiredTimeType = "UTC"; // This gets changed based on tests which can goof up what you may desire downstream.
+    $     = SCOBotUtil,
     scorm = new SCOBotBase({
         debug:          true,           // edit
         throw_alerts:   false,          // edit
-        time_type:      'GMT',          // edit
+        time_type:      'UTC',          // edit
         exit_type:      'suspend',      // edit
         success_status: 'unknown'       // edit
     }),
@@ -153,6 +154,7 @@ $.addEvent(SB, 'load', function (e) {
         newDate.setTime(date.getTime());
         // No way I'm aware to tweak the timezone without doing heavier manipulation.
         strictEqual(newDate.toString().split("GMT")[0] + "GMT-0700 (PDT)", 'Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)', 'Checking ISO8601 String to Date equals - Tue Mar 20 2012 10:47:54 GMT-0700 (PDT)');
+        scorm.set("time_type", desiredTimeType); // reset time
     });
     test("Set Totals", function () {
         strictEqual(SB.setTotals({
