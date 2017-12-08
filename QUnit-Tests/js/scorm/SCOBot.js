@@ -1425,7 +1425,7 @@ function SCOBot(options) {
             //Time stuff will need to move after ID is added
             //if (typeof (data.timestamp) === "object") {
             if (Utl.type(data.timestamp) === "date") {
-                timestamp = scorm.getAPIVersion() === "1.2" ? scorm.dateToscorm12Time(data.timestamp) : scorm.isoDateToString(data.timestamp); // HH:MM:SS vs 2012-02-12T00:37:29
+                timestamp = scorm.getAPIVersion() === "1.2" ? scorm.dateToscorm12Time(data.timestamp) : scorm.get("time_type") === "UTC" ? scorm.isoDateToStringUTC(data.timestamp) : scorm.isoDateToString(data.timestamp); // HH:MM:SS vs 2012-02-12T00:37:29
             }
             data.timestamp = timestamp; // SCORM API Will convert timestamp to time
             //if (typeof (data.latency) === "object") {
