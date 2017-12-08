@@ -10,9 +10,7 @@
         "e-learning",
         "standards"
     ],
-    "licenses": [
-        "Creative Commons Sharealike 4.0 International"
-    ],
+    "license": "Creative Commons Sharealike 4.0 International",
     "contributors": [
         {
             "name": "Mark Statkus",
@@ -31,7 +29,7 @@
         "url": "https://github.com/cybercussion/SCOBot/issues"
     },
     "dependencies": {
-    "jsdom": "~0.0.1"
+    "jsdom": "~0.5.0"
     },
     "devDependencies": {
         "grunt": "~1.0.1",
