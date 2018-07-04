@@ -1,53 +1,53 @@
 {
-    "name": "SCOBot",
-    "main": "QUnit-Tests/js/scorm.bot.pack.js",
-    "description": "SCOBot support SCORM 1.2 and SCORM 2004 supplying API's to content developers to accommodate data validation, formatting and transparency.",
-    "version": "4.1.2",
-    "private": false,
-    "homepage": "http://www.cybercussion.com",
-    "keywords": [
-        "SCORM",
-        "e-learning",
-        "standards"
-    ],
-    "license": "Creative Commons Sharealike 4.0 International",
-    "contributors": [
-        {
-            "name": "Mark Statkus",
-            "email": "mark@cybercussion.com"
-        },
-        {
-            "name": "Brandon Bradley",
-            "email": "brandon.bradley@gmail.com"
-        }
-    ],
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/cybercussion/SCOBot.git"
+  "name": "SCOBot",
+  "main": "QUnit-Tests/js/scorm.bot.pack.js",
+  "description": "SCOBot support SCORM 1.2 and SCORM 2004 supplying API's to content developers to accommodate data validation, formatting and transparency.",
+  "version": "4.1.2",
+  "private": false,
+  "homepage": "http://www.cybercussion.com",
+  "keywords": [
+    "SCORM",
+    "e-learning",
+    "standards"
+  ],
+  "license": "Creative Commons Sharealike 4.0 International",
+  "contributors": [
+    {
+      "name": "Mark Statkus",
+      "email": "mark@cybercussion.com"
     },
-    "bugs": {
-        "url": "https://github.com/cybercussion/SCOBot/issues"
-    },
-    "dependencies": {
-    "jsdom": "~0.5.0"
-    },
-    "devDependencies": {
-        "grunt": "~1.0.1",
-        "browserify": "~14.5.0"
-    },
-    "scripts": {
-        "test": "grunt travis --verbose"
-    },
-    "testling": {
-        "html": "QUnit-Tests/qunit_SCOBot_prod_full.html",
-        "browsers": [
-            "ie/8..latest",
-            "chrome/23..latest",
-            "firefox/17..latest",
-            "safari/5.1..latest",
-            "opera/11.5..latest",
-            "iphone/6..latest",
-            "ipad/6..latest"
-        ]
+    {
+      "name": "Brandon Bradley",
+      "email": "brandon.bradley@gmail.com"
     }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cybercussion/SCOBot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cybercussion/SCOBot/issues"
+  },
+  "dependencies": {
+    "jsdom": "~1.0.0"
+  },
+  "devDependencies": {
+    "grunt": "~1.0.1",
+    "browserify": "~14.5.0"
+  },
+  "scripts": {
+    "test": "grunt travis --verbose"
+  },
+  "testling": {
+    "html": "QUnit-Tests/qunit_SCOBot_prod_full.html",
+    "browsers": [
+      "ie/8..latest",
+      "chrome/23..latest",
+      "firefox/17..latest",
+      "safari/5.1..latest",
+      "opera/11.5..latest",
+      "iphone/6..latest",
+      "ipad/6..latest"
+    ]
+  }
 }
