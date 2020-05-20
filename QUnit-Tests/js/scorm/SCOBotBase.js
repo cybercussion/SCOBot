@@ -35,9 +35,9 @@
  * @event debug, getvalue, setvalue, exception, terminated, StoreData
  *
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
- * @license Copyright (c) 2009-2017, Cybercussion Interactive LLC
+ * @license Copyright (c) 2009-2020, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
- * @version 4.1.6
+ * @version 4.1.7
  * @param options {Object} override default values
  * @constructor
  */
@@ -52,9 +52,9 @@ function SCOBotBase(options) {
     // Please edit run time options or override them when you instantiate this object.
     var Utl      = SCOBotUtil,
         defaults = {
-            version:           "4.1.6",
+            version:           "4.1.7",
             createDate:        "04/05/2011 08:56AM",
-            modifiedDate:      "03/04/2016 12:24AM",
+            modifiedDate:      "05/20/2020 08:18AM",
             debug:             false,
             isActive:          false,
             throw_alerts:      false,
@@ -1422,7 +1422,15 @@ function SCOBotBase(options) {
             return true;
         }
         debug(settings.prefix + ": I was unable to locate an API for communication", 2);
+        // Need a gap in time here to allow events to be established, this is happening far before any listeners established.
+        setTimeout(function() {
+            Utl.triggerEvent(self, 'nolms', { msg: 'Could not locate Runtime API.  Your data will not be persisted.'}); // Handle this or not at the SCO level
+        }, 1000);
         if (settings.use_standalone) {
+            // Hint: You would use standalone mode if you intend on running this different than against a platform.
+            // If you were to run this on a platform, and not locate the LMS API due to Same-Origin-Policy or CORS the student would not know
+            // there instance was not persisted against the LMS.  So this project will now fire up a alert below letting them know no connection
+            // was made.
             // Create Local API in SCORM 2004
             debug(settings.prefix + ": If you included Local_API_1484_11 I'll mimic the LMS.  If not, all SCORM calls will fail.", 4);
             settings.standalone = true;

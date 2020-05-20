@@ -18,7 +18,7 @@ var desiredTimeType = "UTC"; // This gets changed based on tests which can goof 
     $     = SCOBotUtil,
     scorm = new SCOBotBase({
         debug:          true,           // edit
-        throw_alerts:   false,          // edit
+        throw_alerts:   true,          // edit
         time_type:      'UTC',          // edit
         exit_type:      'suspend',      // edit
         success_status: 'unknown'       // edit
@@ -35,7 +35,11 @@ var desiredTimeType = "UTC"; // This gets changed based on tests which can goof 
     getvalue_calls = 0,
     // These things tend to happen during authoring/creation. We'll use this later to put into suspend data
     character_str = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ˜‌‍‎‏–—―‗‘’‚‛“”„†‡•…‰′″‹›‼‾⁄₣₤₧₪₫€℅ℓ№™Ω℮⅓⅔⅛⅜⅝⅞←↑→↓∂√∞∩∫≠≡■□▲△▼○●♀♂♪";
-
+$.addEvent(scorm, "nolms", function (e) {
+    "use strict";
+    alert(e.msg);
+    SB.debug(e.msg, 1);
+});
 $.addEvent(scorm, "setvalue", function (e) {
     "use strict";
     setvalue_calls += 1;
