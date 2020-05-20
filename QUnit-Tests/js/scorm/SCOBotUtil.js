@@ -42,7 +42,7 @@
  * https://github.com/cybercussion/SCOBot
  *
  * @author Cybercussion Interactive, LLC <info@cybercussion.com>
- * @license Copyright (c) 2009-2016, Cybercussion Interactive LLC
+ * @license Copyright (c) 2009-2020, Cybercussion Interactive LLC
  * As of 3.0.0 this code is under a Creative Commons Attribution-ShareAlike 4.0 International License.
  * @version 4.0.5
  * @constructor
