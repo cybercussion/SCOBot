@@ -1096,6 +1096,7 @@ function SCOBot(options) {
                     } // most definitely its a resume if there is suspend data.
                 } else {
                     scorm.debug(settings.prefix + ": Creating new suspend data object", 4);
+                    settings.suspend_data = {pages: []}; // Put it back to the way it was (fix 4-28-2025 for not saving suspend data)
                     // Object already created by default see settings.suspend_data
                 }
             } else {
