@@ -29,7 +29,7 @@
     "url": "https://github.com/cybercussion/SCOBot/issues"
   },
   "dependencies": {
-    "jsdom": "~1.0.0"
+    "jsdom": "~16.6.0"
   },
   "devDependencies": {
     "grunt": "~1.0.1",
