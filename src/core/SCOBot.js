@@ -18,6 +18,7 @@ export default class SCOBot extends SCOBotBase {
 
         // SCOBot specifics
         const scoBotDefaults = {
+            version: "5.1.0",
             launch_data: {},
             interaction_mode: "state", // or journaled
             launch_data_type: "querystring", // or json
@@ -286,6 +287,41 @@ export default class SCOBot extends SCOBotBase {
         }
     }
 
+    // --- Internal Helpers ---
+
+    isBadValue(v) {
+        return "|null|undefined|false|NaN|| |".indexOf('|' + v + '|') >= 0;
+    }
+
+    trueRound(v, dec) {
+        const num = parseFloat(v); // ensure number
+        return parseFloat(num.toPrecision(dec));
+    }
+
+    findResponseType(type, str) {
+        let reg;
+        switch (type) {
+            case "order_matters":
+                reg = /^\{order_matters=.*?\}/;
+                break;
+            case "case_matters":
+                reg = /^\{case_matters=.*?\}/;
+                break;
+            case "lang":
+                reg = /^\{lang=.*?\}/;
+                break;
+            default:
+                this.debug(`${this.settings.prefix}: Sorry, this is not a valid Response type.`, 1);
+                break;
+        }
+        return reg.exec(str);
+    }
+
+    isISO8601Duration(v) {
+        const iso8601Dur = /^(?:P)([^T]*)(?:T)?(.*)?$/;
+        return iso8601Dur.test(v);
+    }
+
     // --- Data Helpers ---
 
     setSuspendData() {
@@ -384,42 +420,389 @@ export default class SCOBot extends SCOBotBase {
         return 'true';
     }
 
+    // --- Interaction Encoding ---
+
+    encodeInteractionType(type, val) {
+        let value = val;
+        let str = '';
+        let str2 = '';
+        let i = 0;
+        let arr = [];
+        let arr2 = [];
+        let len;
+        let index;
+
+        switch (type) {
+            case 'true-false':
+                value = value.toString().toLowerCase();
+                if (value === 'true' || value === 'false') {
+                    if (this.getAPIVersion() === "1.2") {
+                        return value.substring(0, 1); // t or f
+                    }
+                    return value;
+                }
+                this.debug(`${this.settings.prefix}: Invalid true-false value: ${value}`, 1);
+                return '';
+
+            case 'choice':
+                if (this.getAPIVersion() === "1.2") {
+                    if (Array.isArray(value)) {
+                        return value.join(",");
+                    }
+                    this.debug(`${this.settings.prefix}: Invalid choice array: ${value}`, 1);
+                    value = '';
+                }
+            /* falls through */
+            case 'sequencing':
+                if (Array.isArray(value)) {
+                    // Validation could go here (length limit etc)
+                    if (this.getAPIVersion() === "1.2") {
+                        return value.join(",");
+                    }
+                    return value.join("[,]");
+                }
+                this.debug(`${this.settings.prefix}: Invalid sequencing/choice array`, 1);
+                return '';
+
+            case 'fill-in':
+                if (SCOBotUtil.isPlainObject(value)) {
+                    if (value.case_matters !== undefined) str += `{case_matters=${value.case_matters}}`;
+                    if (value.order_matters !== undefined) str += `{order_matters=${value.order_matters}}`;
+                    if (value.lang !== undefined) str += `{lang=${value.lang}}`;
+
+                    if (Array.isArray(value.words)) {
+                        str += value.words.join("[,]");
+                    }
+                    return str;
+                }
+                return '';
+
+            case 'long-fill-in':
+                if (SCOBotUtil.isPlainObject(value)) {
+                    if (value.case_matters !== undefined) str += `{case_matters=${value.case_matters}}`;
+                    if (value.lang !== undefined) str += `{lang=${value.lang}}`;
+                    str += value.text;
+                    return str;
+                }
+                return '';
+
+            case 'matching':
+                // 1.2: source.target,source.target
+                // 2004: source[.]target[,]source[.]target
+                if (Array.isArray(value)) {
+                    len = value.length;
+                    for (i = 0; i < len; i++) {
+                        if (Array.isArray(value[i])) {
+                            arr.push(this.getAPIVersion() === "1.2" ? value[i].join(".") : value[i].join("[.]"));
+                        }
+                    }
+                    return this.getAPIVersion() === "1.2" ? arr.join(",") : arr.join("[,]");
+                }
+                return '';
+
+            case 'performance':
+                // Complex type, typically array of arrays [[step, value], [step, value]]
+                // Or Correct Response Pattern Object
+                if (!Array.isArray(value)) {
+                    // Expect Object (Correct Response Pattern)
+                    if (value.order_matters !== undefined) str += `{order_matters=${value.order_matters}}`;
+
+                    if (Array.isArray(value.answers)) {
+                        len = value.answers.length;
+                        for (i = 0; i < len; i++) {
+                            if (Array.isArray(value.answers[i])) {
+                                // numeric range inside performance?
+                                if (SCOBotUtil.isPlainObject(value.answers[i][1])) {
+                                    // {min: x, max: y} -> x[:]y
+                                    const min = this.trueRound(value.answers[i][1].min, 7);
+                                    const max = this.trueRound(value.answers[i][1].max, 7);
+                                    value.answers[i][1] = `${min}[:]${max}`;
+                                }
+                                arr.push(value.answers[i].join("[.]"));
+                            }
+                        }
+                        return str + arr.join("[,]");
+                    }
+                } else {
+                    // Learner Response (Array)
+                    len = value.length;
+                    for (i = 0; i < len; i++) {
+                        if (Array.isArray(value[i])) {
+                            arr.push(value[i].join("[.]"));
+                        }
+                    }
+                    return arr.join("[,]");
+                }
+                return '';
+
+            case 'numeric':
+                if (typeof value === "number") return '' + value;
+                if (SCOBotUtil.isPlainObject(value)) {
+                    // {min: x, max: y} -> x[:]y
+                    const min = this.trueRound(value.min, 7);
+                    const max = this.trueRound(value.max, 7);
+                    return `${min}[:]${max}`;
+                }
+                return value;
+
+            case 'likert':
+            case 'other':
+                return '' + value;
+
+            default:
+                return '';
+        }
+    }
+
+    decodeInteractionType(type, val) {
+        let value = val;
+        let arr = [];
+        let obj = {};
+        let len;
+        let i;
+
+        switch (type) {
+            case 'true-false':
+                if (this.getAPIVersion() === "1.2") {
+                    return value === "t" ? "true" : "false";
+                }
+                return value;
+
+            case 'choice':
+            case 'sequencing':
+                return value.split("[,]");
+
+            case 'fill-in':
+                // Decode meta tags
+                let arrMeta = this.findResponseType('case_matters', value);
+                if (arrMeta) {
+                    obj.case_matters = arrMeta[0].substring(14, arrMeta[0].length - 1);
+                    value = value.replace(arrMeta[0], '');
+                }
+                arrMeta = this.findResponseType('order_matters', value);
+                if (arrMeta) {
+                    obj.order_matters = arrMeta[0].substring(15, arrMeta[0].length - 1);
+                    value = value.replace(arrMeta[0], '');
+                }
+                arrMeta = this.findResponseType('lang', value);
+                if (arrMeta) {
+                    obj.lang = arrMeta[0].substring(6, arrMeta[0].length - 1);
+                    value = value.replace(arrMeta[0], '');
+                }
+                obj.words = value.split("[,]");
+                return obj;
+
+            case 'matching':
+                arr = value.split("[,]");
+                for (i = 0; i < arr.length; i++) {
+                    arr[i] = arr[i].split("[.]");
+                }
+                return arr;
+
+            case 'performance':
+                // Check order matters
+                let arrMatch = this.findResponseType('order_matters', value);
+                let match = false;
+                if (arrMatch) {
+                    match = true;
+                    obj.order_matters = arrMatch[0].substring(15, arrMatch[0].length - 1);
+                    value = value.replace(arrMatch[0], '');
+                }
+                arr = value.split("[,]");
+                for (i = 0; i < arr.length; i++) {
+                    arr[i] = arr[i].split("[.]");
+                }
+                if (match) {
+                    obj.answers = arr;
+                    return obj;
+                }
+                return arr;
+
+            default:
+                return value;
+        }
+    }
+
     // --- Interaction & Objective Helpers ---
 
     setInteraction(data) {
-        if (this.isActive) {
-            const count = parseInt(this.getvalue("cmi.interactions._count"), 10);
-            const idx = count; // New index
+        if (this.isConnectionActive()) {
+            const version = this.getAPIVersion();
+            let n; // Interaction count
+            let m; // Objective count
+            let i; // Objective loop
+            let j; // Correct response loop
+            let p; // Correct response pattern count
+            let p1 = 'cmi.interactions.';
+            let p2; // _count string helper
+            let result = 'false';
 
-            this.setvalue(`cmi.interactions.${idx}.id`, data.id);
-            this.setvalue(`cmi.interactions.${idx}.type`, data.type);
-            this.setvalue(`cmi.interactions.${idx}.timestamp`, data.timestamp);
-            this.setvalue(`cmi.interactions.${idx}.weighting`, data.weighting || '1');
-            this.setvalue(`cmi.interactions.${idx}.result`, data.result);
-            this.setvalue(`cmi.interactions.${idx}.latency`, data.latency);
-            this.setvalue(`cmi.interactions.${idx}.description`, data.description);
-
-            // Correct Responses (Pattern)
-            if (data.correct_responses && data.correct_responses.length) {
-                data.correct_responses.forEach((cr, i) => {
-                    this.setvalue(`cmi.interactions.${idx}.correct_responses.${i}.pattern`, Array.isArray(cr.pattern) ? cr.pattern.join('[,]') : cr.pattern);
-                });
+            // Validate Data Object
+            if (!SCOBotUtil.isPlainObject(data)) {
+                this.debug(`${this.settings.prefix}: Developer, you're not passing a {object} argument!!`, 1);
+                return 'false';
+            }
+            if (this.isBadValue(data.id)) {
+                this.debug(`${this.settings.prefix}: Developer, you're passing a interaction without a ID`, 1);
+                return 'false';
             }
 
-            // Learner Response
-            if (data.learner_response) {
-                const response = Array.isArray(data.learner_response) ? data.learner_response.join('[,]') : data.learner_response;
-                this.setvalue(`cmi.interactions.${idx}.learner_response`, response);
+            // Convert String Timestamp to Date if needed
+            if (typeof data.timestamp === 'string') {
+                // Try native parse first
+                const d = new Date(data.timestamp);
+                if (!isNaN(d.getTime())) {
+                    data.timestamp = d;
+                } else {
+                    // Fallback to internal parser (SCORM 1.2 or specific formats)
+                    data.timestamp = this.isoStringToDate(data.timestamp);
+                }
             }
 
-            // Objectives
-            if (data.objectives && data.objectives.length) {
-                data.objectives.forEach((obj, i) => {
-                    this.setvalue(`cmi.interactions.${idx}.objectives.${i}.id`, obj.id);
-                });
+            // Timestamp / Latency Handling
+            // Need original timestamp for latency calculation
+            const orig_timestamp = data.timestamp || this.isoStringToDate(this.getvalue(`${p1}${this.getInteractionByID(data.id)}.timestamp`));
+
+            let timestamp;
+            if (Object.prototype.toString.call(data.timestamp) === '[object Date]') {
+                timestamp = (version === "1.2")
+                    ? this.dateToscorm12Time(data.timestamp)
+                    : (this.settings.time_type === "UTC" ? this.isoDateToStringUTC(data.timestamp) : this.isoDateToString(data.timestamp));
+            } else {
+                timestamp = data.timestamp; // Assume pre-formatted string? Or undefined.
+            }
+            data.timestamp = timestamp;
+
+            // Latency Calculation
+            let latency;
+            if (Object.prototype.toString.call(data.latency) === '[object Date]') {
+                latency = (data.latency.getTime() - orig_timestamp.getTime()) * 0.001;
+                data.latency = (version === "1.2")
+                    ? this.centisecsToSCORM12Duration(latency * 100)
+                    : this.centisecsToISODuration(latency * 100, true);
+            } else if (data.learner_response && data.learner_response.length > 0 && !this.isBadValue(data.learner_response)) {
+                // Auto-calculate latency if learner response exists but no latency provided
+                const now = new Date();
+                const diff = (now.getTime() - (orig_timestamp ? orig_timestamp.getTime() : now.getTime())) * 0.001;
+                data.latency = (version === "1.2")
+                    ? this.centisecsToSCORM12Duration(diff * 100)
+                    : this.centisecsToISODuration(diff * 100, true);
             }
 
-            return 'true';
+            // Interaction Mode Check
+            p2 = '_count';
+            if (this.settings.interaction_mode === "journaled" || version === "1.2") {
+                // SCORM 1.2 is journaled by nature (mostly write-only)
+                const count = this.getvalue(p1 + p2);
+                n = (count === "-1") ? '0' : count;
+            } else {
+                // State mode - update by ID
+                n = this.getInteractionByID(data.id);
+                if (this.isBadValue(n)) {
+                    const count = this.getvalue(p1 + p2);
+                    n = (count === "-1") ? '0' : count;
+                }
+            }
+
+            p1 += n + "."; // e.g. cmi.interactions.0.
+
+            // set ID
+            if (!this.isBadValue(data.id)) {
+                result = this.setvalue(p1 + 'id', data.id);
+            }
+
+            // set Type
+            if (!this.isBadValue(data.type)) {
+                if (version === "1.2") {
+                    switch (data.type) {
+                        case "other":
+                        case "long-fill-in":
+                            data.type = "fill-in";
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                // SCORM 1.2 doesn't support long-fill-in, map to fill-in
+                result = this.setvalue(p1 + 'type', data.type);
+            }
+
+            // set Objectives
+            if (data.objectives !== undefined) {
+                const len = data.objectives.length;
+                for (i = 0; i < len; i++) {
+                    // Check duplication
+                    m = this.getInteractionObjectiveByID(n, data.objectives[i].id);
+                    if (m === 'false') {
+                        const objCount = this.getvalue(`${p1}objectives._count`);
+                        m = (objCount === '-1') ? '0' : objCount;
+                    }
+                    result = this.setvalue(`${p1}objectives.${m}.id`, data.objectives[i].id);
+                }
+            }
+
+            // set Timestamp
+            if (data.timestamp !== undefined) {
+                if (version !== "1.2") {
+                    result = this.setvalue(p1 + 'timestamp', data.timestamp);
+                } else {
+                    result = this.setvalue(p1 + 'time', data.timestamp);
+                }
+            }
+
+            // set Correct Responses
+            if (Array.isArray(data.correct_responses)) {
+                const len = data.correct_responses.length;
+                for (j = 0; j < len; j++) {
+                    p = this.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
+                    if (p === 'false') {
+                        const crCount = this.getvalue(`${p1}correct_responses._count`);
+                        p = (crCount === '-1') ? 0 : crCount;
+                    }
+
+                    if (p === "match") {
+                        this.debug(`${this.settings.prefix}: Duplicate correct response pattern ignored: ${data.correct_responses[j].pattern}`, 2);
+                    } else {
+                        result = this.setvalue(
+                            `${p1}correct_responses.${p}.pattern`,
+                            this.encodeInteractionType(data.type, data.correct_responses[j].pattern)
+                        );
+                    }
+                }
+            }
+
+            // set Weighting
+            if (!this.isBadValue(data.weighting)) {
+                result = this.setvalue(p1 + 'weighting', data.weighting);
+            }
+
+            // set Learner Response
+            if (!this.isBadValue(data.learner_response)) {
+                if (version !== "1.2") {
+                    result = this.setvalue(p1 + 'learner_response', this.encodeInteractionType(data.type, data.learner_response));
+                } else {
+                    result = this.setvalue(p1 + 'student_response', this.encodeInteractionType(data.type, data.learner_response));
+                }
+            }
+
+            // set Result
+            if (!this.isBadValue(data.result)) {
+                result = this.setvalue(p1 + 'result', data.result);
+            }
+
+            // set Latency
+            if (!this.isBadValue(data.latency)) {
+                result = this.setvalue(p1 + 'latency', data.latency);
+            }
+
+            // set Description
+            if (version !== "1.2") {
+                if (!this.isBadValue(data.description)) {
+                    result = this.setvalue(p1 + 'description', data.description);
+                }
+            }
+
+            return result;
         }
         return 'false';
     }

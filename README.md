@@ -21,10 +21,10 @@ Key Features:
 
 ### Method 1: NPM / Bundlers
 ```bash
-npm install scobot
+npm install @cybercussion/scobot
 ```
 ```javascript
-import { SCOBot } from 'scobot';
+import { SCOBot } from '@cybercussion/scobot';
 ```
 
 ### Method 2: Browser (Script Tag)
