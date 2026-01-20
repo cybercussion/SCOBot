@@ -1,6 +1,9 @@
 {
   "name": "@cybercussion/scobot",
   "version": "5.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Modern, Native JavaScript SCORM (1.2/2004) Library",
   "type": "module",
   "main": "./dist/scobot.umd.js",
