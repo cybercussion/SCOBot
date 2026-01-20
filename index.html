@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCOBot Boilerplate</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+    }
+
+    .status-box {
+      padding: 1rem;
+      border: 1px solid #ccc;
+      margin-top: 1rem;
+      border-radius: 4px;
+      background: #f9f9f9;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>SCOBot v5 Boilerplate</h1>
+  <p>This is a sample implementation of the SCOBot library.</p>
+
+  <div>
+    <button id="btn-init">Initialize</button>
+    <button id="btn-score">Set Score (85%)</button>
+    <button id="btn-save">Commit</button>
+    <button id="btn-exit">Exit</button>
+  </div>
+
+  <div class="status-box">
+    <strong>Log:</strong>
+    <pre id="log">Waiting...</pre>
+  </div>
+
+  <!-- 
+      SCOBot v5 Usage 
+      Using ES Modules from distribution (or src if running via Vite Dev Server)
+    -->
+  <script type="module">
+    // In local development with Vite, this resolves to src/index.js
+    // In production, this would point to ./dist/scobot.js
+    import { SCOBot } from './src/index.js'; // Direct source for dev demo
+
+    const logEl = document.getElementById('log');
+    const log = (msg) => {
+      logEl.textContent += '\n' + msg;
+      console.log(msg);
+    };
+
+    // 1. Instantiate
+    const scobot = new SCOBot({
+      debug: true,            // Verbose logging
+      use_standalone: true,   // Auto-failover to Mock API
+      compression: true,      // Compress suspend_data
+      exit_type: "suspend"    // Suspend on exit
+    });
+
+    // Event Listeners
+    document.getElementById('btn-init').addEventListener('click', () => {
+      const connected = scobot.initialize();
+      log(`Initialize: Connected = ${connected}`);
+      if (connected === 'true') {
+        const mode = scobot.getMode();
+        const entry = scobot.settings.entry; // direct access or use proper getter if available
+        log(`Mode: ${mode}, Entry: ${entry}`);
+      }
+    });
+
+    document.getElementById('btn-score').addEventListener('click', () => {
+      log('Setting Score to 85%...');
+      scobot.setvalue('cmi.score.min', '0');
+      scobot.setvalue('cmi.score.max', '100');
+      scobot.setvalue('cmi.score.raw', '85');
+      scobot.setvalue('cmi.score.scaled', '0.85');
+      scobot.setvalue('cmi.success_status', 'passed');
+      scobot.setvalue('cmi.completion_status', 'completed');
+
+      // Example of suspend data
+      scobot.setvalue('cmi.suspend_data', JSON.stringify({
+        bookmark: 'page2',
+        timestamp: new Date().toISOString()
+      }));
+    });
+
+    document.getElementById('btn-save').addEventListener('click', () => {
+      const result = scobot.commit();
+      log(`Commit: ${result}`);
+    });
+
+    document.getElementById('btn-exit').addEventListener('click', () => {
+      const result = scobot.terminate();
+      log(`Terminate: ${result}`);
+      log('Session Ended.');
+    });
+
+    // Auto-log initial state
+    log(`SCOBot v${scobot.settings.version} Loaded.`);
+
+    // Expose to console for debugging
+    window.scobot = scobot;
+  </script>
+</body>
+
+</html>
