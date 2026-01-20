@@ -1,6 +1,6 @@
 # SCOBot - Modern SCORM Library
 [![CI](https://github.com/cybercussion/SCOBot/actions/workflows/ci.yml/badge.svg?branch=v5)](https://github.com/cybercussion/SCOBot/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-5.0.0-blue)]()
+[![Version](https://img.shields.io/badge/version-5.1.0-blue)]()
 [![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-orange)]()
 
 ![logo](https://content.cybercussion.com/css/img/cybercussion_logo_black_sm.png)
