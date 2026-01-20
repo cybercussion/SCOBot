@@ -13,7 +13,7 @@ export default class SCOBot_API_1484_11 {
 
     constructor(options = {}) {
         const defaults = {
-            version: "5.0.0",
+            version: "5.1.0",
             createdate: "01/20/2026 08:15AM",
             moddate: new Date().toISOString(),
             prefix: "SCOBot_API_1484_11",
@@ -331,38 +331,122 @@ export default class SCOBot_API_1484_11 {
 
         // Deep Dive for Interactions/Objectives creation logic
         if (tiers[1] === "comments_from_learner") {
-            // Logic to update _count? 
-            // Simplified: Just set data
+            if (this.cmi.comments_from_learner._children.indexOf(tiers[3]) === -1) {
+                return this._throwVocabError(key, value);
+            }
             this._setData(key.substr(4), value, this.cmi);
+            // Count logic: objects length - 2 (_children, _count)
+            this.cmi.comments_from_learner._count = String(this._getObjLength(this.cmi.comments_from_learner) - 2);
             return 'true';
         }
 
         // Object Array Logic (Interactions/Objectives)
-        if (tiers[1] === "interactions" || tiers[1] === "objectives") {
+        if (tiers[1] === "interactions") {
+            if (this.cmi.interactions._children.indexOf(tiers[3]) === -1) {
+                return this._throwVocabError(key, value);
+            }
+
             const index = parseInt(tiers[2], 10);
-            if (!isNaN(index)) {
+            if (isNaN(index)) return 'false';
+
+            // Check if interaction exists
+            if (!this.cmi.interactions[index]) {
+                // STRICT: Must be setting ID to create new interaction
                 if (tiers[3] === "id") {
-                    // Init object if missing
-                    if (!this.cmi[tiers[1]][index]) {
-                        this.cmi[tiers[1]][index] = {};
-                        // Update _count
-                        const currentCount = parseInt(this.cmi[tiers[1]]._count, 10);
-                        if (index >= currentCount) {
-                            this.cmi[tiers[1]]._count = String(index + 1);
-                        }
-                    }
-                }
-                // Ensure target exists
-                if (!this.cmi[tiers[1]][index]) {
-                    // Start of new object without setting ID first is technically not allowed by strict SCOBot logic usually
-                    // But if we are forgiving:
-                    this.cmi[tiers[1]][index] = {};
-                    const currentCount = parseInt(this.cmi[tiers[1]]._count, 10);
-                    if (index >= currentCount) {
-                        this.cmi[tiers[1]]._count = String(index + 1);
-                    }
+                    this.cmi.interactions[index] = {};
+                    this._setData(key.substr(4), value, this.cmi); // Set ID
+
+                    // Initialize Containers
+                    console.log(`${this.settings.prefix}: Constructing objectives/correct_responses for new interaction`);
+                    this.cmi.interactions[index].objectives = { _count: "-1" };
+                    this.cmi.interactions[index].correct_responses = { _count: "-1" };
+
+                    // Update main count
+                    this.cmi.interactions._count = String(this._getObjLength(this.cmi.interactions) - 2);
+                    return 'true';
+                } else {
+                    console.warn("Can't add interaction without ID first!");
+                    this.settings.errorCode = 408; // Dependency not established
+                    return 'false';
                 }
             }
+
+            // Handle Interaction Sub-Structures
+
+            // 1. Objectives (cmi.interactions.n.objectives.m.id)
+            if (tiers[3] === 'objectives') {
+                const m = parseInt(tiers[4], 10);
+                if (isNaN(m)) return 'false';
+
+                if (tiers[5] === 'id') {
+                    // Check Uniqueness
+                    const count = parseInt(this.cmi.interactions[index].objectives._count, 10); // currently technically -1 if empty
+                    // The count logic in original was _count based.
+                    // If _count is -1, loop 0 times. 
+                    // Realistically we iterate existing keys.
+
+                    // Iterate existing to check for duplicate ID
+                    const objs = this.cmi.interactions[index].objectives;
+                    for (let z in objs) {
+                        if (objs.hasOwnProperty(z) && objs[z].id === value) {
+                            return this._throwGeneralSetError(key, value, z);
+                        }
+                    }
+                } else {
+                    // Validation: If not setting ID, ensure object exists
+                    if (!this.cmi.interactions[index].objectives[m]) {
+                        this.settings.errorCode = 408; // Dependency
+                        return 'false';
+                    }
+                }
+
+                this._setData(key.substr(4), value, this.cmi);
+
+                // Update objectives count
+                // Note: Original code logic for count was specific: (length - 1) because only _count exists initially?
+                // If we have { _count: "-1", "0": {...} }, length is 2. 2-1 = 1. Correct count is 0?
+                // Wait, strict mode says count is 0-based index or actual count? SCORM is actual count.
+                // Original: (getObjLength(obj) - 1).toString(); 
+                this.cmi.interactions[index].objectives._count = String(this._getObjLength(this.cmi.interactions[index].objectives) - 1);
+                return 'true';
+            }
+
+            // 2. Correct Responses
+            if (tiers[3] === 'correct_responses') {
+                this._setData(key.substr(4), value, this.cmi);
+                this.cmi.interactions[index].correct_responses._count = String(this._getObjLength(this.cmi.interactions[index].correct_responses) - 1);
+                return 'true';
+            }
+
+            // Default Set for Interaction
+            this._setData(key.substr(4), value, this.cmi);
+            this.cmi.interactions._count = String(this._getObjLength(this.cmi.interactions) - 2);
+            return 'true';
+        }
+
+        if (tiers[1] === "objectives") {
+            const index = parseInt(tiers[2], 10);
+            if (isNaN(index)) return 'false';
+
+            if (tiers[3] === "id") {
+                // Check Uniqueness
+                for (let z in this.cmi.objectives) {
+                    if (this.cmi.objectives[z] && this.cmi.objectives[z].id === value) {
+                        return this._throwGeneralSetError(key, value, z);
+                    }
+                }
+            } else {
+                // If not setting ID, ensure exists
+                if (!this.cmi.objectives[index]) {
+                    this.settings.errorCode = 408;
+                    this.settings.diagnostic = "The objectives.id element must be set before other elements can be set";
+                    return 'false';
+                }
+            }
+
+            this._setData(key.substr(4), value, this.cmi);
+            this.cmi.objectives._count = String(this._getObjLength(this.cmi.objectives) - 2);
+            return 'true';
         }
 
         // Default Set
@@ -400,5 +484,21 @@ export default class SCOBot_API_1484_11 {
         this.settings.errorCode = 406;
         this.settings.diagnostic = `Value ${v} is not allowed for ${k}`;
         return 'false';
+    }
+
+    _throwGeneralSetError(k, v, o) {
+        this.settings.errorCode = 351;
+        this.settings.diagnostic = `The ${k} element must be unique. The value '${v}' has already been set in #${o}`;
+        return 'false';
+    }
+
+    _getObjLength(obj) {
+        let length = 0;
+        for (let name in obj) {
+            if (obj.hasOwnProperty(name)) {
+                length += 1;
+            }
+        }
+        return length;
     }
 }
