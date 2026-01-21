@@ -97,6 +97,27 @@ To contribute or modify the library:
     npm run build
     ```
 
+## Showcase
+
+### SCOBot Player 2
+
+<a href="https://github.com/cybercussion/axiom/tree/scobot-player2">
+  <img src="https://github.com/cybercussion/axiom/raw/scobot-player2/docs/scobot-player2.png" alt="SCOBot Player 2" width="600">
+</a>
+
+**[Axiom - SCOBot Player 2](https://github.com/cybercussion/axiom/tree/scobot-player2)** is a modern e-learning player built with SCOBot. It demonstrates a complete SCORM integration including:
+
+- 📚 Multiple question types (choice, matching, fill-in-the-blank)
+- 🔄 Session persistence and resume capability
+- 📊 Score tracking and completion status
+- 🎯 Interactive drag-and-drop templates
+- 🧪 Standalone mode for LMS-free development
+- 📦 Minify/bundle to SCORM-compliant ZIP for LMS deployment
+
+Check out the [SCOBot Integration Guide](https://github.com/cybercussion/axiom/blob/scobot-player2/SCOBot_README.md) for implementation details.
+
+---
+
 ## License
 **CC-BY-SA-4.0**
 Copyright (c) 2009-2026 Cybercussion Interactive, LLC.
