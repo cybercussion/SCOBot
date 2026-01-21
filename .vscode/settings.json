@@ -2,6 +2,11 @@
   "workbench.colorCustomizations": {
     "tab.activeModifiedBorder": "#00c3ff",
     "tab.activeBorderBottom": "#f003fc",
-    "statusBar.noFolderBackground": "#3a28af"
+    "statusBar.noFolderBackground": "#3a28af",
+    "editor.lineHighlightBackground": "#1073cf2d",
+    "editor.lineHighlightBorder": "#9fced11f",
+    "activityBar.background": "#411A5E",
+    "titleBar.activeBackground": "#5C2484",
+    "titleBar.activeForeground": "#FCF9FD"
   }
 }

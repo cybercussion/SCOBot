@@ -389,6 +389,45 @@ export default class SCOBot extends SCOBotBase {
         return 'false';
     }
 
+    getCommentsFromLearner() {
+        if (this.isConnectionActive()) {
+            const countStr = this.getvalue("cmi.comments_from_learner._count");
+            const count = parseInt(countStr, 10);
+
+            if (isNaN(count) || count === 0) return [];
+
+            const comments = [];
+            for (let i = 0; i < count; i++) {
+                comments.push({
+                    comment: this.getvalue(`cmi.comments_from_learner.${i}.comment`),
+                    location: this.getvalue(`cmi.comments_from_learner.${i}.location`),
+                    timestamp: this.getvalue(`cmi.comments_from_learner.${i}.timestamp`)
+                });
+            }
+            return comments;
+        }
+        return 'false';
+    }
+
+    addLearnerComment(comment, location = '') {
+        if (this.isConnectionActive()) {
+            const countStr = this.getvalue("cmi.comments_from_learner._count");
+            const count = parseInt(countStr, 10) || 0;
+            
+            const timestamp = new Date().toISOString();
+            
+            this.setvalue(`cmi.comments_from_learner.${count}.comment`, comment);
+            this.setvalue(`cmi.comments_from_learner.${count}.timestamp`, timestamp);
+            
+            if (location) {
+                this.setvalue(`cmi.comments_from_learner.${count}.location`, location);
+            }
+            
+            return 'true';
+        }
+        return 'false';
+    }
+
     // --- Interaction & Objective Helpers ---
 
     gradeIt() {
