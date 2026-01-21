@@ -3,7 +3,9 @@
 
 ![logo](https://content.cybercussion.com/css/img/cybercussion_logo_black_sm.png)
 
-## Project Status: Maintenace mode
+## New ES6 version in the `v5` branch of this project.  That will be used going forward.
+
+## Project Status: Maintenace mode (Legacy)
 API's and features have been built and tested.  More tests can always be written based on scenarios.  If you encounter anything please open an issue.
 
 ## Communication, Packaging, Sequencing (SCORM 2004 only)
