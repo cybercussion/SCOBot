@@ -369,6 +369,35 @@ export default class SCOBot extends SCOBotBase {
         return 'false';
     }
 
+    // --- Bookmarking ---
+
+    /**
+     * Set Bookmark (classic Content API): stores the resume location.
+     * SCORM 2004 allows up to 1000 chars; 1.2 allows 255.
+     * @param {String} v Location value (e.g. a page id or index)
+     * @returns {String} 'true' or 'false'
+     */
+    setBookmark(v) {
+        if (this.isConnectionActive()) {
+            this.settings.location = '' + v;
+            return this.setvalue('cmi.location', this.settings.location);
+        }
+        return 'false';
+    }
+
+    /**
+     * Get Bookmark (classic Content API)
+     * @returns {String} stored cmi.location ('' when unset), or 'false' if not connected
+     */
+    getBookmark() {
+        if (this.isConnectionActive()) {
+            const value = this.getvalue('cmi.location');
+            // Convert 'false' (not set) to empty string
+            return value === 'false' ? '' : value;
+        }
+        return 'false';
+    }
+
     getCommentsFromLMS() {
         if (this.isConnectionActive()) {
             const countStr = this.getvalue("cmi.comments_from_lms._count");
