@@ -104,4 +104,18 @@ describe('SCOBot SCORM 1.2 Mapping Functionality', () => {
     expect(mockAPI.LMSGetValue('cmi.interactions.0.student_response')).toBe('a');
     expect(mockAPI.LMSGetValue('cmi.interactions.0.result')).toBe('wrong');
   });
+
+  it('should round-trip an interaction through setInteraction/getInteraction (1.2)', () => {
+    scobot.setInteraction({
+      id: 'q1_12',
+      type: 'choice',
+      learner_response: ['a'],
+      result: 'correct',
+      timestamp: new Date()
+    });
+    const found = scobot.getInteraction('q1_12');
+    expect(found).not.toBe('false');
+    expect(found.id).toBe('q1_12');
+    expect(found.result).toBe('correct');
+  });
 });
