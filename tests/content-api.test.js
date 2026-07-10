@@ -144,4 +144,20 @@ describe('Content API additions (5.2.0)', () => {
             expect(sbSession2.getvalue('cmi.completion_status')).toBe('completed');
         });
     });
+
+    describe('Lifecycle guards (regression: bare this.isActive was always truthy)', () => {
+        it('suspend after terminate returns false and does not write cmi.exit', () => {
+            // scobot was initSCO'd in beforeEach; end the session.
+            scobot.setvalue('cmi.exit', 'normal');
+            expect(scobot.terminate()).toBe('true');
+            const exitBefore = window.API_1484_11.cmi.exit;
+
+            // A terminated session must refuse to suspend. Before the fix, suspend()'s
+            // `if (this.isActive)` referenced the inherited isActive METHOD without
+            // calling it -- a function object is always truthy -- so it proceeded to
+            // setvalue('cmi.exit', 'suspend') against a dead connection.
+            expect(scobot.suspend()).toBe('false');
+            expect(window.API_1484_11.cmi.exit).toBe(exitBefore);
+        });
+    });
 });

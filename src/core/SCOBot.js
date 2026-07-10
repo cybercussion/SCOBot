@@ -200,7 +200,8 @@ export default class SCOBot extends SCOBotBase {
 
     exitSCO() {
         this.debug(`${this.settings.prefix}: Unloading/Exiting...`, 3);
-        if (this.isActive) {
+        // isConnectionActive() is the canonical check; bare `this.isActive` was a truthy non-call (inherited method reference).
+        if (this.isConnectionActive()) {
             SCOBotUtil.triggerEvent(this, "unload");
             switch (this.settings.exit_type) {
                 case "finish": this.finish(); break;
@@ -214,7 +215,8 @@ export default class SCOBot extends SCOBotBase {
     // --- State Management ---
 
     finish() {
-        if (this.isActive) {
+        // isConnectionActive() is the canonical check; bare `this.isActive` was a truthy non-call (inherited method reference).
+        if (this.isConnectionActive()) {
             if (this.settings.sequencing.nav.request !== "_none_") {
                 this.setvalue('adl.nav.request', this.settings.sequencing.nav.request);
             }
@@ -227,7 +229,8 @@ export default class SCOBot extends SCOBotBase {
     }
 
     suspend() {
-        if (this.isActive) {
+        // isConnectionActive() is the canonical check; bare `this.isActive` was a truthy non-call (inherited method reference).
+        if (this.isConnectionActive()) {
             this.debug(`${this.settings.prefix}: Suspending...`, 3);
             this.setvalue('cmi.exit', 'suspend');
             this.isStarted = false;
@@ -237,7 +240,8 @@ export default class SCOBot extends SCOBotBase {
     }
 
     timeout() {
-        if (this.isActive) {
+        // isConnectionActive() is the canonical check; bare `this.isActive` was a truthy non-call (inherited method reference).
+        if (this.isConnectionActive()) {
             this.debug(`${this.settings.prefix}: Timing out...`, 3);
             this.setvalue('cmi.exit', 'time-out');
             this.updateStatus(true);
