@@ -1,9 +1,11 @@
 # SCOBot - Modern SCORM Library
 [![CI](https://github.com/cybercussion/SCOBot/actions/workflows/ci.yml/badge.svg?branch=v5)](https://github.com/cybercussion/SCOBot/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-5.1.0-blue)]()
+[![Version](https://img.shields.io/badge/version-5.2.0-blue)]()
 [![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-orange)]()
 
 ![logo](https://content.cybercussion.com/css/img/cybercussion_logo_black_sm.png)
+
+**Links:** [SCOBot Platform](https://scobot.cybercussion.com) · [SCOBot at Cybercussion](https://cybercussion.com/scobot) · [Documentation Wiki](https://github.com/cybercussion/SCOBot/wiki)
 
 ## Overview
 **SCOBot 5** is a modernized, native JavaScript library for SCORM 1.2 and 2004 (2nd, 3rd, 4th Edition). It simplifies the complexity of the SCORM Run-Time Environment (RTE) by providing a robust, object-oriented interface for content developers.
