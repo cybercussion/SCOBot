@@ -476,6 +476,34 @@ export default class SCOBot extends SCOBotBase {
 
     // --- Interaction & Objective Helpers ---
 
+    /**
+     * Set Totals (classic Content API): declare totals so SCOBot manages
+     * progress_measure and score bounds. Call once after start().
+     * @param {Object} data {totalInteractions, totalObjectives, scoreMin, scoreMax}
+     * @returns {String} 'true' or 'false'
+     */
+    setTotals(data) {
+        this.SCOBotManagedStatus = true;
+        if (this.isConnectionActive()) {
+            if (!this.isBadValue(data.totalInteractions)) {
+                this.settings.totalInteractions = parseInt(data.totalInteractions, 10);
+            }
+            if (!this.isBadValue(data.totalObjectives)) {
+                this.settings.totalObjectives = parseInt(data.totalObjectives, 10);
+            }
+            if (!this.isBadValue(data.scoreMin)) {
+                this.buffer.score.min = '' + this.trueRound(data.scoreMin, 7);
+                this.setvalue('cmi.score.min', this.buffer.score.min);
+            }
+            if (!this.isBadValue(data.scoreMax)) {
+                this.buffer.score.max = '' + this.trueRound(data.scoreMax, 7);
+                this.setvalue('cmi.score.max', this.buffer.score.max);
+            }
+            return 'true';
+        }
+        return 'false';
+    }
+
     gradeIt() {
         let scoreScaled = 1;
         const scoreRaw = parseFloat(this.getvalue('cmi.score.raw'));
@@ -489,11 +517,13 @@ export default class SCOBot extends SCOBotBase {
             this.setvalue('cmi.score.scaled', 1);
         }
 
-        // Completion
+        // Completion (restored 4.x gate): progress_measure vs completion_threshold.
+        // Default threshold 0 keeps prior behavior (always completed).
         if (this.buffer.completion_status !== "completed") {
-            // Logic check
-            this.buffer.completion_status = 'completed'; // simplified
-            this.setvalue('cmi.completion_status', 'completed');
+            this.buffer.completion_status =
+                (parseFloat(this.buffer.progress_measure) >= parseFloat(this.buffer.completion_threshold))
+                    ? 'completed' : 'incomplete';
+            this.setvalue('cmi.completion_status', this.buffer.completion_status);
         }
 
         // Success
@@ -950,6 +980,20 @@ export default class SCOBot extends SCOBotBase {
             this.setvalue(`cmi.objectives.${idx}.completion_status`, data.completion_status);
             this.setvalue(`cmi.objectives.${idx}.progress_measure`, data.progress_measure);
             this.setvalue(`cmi.objectives.${idx}.description`, data.description);
+
+            // Maintain progress_measure (restored 4.x behavior):
+            // completed objectives / totalObjectives declared via setTotals.
+            if (this.settings.totalObjectives > 0 && data.completion_status === 'completed') {
+                const objCount = parseInt(this.getvalue('cmi.objectives._count'), 10);
+                let completedCount = 0;
+                for (let j = 0; j < objCount; j++) {
+                    if (this.getvalue(`cmi.objectives.${j}.completion_status`) === 'completed') {
+                        completedCount++;
+                    }
+                }
+                this.buffer.progress_measure = '' + this.trueRound(completedCount / this.settings.totalObjectives, 7);
+                this.setvalue('cmi.progress_measure', this.buffer.progress_measure);
+            }
 
             return 'true';
         }
