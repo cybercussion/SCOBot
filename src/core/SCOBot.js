@@ -981,7 +981,8 @@ export default class SCOBot extends SCOBotBase {
     }
 
     setObjective(data) {
-        if (this.isActive) {
+        // isConnectionActive() is the canonical check; bare `this.isActive` was a truthy non-call (inherited method reference).
+        if (this.isConnectionActive()) {
             const count = parseInt(this.getvalue("cmi.objectives._count"), 10);
             let idx = count;
 
@@ -1025,7 +1026,8 @@ export default class SCOBot extends SCOBotBase {
     }
 
     getObjective(id) {
-        if (this.isActive) {
+        // isConnectionActive() is the canonical check; bare `this.isActive` was a truthy non-call (inherited method reference).
+        if (this.isConnectionActive()) {
             const count = parseInt(this.getvalue("cmi.objectives._count"), 10);
             for (let i = 0; i < count; i++) {
                 if (this.getvalue(`cmi.objectives.${i}.id`) === id) {
