@@ -67,4 +67,45 @@ describe('Content API additions (5.2.0)', () => {
             expect(scobot.getInteraction('nope')).toBe('false');
         });
     });
+
+    describe('Scoring essence (restored from 4.x)', () => {
+        const obj = (id) => ({
+            id,
+            score: { scaled: '1', raw: '1', min: '0', max: '1' },
+            success_status: 'passed',
+            completion_status: 'completed',
+            progress_measure: '1',
+            description: `Objective ${id}`
+        });
+
+        it('setTotals sets score bounds', () => {
+            expect(scobot.setTotals({
+                totalInteractions: '2', totalObjectives: '2', scoreMin: '0', scoreMax: '100'
+            })).toBe('true');
+            expect(scobot.getvalue('cmi.score.min')).toBe('0');
+            expect(scobot.getvalue('cmi.score.max')).toBe('100');
+        });
+
+        it('setObjective maintains progress_measure against totalObjectives', () => {
+            scobot.setTotals({ totalObjectives: '2', scoreMin: '0', scoreMax: '100' });
+            scobot.setObjective(obj('obj1'));
+            expect(parseFloat(scobot.getvalue('cmi.progress_measure'))).toBeCloseTo(0.5);
+            scobot.setObjective(obj('obj2'));
+            expect(parseFloat(scobot.getvalue('cmi.progress_measure'))).toBeCloseTo(1);
+        });
+
+        it('gradeIt gates completion on completion_threshold', () => {
+            window.API_1484_11 = new SCOBot_API_1484_11();
+            const sb = new SCOBot({ completion_threshold: 1 });
+            sb.initSCO();
+            sb.setTotals({ totalObjectives: '2', scoreMin: '0', scoreMax: '100' });
+            sb.setObjective(obj('obj1'));
+            sb.setvalue('cmi.score.raw', '50');
+            sb.gradeIt();
+            expect(sb.getvalue('cmi.completion_status')).toBe('incomplete');
+            sb.setObjective(obj('obj2'));
+            sb.gradeIt();
+            expect(sb.getvalue('cmi.completion_status')).toBe('completed');
+        });
+    });
 });
