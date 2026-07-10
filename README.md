@@ -33,7 +33,10 @@ import { SCOBot } from '@cybercussion/scobot';
 Use the production-ready UMD bundle.
 ```html
 <script src="dist/scobot.umd.cjs"></script>
-<!-- Exposes global: SCOBot -->
+<!-- Exposes window.SCOBot as a namespace object: { SCOBot, SCOBotBase, SCOBotUtil, SCOBot_API_1484_11 } -->
+<script>
+  const { SCOBot } = window.SCOBot;   // unwrap the constructor
+</script>
 ```
 
 ## Quick Start
@@ -74,7 +77,7 @@ scobot.setInteraction({
     type: 'choice',              // true-false, choice, matching, fill-in, performance...
     learner_response: ['b'],     // SCOBot handles the SCORM encoding
     result: 'correct',
-    weight: '1',
+    weighting: '1',              // note: write key is 'weighting'; getInteraction returns it as 'weight'
     timestamp: new Date().toISOString(),
     latency: 'PT12S'
 });
