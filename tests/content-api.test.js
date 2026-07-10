@@ -43,6 +43,11 @@ describe('Content API additions (5.2.0)', () => {
             expect(s).toBeGreaterThanOrEqual(0);
             expect(s).toBeLessThan(5);
         });
+
+        it('getMode returns the cmi.mode captured at start', () => {
+            // Mock default for cmi.mode is 'normal' (src/mocks/SCOBot_API_1484_11.js)
+            expect(scobot.getMode()).toBe('normal');
+        });
     });
 
     describe('getInteraction', () => {

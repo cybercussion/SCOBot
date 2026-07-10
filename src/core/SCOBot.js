@@ -407,6 +407,16 @@ export default class SCOBot extends SCOBotBase {
     }
 
     /**
+     * Get Mode (classic Content API): 'normal' | 'browse' | 'review',
+     * captured by start(). Overrides the Base connector's stub, whose
+     * API.mode field is never populated.
+     * @returns {String}
+     */
+    getMode() {
+        return this.settings.mode;
+    }
+
+    /**
      * Get Seconds From Start (classic Content API).
      * NOTE: the 4.x original returned startTime - now (negative); corrected here.
      * @returns {Number} elapsed seconds since start(), rounded to 2 places
