@@ -30,4 +30,18 @@ describe('Content API additions (5.2.0)', () => {
             expect(scobot.setBookmark('x')).toBe('false');
         });
     });
+
+    describe('Session info', () => {
+        it('getEntry returns the cmi.entry captured at start', () => {
+            expect(typeof scobot.getEntry()).toBe('string');
+            expect(['', 'ab-initio', 'resume']).toContain(scobot.getEntry());
+        });
+
+        it('getSecondsFromStart returns non-negative elapsed seconds', async () => {
+            await new Promise((r) => setTimeout(r, 20));
+            const s = scobot.getSecondsFromStart();
+            expect(s).toBeGreaterThanOrEqual(0);
+            expect(s).toBeLessThan(5);
+        });
+    });
 });

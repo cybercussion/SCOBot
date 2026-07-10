@@ -398,6 +398,23 @@ export default class SCOBot extends SCOBotBase {
         return 'false';
     }
 
+    /**
+     * Get Entry (classic Content API): '' | 'ab-initio' | 'resume', captured by start().
+     * @returns {String}
+     */
+    getEntry() {
+        return this.settings.entry;
+    }
+
+    /**
+     * Get Seconds From Start (classic Content API).
+     * NOTE: the 4.x original returned startTime - now (negative); corrected here.
+     * @returns {Number} elapsed seconds since start(), rounded to 2 places
+     */
+    getSecondsFromStart() {
+        return this.trueRound((new Date().getTime() - this.settings.startTime) / 1000, 2);
+    }
+
     getCommentsFromLMS() {
         if (this.isConnectionActive()) {
             const countStr = this.getvalue("cmi.comments_from_lms._count");
