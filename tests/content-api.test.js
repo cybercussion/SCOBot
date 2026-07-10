@@ -159,5 +159,19 @@ describe('Content API additions (5.2.0)', () => {
             expect(scobot.suspend()).toBe('false');
             expect(window.API_1484_11.cmi.exit).toBe(exitBefore);
         });
+
+        it('setObjective after terminate returns false', () => {
+            expect(scobot.terminate()).toBe('true');
+            // Same bare `this.isActive` bug class: pre-fix, setObjective fell through
+            // the guard and ground through CMI calls against a dead connection.
+            expect(scobot.setObjective({
+                id: 'obj-dead',
+                score: { scaled: '1', raw: '1', min: '0', max: '1' },
+                success_status: 'passed',
+                completion_status: 'completed',
+                progress_measure: '1',
+                description: 'Written after terminate'
+            })).toBe('false');
+        });
     });
 });
