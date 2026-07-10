@@ -112,5 +112,36 @@ describe('Content API additions (5.2.0)', () => {
             sb.gradeIt();
             expect(sb.getvalue('cmi.completion_status')).toBe('completed');
         });
+
+        it('gradeIt rehydrates progress_measure from CMI on resume (regression: stale buffer after session 2 resume)', () => {
+            // Session 1: learner answers every interactive page (both objectives complete
+            // cmi.progress_measure -> 1.0), then suspends. The mock persists cmi to
+            // localStorage on terminate/suspend, simulating a real LMS commit.
+            localStorage.clear();
+            window.API_1484_11 = new SCOBot_API_1484_11();
+            const sbSession1 = new SCOBot();
+            sbSession1.initSCO();
+            sbSession1.setTotals({ totalObjectives: '2', scoreMin: '0', scoreMax: '100' });
+            sbSession1.setObjective(obj('obj1'));
+            sbSession1.setObjective(obj('obj2'));
+            expect(sbSession1.getvalue('cmi.progress_measure')).toBe('1');
+            sbSession1.setvalue('cmi.score.raw', '100');
+            sbSession1.suspend(); // persists cmi (incl. progress_measure) via the mock's localStorage store
+
+            // Session 2: a brand-new page load / brand-new SCOBot + mock instance resumes
+            // from the persisted cmi. The learner finishes via a NON-interactive page, so
+            // setObjective never fires -- this.buffer.progress_measure stays at its "0"
+            // construction default because start() never rehydrates it from CMI.
+            window.API_1484_11 = new SCOBot_API_1484_11();
+            const sbSession2 = new SCOBot();
+            sbSession2.initSCO();
+            expect(sbSession2.getEntry()).toBe('resume'); // sanity: mock recognizes the suspended session
+            sbSession2.setvalue('cmi.score.raw', '100');
+            sbSession2.gradeIt(); // no setObjective call in this session
+
+            // gradeIt must consult the authoritative CMI value (persisted "1"), not the
+            // stale in-memory buffer default ("0"), or the learner gets no credit.
+            expect(sbSession2.getvalue('cmi.completion_status')).toBe('completed');
+        });
     });
 });

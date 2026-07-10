@@ -529,9 +529,19 @@ export default class SCOBot extends SCOBotBase {
 
         // Completion (restored 4.x gate): progress_measure vs completion_threshold.
         // Default threshold 0 keeps prior behavior (always completed).
+        // CMI is authoritative: setObjective writes cmi.progress_measure through as it
+        // runs, but this.buffer.progress_measure is only updated in-process by
+        // setObjective. On a resumed session (new SCOBot instance rehydrated from a
+        // prior suspend/commit) the buffer never gets rehydrated from CMI, so if the
+        // learner finishes via a non-interactive page (no setObjective call) the buffer
+        // is still at its "0" construction default even though CMI holds the real,
+        // persisted progress. Read CMI first and fall back to the buffer only for
+        // pre-commit states where CMI hasn't been written yet.
         if (this.buffer.completion_status !== "completed") {
+            const cmiProgress = this.getvalue('cmi.progress_measure');
+            const progress = (cmiProgress && cmiProgress !== 'false') ? cmiProgress : this.buffer.progress_measure;
             this.buffer.completion_status =
-                (parseFloat(this.buffer.progress_measure) >= parseFloat(this.buffer.completion_threshold))
+                (parseFloat(progress) >= parseFloat(this.buffer.completion_threshold))
                     ? 'completed' : 'incomplete';
             this.setvalue('cmi.completion_status', this.buffer.completion_status);
         }
