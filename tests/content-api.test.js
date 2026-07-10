@@ -44,4 +44,27 @@ describe('Content API additions (5.2.0)', () => {
             expect(s).toBeLessThan(5);
         });
     });
+
+    describe('getInteraction', () => {
+        it('returns a previously set interaction by id (decoded)', () => {
+            scobot.setInteraction({
+                id: 'q1',
+                type: 'choice',
+                learner_response: ['a'],
+                result: 'correct',
+                weight: '1',
+                timestamp: new Date().toISOString(),
+                latency: 'PT5S'
+            });
+            const found = scobot.getInteraction('q1');
+            expect(found).not.toBe('false');
+            expect(found.id).toBe('q1');
+            expect(found.type).toBe('choice');
+            expect(found.result).toBe('correct');
+        });
+
+        it('returns false for an unknown id', () => {
+            expect(scobot.getInteraction('nope')).toBe('false');
+        });
+    });
 });

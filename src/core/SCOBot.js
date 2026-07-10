@@ -892,6 +892,43 @@ export default class SCOBot extends SCOBotBase {
         return 'false';
     }
 
+    /**
+     * Get Interaction (classic Content API): find by id, return decoded object
+     * (inverse of setInteraction, mirrors getObjective's shape).
+     * @param {String} id
+     * @returns {Object|String} interaction object or 'false'
+     */
+    getInteraction(id) {
+        if (this.isConnectionActive()) {
+            const version = this.getAPIVersion();
+            if (version === "1.2") {
+                // getInteractionByID doesn't return a real index under SCORM 1.2
+                // (it returns cmi.interactions._count instead of a match/'false'
+                // sentinel), and 1.2 doesn't support reading interactions back.
+                this.debug(`${this.settings.prefix}: getInteraction is not supported when getAPIVersion is 1.2`, 2);
+                return 'false';
+            }
+            const n = this.getInteractionByID(id);
+            if (this.isBadValue(n)) {
+                return 'false';
+            }
+            const p1 = `cmi.interactions.${n}.`;
+            const type = this.getvalue(p1 + 'type');
+            const responseKey = version !== '1.2' ? 'learner_response' : 'student_response';
+            return {
+                id: id,
+                type: type,
+                learner_response: this.decodeInteractionType(type, this.getvalue(p1 + responseKey)),
+                result: this.getvalue(p1 + 'result'),
+                weight: this.getvalue(p1 + 'weighting'),
+                latency: version !== '1.2' ? this.getvalue(p1 + 'latency') : '',
+                timestamp: version !== '1.2' ? this.getvalue(p1 + 'timestamp') : this.getvalue(p1 + 'time'),
+                description: version !== '1.2' ? this.getvalue(p1 + 'description') : ''
+            };
+        }
+        return 'false';
+    }
+
     setObjective(data) {
         if (this.isActive) {
             const count = parseInt(this.getvalue("cmi.objectives._count"), 10);
