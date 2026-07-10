@@ -5,6 +5,14 @@
     "access": "public"
   },
   "description": "Modern, Native JavaScript SCORM (1.2/2004) Library",
+  "homepage": "https://scobot.cybercussion.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cybercussion/SCOBot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cybercussion/SCOBot/issues"
+  },
   "type": "module",
   "main": "./dist/scobot.umd.cjs",
   "module": "./dist/scobot.js",
