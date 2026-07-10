@@ -44,24 +44,61 @@ Check out the **`index.html`** file in the root directory for a complete, workin
 const scobot = new SCOBot({
     debug: true,             // Enable console logging
     use_standalone: true,    // Failover to Mock API if no LMS found
-    compression: true,       // Compress data to save space
+    compression: true,       // Compress suspend_data (lz-string)
     exit_type: "suspend"     // Default exit behavior
 });
 
-// 2. Connect
-if (scobot.initialize() === 'true') {
-    console.log("Connected to LMS (or Mock)!");
+// 2. Connect — initSCO() = initialize() + start():
+//    learner info, entry/mode, and suspend-data restore in one call.
+if (scobot.initSCO() === 'true') {
+    console.log(`Connected. Mode: ${scobot.getMode()}, Entry: ${scobot.getEntry() || 'ab-initio'}`);
 }
 
-// 3. Set Data (Uses SCORM 2004 syntax)
-scobot.setvalue('cmi.score.scaled', '0.9');
-scobot.setvalue('cmi.location', 'slide_5');
-scobot.setvalue('cmi.suspend_data', JSON.stringify({ bookmarks: [1, 5, 8] }));
+// 3. Declare totals once — SCOBot manages cmi.progress_measure for you
+//    as objectives complete, and gradeIt() gates completion on it.
+scobot.setTotals({
+    totalInteractions: '3',
+    totalObjectives: '3',
+    scoreMin: '0',
+    scoreMax: '100'
+});
 
-// 4. Save & Exit
-scobot.commit();
-scobot.terminate();
+// 4. Bookmark + per-page state — no hand-rolled suspend_data blobs.
+scobot.setBookmark('page_5');
+scobot.setSuspendDataByPageID('page_5', 'Quiz Page', { answered: true, choice: 'b' });
+// ...on relaunch: scobot.getBookmark() / scobot.getSuspendDataByPageID('page_5')
+
+// 5. Record a question — the interaction AND its per-question objective.
+scobot.setInteraction({
+    id: 'q1',
+    type: 'choice',              // true-false, choice, matching, fill-in, performance...
+    learner_response: ['b'],     // SCOBot handles the SCORM encoding
+    result: 'correct',
+    weight: '1',
+    timestamp: new Date().toISOString(),
+    latency: 'PT12S'
+});
+scobot.setObjective({
+    id: 'q1',
+    score: { scaled: '1', raw: '1', min: '0', max: '1' },
+    success_status: 'passed',
+    completion_status: 'completed',
+    progress_measure: '1',
+    description: 'Question 1'
+});
+// ...read back any time: scobot.getInteraction('q1') / scobot.getObjective('q1')
+
+// 6. Grade & exit — gradeIt() derives score.scaled + success_status and
+//    gates completion_status; finish() ends the attempt (or suspend() to
+//    save-and-resume). Both commit and terminate for you.
+scobot.setvalue('cmi.score.raw', '90');  // gradeIt's input (min/max via setTotals)
+scobot.gradeIt();
+scobot.finish();
 ```
+
+> **Raw CMI access** — `scobot.setvalue('cmi.location', 'slide_5')` / `getvalue(...)`
+> remain available for anything the Content API doesn't wrap, with automatic
+> SCORM 1.2 ↔ 2004 syntax bridging.
 
 ## Developer Guide
 For detailed instructions, architecture info, and advanced configuration, see the [Developer Usage Guide](usage_guide.md).
