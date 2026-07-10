@@ -122,8 +122,8 @@ Check out the [SCOBot Integration Guide](https://github.com/cybercussion/axiom/b
 
 ## Resources
 
-- 🌐 **[cybercussion.com](https://cybercussion.com)** – More projects, articles, and e-learning resources
-- 🧪 **[angular.scobot.net](https://angular.scobot.net)** – Test your content against real SCORM Runtime APIs
+- 🌐 **[cybercussion.com/scobot](https://cybercussion.com/scobot)** – SCOBot articles, projects, and e-learning resources
+- 🧪 **[scobot.cybercussion.com](https://scobot.cybercussion.com)** – Test your content against real SCORM Runtime APIs
 
 ---
 
