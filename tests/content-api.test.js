@@ -71,6 +71,21 @@ describe('Content API additions (5.2.0)', () => {
         it('returns false for an unknown id', () => {
             expect(scobot.getInteraction('nope')).toBe('false');
         });
+
+        it('honors a supplied ISO8601 latency instead of auto-calculating it when learner_response is present', () => {
+            scobot.setInteraction({
+                id: 'q2',
+                type: 'choice',
+                learner_response: ['a'],
+                result: 'correct',
+                weight: '1',
+                timestamp: new Date().toISOString(),
+                latency: 'PT12S'
+            });
+            expect(scobot.getvalue('cmi.interactions.0.latency')).toBe('PT12S');
+            const found = scobot.getInteraction('q2');
+            expect(found.latency).toBe('PT12S');
+        });
     });
 
     describe('Scoring essence (restored from 4.x)', () => {
