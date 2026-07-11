@@ -5,7 +5,7 @@
 
 ![logo](https://content.cybercussion.com/css/img/cybercussion_logo_black_sm.png)
 
-**Links:** [SCOBot Platform](https://scobot.cybercussion.com) · [SCOBot at Cybercussion](https://cybercussion.com/scobot) · [Documentation Wiki](https://github.com/cybercussion/SCOBot/wiki)
+**Links:** [SCOBot Platform](https://scobot.cybercussion.com) · [SCOBot at Cybercussion](https://cybercussion.com/scobot) · [Documentation Wiki](https://github.com/cybercussion/SCOBot/wiki) · [SCOBOT.md](SCOBOT.md) (agent integration contract)
 
 ## Overview
 **SCOBot 5** is a modernized, native JavaScript library for SCORM 1.2 and 2004 (2nd, 3rd, 4th Edition). It simplifies the complexity of the SCORM Run-Time Environment (RTE) by providing a robust, object-oriented interface for content developers.
