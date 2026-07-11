@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "description": "Modern, Native JavaScript SCORM (1.2/2004) Library",
+  "description": "Modern, Native JavaScript SCORM (1.2/2004) Library for Content Creation",
   "homepage": "https://scobot.cybercussion.com",
   "repository": {
     "type": "git",
