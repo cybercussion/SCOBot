@@ -18,7 +18,7 @@ export default class SCOBot extends SCOBotBase {
 
         // SCOBot specifics
         const scoBotDefaults = {
-            version: "5.2.1",
+            version: "5.2.2",
             launch_data: {},
             interaction_mode: "state", // or journaled
             launch_data_type: "querystring", // or json
