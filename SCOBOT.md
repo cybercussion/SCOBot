@@ -136,6 +136,9 @@ except via `setvalue`/`getvalue` for fields the Content API doesn't wrap.
   Pass `timestamp` as an ISO 8601 string or `Date` object; `latency` as a
   `Date` (SCOBot computes the delta) or a pre-formatted ISO 8601 duration
   (`PT12S`). Malformed latency strings do not throw — they persist as-is.
+  (≤5.2.1 silently overwrites supplied latency with an auto-calculation when
+  `learner_response` is present — fixed after 5.2.1; on affected versions
+  omit `latency` and let SCOBot compute it from your `timestamp`.)
 - **`isLMSConnected()` ≠ `isConnectionActive()`.** `isLMSConnected()`
   reports whether a runtime API (real or standalone mock) was ever found
   (`API.connection`). `isConnectionActive()` reports whether the session is
