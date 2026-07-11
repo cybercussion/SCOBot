@@ -819,8 +819,16 @@ export default class SCOBot extends SCOBotBase {
                 data.latency = (version === "1.2")
                     ? this.centisecsToSCORM12Duration(latency * 100)
                     : this.centisecsToISODuration(latency * 100, true);
+            } else if (typeof data.latency === 'string' && this.isISO8601Duration(data.latency)) {
+                // Caller (e.g. the reference player) already computed and supplied a valid
+                // ISO8601 duration. Honor it as-is: previously this branch was unreachable
+                // because the learner_response auto-calc below ran unconditionally whenever
+                // learner_response was present, silently clobbering a supplied latency with
+                // ~now - orig_timestamp (effectively PT0H0M0S). Classic 4.x SCOBot had the
+                // same gap for string latencies (it only preserved latency passed as a Date
+                // object), so this is a genuine fix rather than a behavior regression vs 4.x.
             } else if (data.learner_response && data.learner_response.length > 0 && !this.isBadValue(data.learner_response)) {
-                // Auto-calculate latency if learner response exists but no latency provided
+                // Auto-calculate latency if learner response exists but no valid latency provided
                 const now = new Date();
                 const diff = (now.getTime() - (orig_timestamp ? orig_timestamp.getTime() : now.getTime())) * 0.001;
                 data.latency = (version === "1.2")
