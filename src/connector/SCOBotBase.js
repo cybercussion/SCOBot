@@ -434,6 +434,12 @@ export default class SCOBotBase {
 
         // Dynamic Objectives Mapping
         if (n.indexOf("cmi.objectives.") === 0) {
+            // 1.2 objectives children are only id, score, status —
+            // progress_measure/description are 2004-only and a spec-strict
+            // 1.2 LMS rejects them (405), so don't send them at all.
+            if (n.match(/\.(progress_measure|description)$/)) {
+                return { name, ignore: true };
+            }
             // Map success_status or completion_status back to just 'status'
             if (n.match(/\.(success_status|completion_status)$/)) {
                 name = n.replace(/\.(success_status|completion_status)$/, ".status");
@@ -509,13 +515,17 @@ export default class SCOBotBase {
 
     centisecsToSCORM12Duration(n) {
         const pad = (num) => (num < 10 ? '0' + num : num);
-        let totalSeconds = Math.floor(n / 100);
+        // Round to whole centiseconds first so a fractional carry propagates
+        // into seconds — rounding the remainder alone can yield 100 centiseconds
+        // (".100"), which is not a valid CMITimespan (max 2 decimal digits).
+        const totalCentisecs = Math.round(n);
+        let totalSeconds = Math.floor(totalCentisecs / 100);
         const hours = Math.floor(totalSeconds / 3600);
         totalSeconds %= 3600;
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
 
-        let sub = Math.round((n % 100)); // centiseconds
+        let sub = totalCentisecs % 100; // centiseconds
 
         // HHHH:MM:SS.SS
         let hStr = "0000" + hours;

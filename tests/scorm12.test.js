@@ -118,4 +118,20 @@ describe('SCOBot SCORM 1.2 Mapping Functionality', () => {
     expect(found.id).toBe('q1_12');
     expect(found.result).toBe('correct');
   });
+
+  it('should not send objectives progress_measure/description to a 1.2 LMS (not in the 1.2 data model)', () => {
+    // SCORM 1.2 cmi.objectives.n._children is "id,score,status" — no
+    // progress_measure or description. A spec-strict 1.2 LMS rejects them
+    // with 405, so the map must ignore them instead of passing them through.
+    scobot.setvalue('cmi.objectives.0.id', 'obj_1');
+    const r1 = scobot.setvalue('cmi.objectives.0.progress_measure', '0.5');
+    const r2 = scobot.setvalue('cmi.objectives.0.description', 'Intro objective');
+    expect(r1).toBe('false');
+    expect(r2).toBe('false');
+    expect(mockAPI.data['cmi.objectives.0.progress_measure']).toBeUndefined();
+    expect(mockAPI.data['cmi.objectives.0.description']).toBeUndefined();
+    // The remap that DOES belong in 1.2 still works.
+    scobot.setvalue('cmi.objectives.0.success_status', 'passed');
+    expect(mockAPI.data['cmi.objectives.0.status']).toBe('passed');
+  });
 });
