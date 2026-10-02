@@ -18,6 +18,7 @@
   "module": "./dist/scobot.js",
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/scobot.js",
       "require": "./dist/scobot.umd.cjs"
     }
@@ -29,7 +30,7 @@
   "types": "./dist/types/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:types && vite build",
+    "build": "vite build && npm run build:types",
     "build:types": "tsc",
     "test": "vitest",
     "coverage": "vitest run --coverage"
