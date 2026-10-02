@@ -104,6 +104,32 @@ describe('SCOBot SCORM 2004 Functionality', () => {
     expect(scobot.getvalue(`cmi.interactions.${n}.type`)).toBe('sequencing');
   });
 
+  it('should not duplicate correct_responses when an interaction is updated (PR #27)', () => {
+    // The duplicate check compared the raw pattern (array/object/number) against the
+    // stored, encoded string, so it never matched and each update appended another entry.
+    const cases = [
+      { id: 'dup_choice', type: 'choice', pattern: ['a', 'b'] },
+      { id: 'dup_sequencing', type: 'sequencing', pattern: ['c', 'b', 'a'] },
+      { id: 'dup_matching', type: 'matching', pattern: [['1', 'a'], ['2', 'b']] },
+      { id: 'dup_fill_in', type: 'fill-in', pattern: { case_matters: false, words: ['cat'] } },
+      { id: 'dup_numeric', type: 'numeric', pattern: { min: 1, max: 5 } },
+      { id: 'dup_true_false', type: 'true-false', pattern: true }
+    ];
+    for (const c of cases) {
+      for (let k = 0; k < 3; k++) {
+        scobot.setInteraction({
+          id: c.id,
+          type: c.type,
+          timestamp: new Date().toISOString(),
+          correct_responses: [{ pattern: c.pattern }],
+          description: 'dedupe'
+        });
+      }
+      const n = scobot.getInteractionByID(c.id);
+      expect(scobot.getvalue(`cmi.interactions.${n}.correct_responses._count`), c.type).toBe('1');
+    }
+  });
+
   it('should handle Time and Date conversions', () => {
     const duration = scobot.ISODurationToCentisec("PT1M30S");
     expect(duration).toBe(9000);
