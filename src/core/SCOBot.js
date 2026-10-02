@@ -901,7 +901,8 @@ export default class SCOBot extends SCOBotBase {
             if (Array.isArray(data.correct_responses)) {
                 const len = data.correct_responses.length;
                 for (j = 0; j < len; j++) {
-                    p = this.getInteractionCorrectResponsesByPattern(n, data.correct_responses[j].pattern);
+                    const correctResponse = this.encodeInteractionType(data.type, data.correct_responses[j].pattern);
+                    p = this.getInteractionCorrectResponsesByPattern(n, correctResponse);
                     if (p === 'false') {
                         const crCount = this.getvalue(`${p1}correct_responses._count`);
                         p = (crCount === '-1') ? 0 : crCount;
@@ -912,7 +913,7 @@ export default class SCOBot extends SCOBotBase {
                     } else {
                         result = this.setvalue(
                             `${p1}correct_responses.${p}.pattern`,
-                            this.encodeInteractionType(data.type, data.correct_responses[j].pattern)
+                            correctResponse
                         );
                     }
                 }
