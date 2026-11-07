@@ -36,6 +36,7 @@ export default class SCOBotBase {
             mode: "",
             connection: false,
             isActive: false,
+            terminated: false,
             data: {
                 completion_status: "",
                 success_status: "",
@@ -234,6 +235,7 @@ export default class SCOBotBase {
                     this.debug(this.settings.prefix + ": Terminated.", 3);
                     SCOBotUtil.triggerEvent(this, 'terminated', {});
                     this.API.isActive = false;
+                    this.API.terminated = true; // a terminated SCO instance can never Initialize again (RTE 104)
                 } else {
                     this.debug(`${this.settings.prefix}: Terminate Error ${this.getLastErrorCode()}`, 1);
                 }

@@ -18,7 +18,7 @@ export default class SCOBot extends SCOBotBase {
 
         // SCOBot specifics
         const scoBotDefaults = {
-            version: "5.2.2",
+            version: "5.2.6",
             launch_data: {},
             interaction_mode: "state", // or journaled
             launch_data_type: "querystring", // or json
@@ -53,11 +53,13 @@ export default class SCOBot extends SCOBotBase {
             success_status: "",
             completion_status: "",
             completion_threshold: this.settings.completion_threshold,
-            progress_measure: "0",
+            // '' = "never set this session": the doNotStatusUntilFinish replay skips it, so a
+            // course that never graded gets no zeros written over the learner's record.
+            progress_measure: "",
             scaled_passing_score: this.settings.scaled_passing_score,
             score: {
-                scaled: "0",
-                raw: "0",
+                scaled: "",
+                raw: "",
                 min: "0",
                 max: "0"
             }
@@ -66,10 +68,15 @@ export default class SCOBot extends SCOBotBase {
         this.isStarted = false;
         this.happyEndingRequest = false;
         this.SCOBotManagedStatus = false;
+        // doNotStatusUntilFinish: the buffer fields set THIS session, in the order they were last set.
+        // Only these are sent at session end; a field merely read at start() is never re-sent.
+        this._held = new Set();
+        this._initSCOCalled = false;
 
         // Auto-Initialize handling
         if (typeof window !== 'undefined') {
-            SCOBotUtil.addEvent(window, 'loaded', () => this.initSCO());
+            // Auto-connect, unless the content already called initSCO() itself (the README's Quick Start does).
+            SCOBotUtil.addEvent(window, 'loaded', () => { if (!this._initSCOCalled) this.initSCO(); });
             SCOBotUtil.addEvent(window, 'beforeunload', () => this.exitSCO());
             SCOBotUtil.addEvent(window, 'unload', () => this.exitSCO());
         }
@@ -84,6 +91,14 @@ export default class SCOBot extends SCOBotBase {
     // --- Lifecycle Methods ---
 
     initSCO() {
+        this._initSCOCalled = true;
+        // Already connected (a direct call plus the auto-connect, or two calls): nothing to do, nothing to report.
+        if (this.isConnectionActive()) return 'true';
+        // Never re-open a terminated session: the LMS would answer 104 and many show the learner an error.
+        if (this.API.terminated) {
+            this.debug(`${this.settings.prefix}: initSCO after terminate ignored.`, 2);
+            return 'false';
+        }
         const connected = this.initialize(); // returns string 'true'/'false'
         this.debug(`${this.settings.prefix}: SCO Loaded. Connected: ${connected}`, 4);
 
@@ -184,6 +199,11 @@ export default class SCOBot extends SCOBotBase {
         // 4. Initial Status Sync
         this.buffer.completion_status = this.getvalue('cmi.completion_status');
         this.buffer.success_status = this.getvalue('cmi.success_status');
+        // initialize()'s own unknown->incomplete normalisation is not a result of this session.
+        // Kept here (not moved into initSCO): start() performs no setvalue of its own, so nothing
+        // session-authored can precede this clear; any setvalue added to start() above this line
+        // would be silently dropped from the hold.
+        this._held.clear();
 
         // 5. Comments
         this.settings.comments_from_lms = this.getCommentsFromLMS();
@@ -233,6 +253,8 @@ export default class SCOBot extends SCOBotBase {
         if (this.isConnectionActive()) {
             this.debug(`${this.settings.prefix}: Suspending...`, 3);
             this.setvalue('cmi.exit', 'suspend');
+            // Owner ruling 2026-11-06: held status goes to the LMS at ANY session end, suspend included.
+            if (this.settings.doNotStatusUntilFinish) this._replayHeld();
             this.isStarted = false;
             return this.terminate();
         }
@@ -252,14 +274,12 @@ export default class SCOBot extends SCOBotBase {
     }
 
     updateStatus(ending) {
-        if (ending && this.SCOBotManagedStatus) {
-            if (this.settings.doNotStatusUntilFinish) {
-                this.setvalue('cmi.score.raw', this.buffer.score.raw);
-                this.setvalue('cmi.score.scaled', this.buffer.score.scaled);
-                this.setvalue('cmi.progress_measure', this.buffer.progress_measure);
-                this.setvalue('cmi.completion_status', this.buffer.completion_status);
-                return this.setvalue('cmi.success_status', this.buffer.success_status);
-            }
+        if (this.settings.doNotStatusUntilFinish) {
+            // Holding: nothing SCOBot-managed reaches the LMS mid-session, defaults included.
+            if (!ending) return 'true';
+            // Session end (finish/timeout): send what was held, then apply defaults exactly as with
+            // the option off -- the LMS now holds what it would have held without the option.
+            this._replayHeld();
         }
 
         if (!this.happyEndingRequest) {
@@ -271,24 +291,115 @@ export default class SCOBot extends SCOBotBase {
             const storss = this.getvalue(ss);
             const storcs = this.getvalue(cs);
 
-            const isSuccessSet = (storss === "passed" || storss === "failed");
-            const isCompletionSet = (storcs === "completed" || storcs === "incomplete");
+            let isSuccessSet = (storss === "passed" || storss === "failed");
+            let isCompletionSet = (storcs === "completed" || storcs === "incomplete");
+            if (this.getAPIVersion() === "1.2") {
+                // 1.2 has ONE lesson_status: a real passed/failed/completed counts as set for both
+                // checks, so no author default overwrites the learner's result.
+                const real12 = (storss === "passed" || storss === "failed" || storss === "completed" ||
+                    storcs === "passed" || storcs === "failed" || storcs === "completed");
+                if (real12) { isSuccessSet = true; isCompletionSet = true; }
+            }
 
             if (this.settings.exit_type === 'finish' || ending) {
-                if (!isSuccessSet && storss !== defss) {
+                if (defss && !isSuccessSet && storss !== defss) {
                     this.setvalue(ss, defss);
                 }
 
                 // Completion logic
-                if (this.getAPIVersion() === "1.2" && this.settings.scorm_status_persist === "completion_status" && !isCompletionSet) {
+                if (this.getAPIVersion() === "1.2" && this.settings.scorm_status_persist === "completion_status" && defcs && !isCompletionSet) {
                     this.setvalue(cs, defcs);
                 } else {
-                    if (!isCompletionSet && storcs !== defcs) {
+                    if (defcs && !isCompletionSet && storcs !== defcs) {
                         this.setvalue(cs, defcs);
                     }
                 }
             }
         }
+    }
+
+    /** doNotStatusUntilFinish: mark a buffer field as set this session (moves it to the end of the order). */
+    _hold(field) {
+        this._held.delete(field);
+        this._held.add(field);
+    }
+
+    /**
+     * doNotStatusUntilFinish: send the buffer fields set this session, in the order they were last set,
+     * so on 1.2 (one lesson_status) the final value is the one the option-off path would have left.
+     * Never writes a field that was only read at start(), nor a '' / 'NaN' value.
+     */
+    _replayHeld() {
+        const keys = {
+            'score.raw': ['cmi.score.raw', () => this.buffer.score.raw],
+            'score.scaled': ['cmi.score.scaled', () => this.buffer.score.scaled],
+            'progress_measure': ['cmi.progress_measure', () => this.buffer.progress_measure],
+            'completion_status': ['cmi.completion_status', () => this.buffer.completion_status],
+            'success_status': ['cmi.success_status', () => this.buffer.success_status]
+        };
+        // Snapshot first: each replayed write re-mirrors into the buffer and _held (1.2 sets both
+        // statuses), so reading live inside the loop would let one status overwrite the other.
+        let plan = [...this._held].map((f) => [keys[f][0], keys[f][1]()]);
+        if (this.getAPIVersion() === '1.2') {
+            // 1.2 maps both statuses onto one lesson_status: when they carry the same value, send it once,
+            // keeping the later entry so the position of the last status write is unchanged.
+            // If the dropped entry is completion, the connector's API.data.completion_status mirror
+            // (SCOBotBase.js ~:423) is not refreshed by it: harmless, it is read only at initialize (~:186).
+            const ci = plan.findIndex(([n]) => n === 'cmi.completion_status');
+            const si = plan.findIndex(([n]) => n === 'cmi.success_status');
+            if (ci >= 0 && si >= 0 && plan[ci][1] === plan[si][1]) {
+                plan.splice(Math.min(ci, si), 1);
+            }
+        }
+        let result = 'true';
+        for (const [n, v] of plan) {
+            if (!this.isBadValue(v)) result = this.setvalue(n, v);
+        }
+        // Clear AFTER the loop: each replayed setvalue goes back through the override and re-holds its
+        // field, so clearing first would leave the burst armed for a second replay (e.g. exitSCO after
+        // a finish whose Terminate failed).
+        this._held.clear();
+        return result;
+    }
+
+    /**
+     * setvalue, plus: while doNotStatusUntilFinish is on, a status/score value the LMS accepted also
+     * updates the buffer, so the finish() replay carries the content's latest value rather than the
+     * session's starting one. A rejected value is not buffered (it would only be rejected again).
+     */
+    setvalue(n, v) {
+        const result = super.setvalue(n, v);
+        if (this.settings && this.settings.doNotStatusUntilFinish && this.buffer && this.makeBoolean(result)) {
+            const val = String(v);
+            switch (n) {
+                case 'cmi.score.raw':
+                case 'cmi.core.score.raw':
+                    this.buffer.score.raw = val; this._hold('score.raw'); break;
+                case 'cmi.score.scaled':
+                    this.buffer.score.scaled = val; this._hold('score.scaled'); break;
+                case 'cmi.progress_measure':
+                    this.buffer.progress_measure = val; this._hold('progress_measure'); break;
+                case 'cmi.completion_status':
+                case 'cmi.success_status':
+                case 'cmi.core.lesson_status':
+                    if (this.getAPIVersion() === '1.2') {
+                        // 1.2 has one lesson_status: the latest write is the whole status, so the
+                        // replay (completion then success) must end on this value, not an older one.
+                        this.buffer.completion_status = val;
+                        this.buffer.success_status = val;
+                        this._hold('completion_status');
+                        this._hold('success_status');
+                    } else if (n === 'cmi.completion_status') {
+                        this.buffer.completion_status = val;
+                        this._hold('completion_status');
+                    } else if (n === 'cmi.success_status') {
+                        this.buffer.success_status = val;
+                        this._hold('success_status');
+                    }
+                    break;
+            }
+        }
+        return result;
     }
 
     // --- Internal Helpers ---
@@ -497,6 +608,7 @@ export default class SCOBot extends SCOBotBase {
      * @returns {String} 'true' or 'false'
      */
     setTotals(data) {
+        // Legacy flag only: it no longer drives the doNotStatusUntilFinish replay (that uses _held).
         this.SCOBotManagedStatus = true;
         if (this.isConnectionActive()) {
             if (!this.isBadValue(data.totalInteractions)) {
@@ -519,16 +631,44 @@ export default class SCOBot extends SCOBotBase {
     }
 
     gradeIt() {
+        // doNotStatusUntilFinish: compute into the buffer only; it is sent at session end.
+        const hold = !!this.settings.doNotStatusUntilFinish;
         let scoreScaled = 1;
-        const scoreRaw = parseFloat(this.getvalue('cmi.score.raw'));
+        // With the option on, a raw set this session lives in the buffer (e.g. happyEnding) until session end.
+        const scoreRawStr = (hold && this._held.has('score.raw')) ? this.buffer.score.raw : this.getvalue('cmi.score.raw');
+        const scoreRaw = parseFloat(scoreRawStr);
         const scoreMin = parseFloat(this.getvalue('cmi.score.min'));
         const scoreMax = parseFloat(this.getvalue('cmi.score.max'));
 
-        if ((scoreMax - scoreMin) !== 0) {
+        // No raw score = nothing to grade: send no scaled score and invent no success_status.
+        const hasRaw = !this.isBadValue(scoreRawStr) && String(scoreRawStr).trim() !== '' && Number.isFinite(scoreRaw);
+
+        // Decision table: a raw score is required in every row. Zero-width range + raw = scaled 1 (1.0.4 rule);
+        // max > min + raw = graded; blank/non-finite/inverted bounds or no raw = nothing to grade.
+        const width = scoreMax - scoreMin;
+        const gradable = Number.isFinite(width) && hasRaw && (width === 0 || width > 0);
+
+        if (!gradable) {
+            // nothing to grade: no scaled score, no NaN
+        } else if (width !== 0) {
             scoreScaled = ((scoreRaw - scoreMin) / (scoreMax - scoreMin));
-            this.setvalue('cmi.score.scaled', scoreScaled.toFixed(7));
+            if (hold) {
+                if (Number.isFinite(scoreScaled)) {
+                    this.buffer.score.scaled = scoreScaled.toFixed(7);
+                    this._hold('score.scaled');
+                }
+            } else {
+                this.setvalue('cmi.score.scaled', scoreScaled.toFixed(7));
+            }
+        } else if (hold) {
+            this.buffer.score.scaled = '1';
+            this._hold('score.scaled');
         } else {
             this.setvalue('cmi.score.scaled', 1);
+        }
+        if (hold && hasRaw) {
+            this.buffer.score.raw = scoreRawStr;
+            this._hold('score.raw');
         }
 
         // Completion (restored 4.x gate): progress_measure vs completion_threshold.
@@ -542,19 +682,27 @@ export default class SCOBot extends SCOBotBase {
         // persisted progress. Read CMI first and fall back to the buffer only for
         // pre-commit states where CMI hasn't been written yet.
         if (this.buffer.completion_status !== "completed") {
+            // With doNotStatusUntilFinish the buffer holds this session's progress (newer than CMI's).
             const cmiProgress = this.getvalue('cmi.progress_measure');
-            const progress = (cmiProgress && cmiProgress !== 'false') ? cmiProgress : this.buffer.progress_measure;
+            const cmiOk = cmiProgress && cmiProgress !== 'false';
+            const progress = (hold && this.buffer.progress_measure !== '')
+                ? this.buffer.progress_measure
+                : (cmiOk ? cmiProgress : (this.buffer.progress_measure || '0')); // '' seed reads as 0, as before
             this.buffer.completion_status =
                 (parseFloat(progress) >= parseFloat(this.buffer.completion_threshold))
                     ? 'completed' : 'incomplete';
-            this.setvalue('cmi.completion_status', this.buffer.completion_status);
+            if (hold) this._hold('completion_status');
+            else this.setvalue('cmi.completion_status', this.buffer.completion_status);
         }
 
-        // Success
-        if (this.buffer.success_status !== "passed") {
-            this.buffer.success_status = (scoreScaled >= parseFloat(this.buffer.scaled_passing_score)) ? 'passed' : 'failed';
+        // Success (only when there is a raw score to grade)
+        if (gradable) {
+            if (this.buffer.success_status !== "passed") {
+                this.buffer.success_status = (scoreScaled >= parseFloat(this.buffer.scaled_passing_score)) ? 'passed' : 'failed';
+            }
+            if (hold) this._hold('success_status'); // the option-off path always writes success here
+            else this.setvalue('cmi.success_status', this.buffer.success_status);
         }
-        this.setvalue('cmi.success_status', this.buffer.success_status);
 
         return 'true';
     }
@@ -1026,7 +1174,11 @@ export default class SCOBot extends SCOBotBase {
                     }
                 }
                 this.buffer.progress_measure = '' + this.trueRound(completedCount / this.settings.totalObjectives, 7);
-                this.setvalue('cmi.progress_measure', this.buffer.progress_measure);
+                if (this.settings.doNotStatusUntilFinish) {
+                    this._hold('progress_measure'); // sent at session end
+                } else {
+                    this.setvalue('cmi.progress_measure', this.buffer.progress_measure);
+                }
             }
 
             return 'true';
@@ -1061,6 +1213,19 @@ export default class SCOBot extends SCOBotBase {
 
     // For now, I'll ensure we expose the "happyEnding" which is popular
     happyEnding() {
+        if (this.isConnectionActive() && this.settings.happyEnding && this.settings.doNotStatusUntilFinish) {
+            // 1.0.4 behaviour: hold the result in the buffer, send only the score bounds now.
+            this.happyEndingRequest = true;
+            this.buffer.score.scaled = '1';
+            this.buffer.score.raw = '100';
+            this.buffer.success_status = 'passed';
+            this.buffer.completion_status = 'completed';
+            this.buffer.progress_measure = '1';
+            // Same order as the option-off branch writes them, so 1.2's lesson_status ends the same.
+            ['score.scaled', 'score.raw', 'success_status', 'progress_measure', 'completion_status'].forEach((f) => this._hold(f));
+            this.setvalue('cmi.score.min', '0');
+            return this.setvalue('cmi.score.max', '100');
+        }
         if (this.isConnectionActive() && this.settings.happyEnding) {
             this.happyEndingRequest = true;
             this.setvalue('cmi.score.scaled', '1');

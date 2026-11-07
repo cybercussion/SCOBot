@@ -100,7 +100,10 @@ except via `setvalue`/`getvalue` for fields the Content API doesn't wrap.
 
 7. **Grade at completion.** `gradeIt()` reads `cmi.score.raw`/`min`/`max`
    (from step 4 + this write) and derives `cmi.score.scaled` +
-   `success_status`, gating completion on `completion_threshold`.
+   `success_status`, gating completion on `completion_threshold`. It grades only with a raw score AND a usable range (max > min), or a zero-width
+   range (min == max, full credit: scaled 1, passed); otherwise there is nothing
+   to grade: no scaled score and no pass/fail (completion still follows progress).
+   A raw of `0` is a real score.
 
    ```js
    scobot.setvalue('cmi.score.raw', '90');
@@ -118,6 +121,46 @@ except via `setvalue`/`getvalue` for fields the Content API doesn't wrap.
    // — or —
    scobot.suspend();  // save progress, resume next launch
    ```
+
+## Holding status until the end: `doNotStatusUntilFinish`
+
+`new SCOBot({ doNotStatusUntilFinish: true })` (default `false`) keeps the
+status SCOBot computes away from the LMS until the session ends. It exists
+for content (e.g. Adobe Captivate) where a mid-session status write
+causes trouble on some LMSs.
+
+- **What it holds back:** the writes SCOBot itself makes to
+  `cmi.score.raw`, `cmi.score.scaled`, `cmi.progress_measure`,
+  `cmi.completion_status` and `cmi.success_status` — from `gradeIt()`, the
+  `setObjective()` progress rollup, and `happyEnding()` (which still sends
+  `cmi.score.min`/`max` at once). Default statuses (`success_status` /
+  `completion_status` options) are not written mid-session either, even by
+  `updateStatus(false)`. SCOBot keeps all of this in memory instead.
+- **What sends them:** any session end — `finish()`, `timeout()` and
+  `suspend()` (so also the page-unload exit, whatever `exit_type` is).
+  `finish()`/`timeout()` then apply default statuses exactly as they do
+  with the option off.
+- **Only fields set this session are sent.** A field SCOBot only read when
+  the session started is never written back, so status your content wrote
+  some other way (e.g. straight to the LMS API) is not overwritten. A course
+  that never grades gets no score or progress written — no zeros.
+- **Initialize still normalises.** `initialize()` itself still turns a
+  `completion_status` of `unknown` / `not attempted` into `incomplete` at
+  session start, even with the option on (1.0.4 parity); that write is not
+  held and not re-sent.
+- **Your own writes still go straight through.** A `setvalue` of any of
+  those five keys reaches the LMS at once and also replaces the held value,
+  so the session end sends your latest value. A value the LMS rejects is
+  not held.
+- **SCORM 1.2:** completion and success share `cmi.core.lesson_status`.
+  Held values are sent in the order they were last set, so `lesson_status`
+  ends on the same value it would have with the option off (`passed`/`failed`
+  after `gradeIt()`, `completed` after `happyEnding()`). On 1.2 a real
+  `passed`/`failed`/`completed` is never overwritten by a `success_status` or
+  `completion_status` default; `incomplete`/`not attempted` still take one.
+- **Do not use it on 5.2.5 or earlier 5.x.** Those versions held nothing
+  back, and `finish()` then wrote the session's starting status and zero
+  scores over the learner's result. Fixed on the 5.2.6 line.
 
 ## Tripwires
 

@@ -1,6 +1,6 @@
 # SCOBot - Modern SCORM Library for Content Creation
 [![CI](https://github.com/cybercussion/SCOBot/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/cybercussion/SCOBot/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-5.2.5-blue)]()
+[![Version](https://img.shields.io/badge/version-5.2.6-blue)]()
 [![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-orange)]()
 
 ![logo](https://content.cybercussion.com/css/img/cybercussion_logo_black_sm.png)
@@ -53,6 +53,7 @@ const scobot = new SCOBot({
 
 // 2. Connect — initSCO() = initialize() + start():
 //    learner info, entry/mode, and suspend-data restore in one call.
+//    SCOBot also connects itself on DOMContentLoaded; calling initSCO() first is fine and connects once.
 if (scobot.initSCO() === 'true') {
     console.log(`Connected. Mode: ${scobot.getMode()}, Entry: ${scobot.getEntry() || 'ab-initio'}`);
 }
