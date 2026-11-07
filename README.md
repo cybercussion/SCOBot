@@ -53,6 +53,7 @@ const scobot = new SCOBot({
 
 // 2. Connect — initSCO() = initialize() + start():
 //    learner info, entry/mode, and suspend-data restore in one call.
+//    SCOBot also connects itself on DOMContentLoaded; calling initSCO() first is fine and connects once.
 if (scobot.initSCO() === 'true') {
     console.log(`Connected. Mode: ${scobot.getMode()}, Entry: ${scobot.getEntry() || 'ab-initio'}`);
 }
