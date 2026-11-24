@@ -129,3 +129,17 @@ describe('SCORM 1.2: cmi.student_data.mastery_score (0..100) grades the learner'
     });
   }
 });
+
+describe('standalone (local mock): the configured mark stands', () => {
+  // The mock seeds cmi.scaled_passing_score "0.7"; it is not an LMS, so it must not override the author.
+  for (const [mark, want] of [[0.5, 'passed'], [0.7, 'failed']]) {
+    it(`scaled_passing_score ${mark}, raw 60/100 -> ${want}`, () => {
+      window.API = undefined; window.API_1484_11 = undefined; localStorage.clear();
+      const s = new SCOBot({ use_standalone: true, scaled_passing_score: mark });
+      s.initSCO();
+      expect(s.buffer.scaled_passing_score).toBe(mark);
+      grade(s, '60');
+      expect(s.getvalue('cmi.success_status')).toBe(want);
+    });
+  }
+});

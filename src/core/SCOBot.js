@@ -188,7 +188,9 @@ export default class SCOBot extends SCOBotBase {
 
         // The LMS pass mark wins over the configured default, and gradeIt() reads the BUFFER, so write both
         // (5.2.6 and earlier wrote a 2004 value to settings only, and every 2004 course graded against 0.7).
-        const lmsPassingScore = this.readLMSPassingScore(this.getvalue('cmi.scaled_passing_score'));
+        // Standalone: the local mock is not an LMS and its seeded "0.7" is no course's pass mark, so the configured value stands.
+        const lmsPassingScore = this.settings.standalone ? null
+            : this.readLMSPassingScore(this.getvalue('cmi.scaled_passing_score'));
         if (lmsPassingScore !== null) {
             this.buffer.scaled_passing_score = this.settings.scaled_passing_score = lmsPassingScore;
         }
