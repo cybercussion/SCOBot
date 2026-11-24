@@ -21,7 +21,7 @@ except via `setvalue`/`getvalue` for fields the Content API doesn't wrap.
        use_standalone: true,         // localStorage mock when no LMS API is found
        compression: true,            // lz-string on suspend_data
        exit_type: 'suspend',         // 'finish' | 'suspend' | 'timeout'
-       scaled_passing_score: 0.7,    // default 0.7
+       scaled_passing_score: 0.7,    // default 0.7; LMS-declared value wins if set (2004 -1..1, 1.2 mastery_score 0..100)
        completion_threshold: 0       // default 0; LMS-declared value wins if set
    });
    ```

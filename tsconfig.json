@@ -6,9 +6,10 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "outDir": "./dist/types",
+    "rootDir": "./src",
     "strict": false,
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "bundler"
   },
   "include": [
     "src"
