@@ -18,7 +18,7 @@ export default class SCOBot extends SCOBotBase {
 
         // SCOBot specifics
         const scoBotDefaults = {
-            version: "5.2.6",
+            version: "5.2.7",
             launch_data: {},
             interaction_mode: "state", // or journaled
             launch_data_type: "querystring", // or json
@@ -186,14 +186,13 @@ export default class SCOBot extends SCOBotBase {
             this.buffer.completion_threshold = tmpCompletionThreshold;
         }
 
-        const tmpScaledPassingScore = this.getvalue('cmi.scaled_passing_score');
-        if (tmpScaledPassingScore && tmpScaledPassingScore !== 'false' && tmpScaledPassingScore !== "-1") {
-            // Sanity check for 1.2 legacy issues where it might be > 1
-            if (parseFloat(tmpScaledPassingScore) > 1) {
-                this.buffer.scaled_passing_score = '' + ((parseFloat(tmpScaledPassingScore) * 10) / 1000);
-            } else {
-                this.settings.scaled_passing_score = tmpScaledPassingScore;
-            }
+        // The LMS pass mark wins over the configured default, and gradeIt() reads the BUFFER, so write both
+        // (5.2.6 and earlier wrote a 2004 value to settings only, and every 2004 course graded against 0.7).
+        // Standalone: the local mock is not an LMS and its seeded "0.7" is no course's pass mark, so the configured value stands.
+        const lmsPassingScore = this.settings.standalone ? null
+            : this.readLMSPassingScore(this.getvalue('cmi.scaled_passing_score'));
+        if (lmsPassingScore !== null) {
+            this.buffer.scaled_passing_score = this.settings.scaled_passing_score = lmsPassingScore;
         }
 
         // 4. Initial Status Sync
@@ -628,6 +627,28 @@ export default class SCOBot extends SCOBotBase {
             return 'true';
         }
         return 'false';
+    }
+
+    /**
+     * Read the LMS pass mark as a scaled score string, or null when there is none to use
+     * (unset, '' [2004 403], 'false', non-numeric or out of range): the configured default stands.
+     * SCORM 2004 cmi.scaled_passing_score is a real in [-1, 1] (RTE 4.2.19); a value in (1, 100] is
+     * read as a percentage, the legacy tolerance for an LMS that sends a 1.2-style mark.
+     * SCORM 1.2 cmi.student_data.mastery_score is a CMIDecimal in [0, 100], always a percentage.
+     * @param {String} v
+     * @returns {String|null}
+     */
+    readLMSPassingScore(v) {
+        const t = String(v ?? '').trim();
+        if (t === '' || t === 'false' || !/^[+-]?(\d+\.?\d*|\.\d+)$/.test(t)) return null;
+        const n = Number(t);
+        const percent = () => '' + ((n * 10) / 1000);
+        if (this.API.version === '1.2') {
+            return (n >= 0 && n <= 100) ? percent() : null;
+        }
+        if (n >= -1 && n <= 1) return t;
+        if (n > 1 && n <= 100) return percent();
+        return null;
     }
 
     gradeIt() {
